@@ -3,7 +3,7 @@ on: [push]
 jobs:
 
   build:
-    name: Build
+    name: Notify-TG
     runs-on: self-hosted
     steps:
       - name: send telegram message on push
