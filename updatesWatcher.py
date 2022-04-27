@@ -46,6 +46,7 @@ def savePage(response, pagefilename='page'):
 
 while True:
     try:
+        os.system("git pull")
         session = requests.Session()
         response = session.get('https://sunflower-land.com/play/')
         urls = re.findall("(https?://[^ \"]*)", response.text)
