@@ -4,20 +4,20 @@ var X = Object.getOwnPropertyDescriptors;
 var W = Object.getOwnPropertySymbols;
 var q = Object.prototype.hasOwnProperty,
     z = Object.prototype.propertyIsEnumerable;
-var V = (e, A, t) => A in e ? Z(e, A, {
+var H = (e, A, t) => A in e ? Z(e, A, {
         enumerable: !0,
         configurable: !0,
         writable: !0,
         value: t
     }) : e[A] = t,
     c = (e, A) => {
-        for (var t in A || (A = {})) q.call(A, t) && V(e, t, A[t]);
+        for (var t in A || (A = {})) q.call(A, t) && H(e, t, A[t]);
         if (W)
-            for (var t of W(A)) z.call(A, t) && V(e, t, A[t]);
+            for (var t of W(A)) z.call(A, t) && H(e, t, A[t]);
         return e
     },
     l = (e, A) => j(e, X(A));
-var x = (e, A, t) => (V(e, typeof A != "symbol" ? A + "" : A, t), t);
+var x = (e, A, t) => (H(e, typeof A != "symbol" ? A + "" : A, t), t);
 import {
     b as buffer,
     p as process,
@@ -90,7 +90,8 @@ const NETWORK = "mainnet",
     SESSION_CONTRACT = "0x070717e1Bc4c6e46C22B0e0B8821e0aC1D4689c3",
     TOKEN_CONTRACT = "0xD1f9c58e33933a993A3891F8acFe05a68E1afC05",
     DISCORD_REDIRECT = "https://sunflower-land.com/play/",
-    CLIENT_VERSION = "2022-04-26T23:11",
+    CLIENT_VERSION = "2022-04-28T01:57",
+    RELEASE_VERSION = "v0.2.21-remove-easter-hunt",
     CONFIG = {
         NETWORK,
         POLYGON_CHAIN_ID,
@@ -104,7 +105,8 @@ const NETWORK = "mainnet",
         PAIR_CONTRACT,
         SESSION_CONTRACT,
         TOKEN_CONTRACT,
-        CLIENT_VERSION
+        CLIENT_VERSION,
+        RELEASE_VERSION
     },
     ERRORS = {
         NO_WEB3: "NO_WEB3",
@@ -5776,38 +5778,6 @@ function openReward({
         inventory: r
     })
 }
-const eggs = {
-        0: "Blue Egg",
-        1: "Red Egg",
-        2: "Orange Egg",
-        3: "Green Egg",
-        4: "Yellow Egg",
-        5: "Pink Egg",
-        6: "Purple Egg"
-    },
-    HUNT_START_AT_MS = Date.UTC(2022, 3, 16, 12);
-
-function availableEgg(e = Date.now()) {
-    const A = e - HUNT_START_AT_MS,
-        a = Math.floor(A / 1e3 / 60 / 60 / 4) % 7;
-    return eggs[a]
-}
-
-function collectEgg({
-    state: e,
-    action: A,
-    createdAt: t = Date.now()
-}) {
-    var n;
-    const a = availableEgg(t);
-    if (!((n = e.inventory["Egg Basket"]) == null ? void 0 : n.gte(1))) throw new Error("Missing an egg basket");
-    if (e.inventory[a]) throw new Error("Egg already collected");
-    return l(c({}, e), {
-        inventory: l(c({}, e.inventory), {
-            [a]: new Decimal(1)
-        })
-    })
-}
 const EVENTS = {
     "item.planted": plant$1,
     "item.harvested": harvest,
@@ -5817,8 +5787,7 @@ const EVENTS = {
     "iron.mined": mineIron,
     "gold.mined": mineGold,
     "tree.chopped": chop,
-    "reward.opened": openReward,
-    "easterEgg.collected": collectEgg
+    "reward.opened": openReward
 };
 
 function processEvent(e, A) {
@@ -9813,10 +9782,11 @@ const CHARITIES = lodash_shuffle([{
 var logo = "data:image/png;base64,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",
     clouds = "./assets/clouds.684ed59f.png",
     sunflowers = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAdoAAACQBAMAAABdfrciAAAABGdBTUEAALGPC/xhBQAAACFQTFRFAAAAY8dN/+s2JlxCPolI93Yi+6og/94fcz45//lOvkovWiADuAAAAAF0Uk5TAEDm2GYAAAOaSURBVHja7Zi/b9NAFMcjlSlbJKaMHlDZQI4YmEC5KSuKEBlBckvXCiJlpAhVGUEgNVOHIIT/St7ZTu7e3Tvb9d0QpO9niNqL38v7vNwPO6MRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwEkyLon7JKl0phK2/7mtHHTqtlT13ztiJwqHqxdsaUBnujthYdh22spBp29b/lkv3+kSfy7Xm3LU87uSbMfl+tOyun75dm2G061keTY9KDlsO23FoJS2YlC0LVVIfC6yrLjQf9nJAtWHbGmMKN5nTwr9Rz3cupJbDj7fQphND04O205bOSidrRiUxpZMistb4ltBctX7dWPF6ttsfy9pTGe6peHlqmydHW0Hn2Thz6YByWHbw1YISmYrByWxpbFfdYW6yI/V+4fG+tW32I51VD1WDVcZgv1qO/gkC2E2DUkO2y7bUghKZysGpbP9nh0Kz55S3U1jd0L192HbukfZeTP4JQv1qz4YWg6+gK03m4Ykh20fWxaU1lZaQOls7a/JNPZKqD5kq1u0ErojrOTjwSCdYUFbaTYNSQ7bPrbssxPajsUFlMrWWRCmsdv+u1TTIu9LGbv9Oh4M4hkWtK013J1iQHLYhmzNI6cblNrW3doT2lq79YYZetUHbesLvYNyzPu1Mx8lVR+y1Rbd67ZXctiKtuyR0zm+k9vyBZTQ9vXEuoPesMay6sO2TYu+qsnUfXjhs2NlZkT/XaqxuOq6l+qVHLaC7YZ5KD8o1nZnfjJzg+JtTfKZUgtzD2I1llW/6rLNzm9ypZQ1A+g//jjDiti61Ydtqwu3Hc+3PZPD1rN1dtvcD4qy3bCfzPiHbWJtWXIqXKn8pbbfq8nENNauvtu2uKyuV/O8aiR9+wRfyexg2PJ9LmjbWPDZVD3hPxqSHLa+Lb+rylnQNNaWeez9oChbFjY6ywl6peqfTyaPTWM/2NW32R5bpDO9uKA357lWpSv4SraWFqu+y5YsnNm0V+rV2YDksPVt3VvXH05QjO2O77bXflCErZO8uaOqCs/pxW6srv7ZKJ8tOm3tfaWybb59vpKn5mCwqu+2JQt3NtGHzgckh61oK/wedwyKtGU3Pm94ULQtS27bkplwP9TDlu0rlW2zHRz6Va/khWm0XX2r7cHiRqcqrg+zSV8xIDlsRVvh18cmaBZn6z2MukExtk7yf4awnWALcUa7AAAAAElFTkSuQmCC";
-const Splash = () => React.createElement("div", {
-    className: "bg-blue-600 w-full h-full flex relative items-center justify-center"
-}, React.createElement("div", {
-    className: `absolute 
+const releaseVersion = CONFIG.RELEASE_VERSION,
+    Splash = () => React.createElement("div", {
+        className: "bg-blue-600 w-full h-full flex relative items-center justify-center"
+    }, React.createElement("div", {
+        className: `absolute 
       z-50 
       top-0 
       left-0
@@ -9831,22 +9801,34 @@ const Splash = () => React.createElement("div", {
       sm:text-sm 
       h-8
       text-white`
-}, "SFL is not tradable until May 9th. Beware of scams"), React.createElement("div", {
-    className: "relative mb-96 animate-float z-10"
-}, React.createElement("img", {
-    src: pumpkin,
-    className: "absolute w-8 -rotate-[20deg] z-10 -top-5 sm:-left-3 sm:-rotate-[30deg] sm:w-12 sm:-top-7"
-}), React.createElement("img", {
-    src: logo
-})), React.createElement("div", {
-    className: "bg-repeat w-full h-full absolute inset-0",
-    style: {
-        backgroundImage: `url(${clouds})`
-    }
-}), React.createElement("img", {
-    src: sunflowers,
-    className: "absolute w-full bottom-0"
-}));
+    }, "SFL is not tradable until May 9th. Beware of scams"), React.createElement("div", {
+        className: "relative mb-96 animate-float z-10"
+    }, React.createElement("img", {
+        src: pumpkin,
+        className: "absolute w-8 -rotate-[20deg] z-10 -top-5 sm:-left-3 sm:-rotate-[30deg] sm:w-12 sm:-top-7"
+    }), React.createElement("img", {
+        src: logo
+    })), React.createElement("div", {
+        className: "bg-repeat w-full h-full absolute inset-0",
+        style: {
+            backgroundImage: `url(${clouds})`
+        }
+    }), React.createElement("img", {
+        src: sunflowers,
+        className: "absolute w-full bottom-0"
+    }), React.createElement("div", {
+        className: "absolute bottom-0 right-0 m-1 pointer-events-auto",
+        style: {
+            zIndex: 1100
+        }
+    }, React.createElement(InnerPanel, null, React.createElement("p", {
+        className: "text-xs sm:text-sm text-shadow text-white p-1"
+    }, "Version:", React.createElement("a", {
+        className: "underline",
+        href: "https://github.com/sunflower-land/sunflower-land/releases",
+        target: "_blank",
+        rel: "noopener noreferrer"
+    }, releaseVersion)))));
 var minting = "./assets/minting.8df1c1f8.gif",
     richBegger = "./assets/rich_begger.5ae0fd9b.gif",
     syncingAnimation = "./assets/syncing.2364d1a3.gif";
@@ -9895,7 +9877,7 @@ const StartFarm = () => {
         }, "Farm ID: ", r), React.createElement(Button, {
             onClick: n,
             className: "overflow-hidden mb-2"
-        }, "Lets farm!"), React.createElement(Button, {
+        }, "Let's farm!"), React.createElement(Button, {
             onClick: s,
             className: "overflow-hidden"
         }, "Explore a friend's farm")) : React.createElement(Loading, null))
@@ -11170,7 +11152,7 @@ const TimeLeftPanel = ({
                 return
             }
             if (!(n.context.state.inventory["Iron Pickaxe"] || new Decimal(0)).lessThanOrEqualTo(0))
-                if (t == f && !C) miningAudio.play(), (K = y.current) == null || K.goToAndPlay(0), h(H => H + 1), u > 0 && u === HITS$3 - 1 && (P(), miningFallAudio.play(), h(0));
+                if (t == f && !C) miningAudio.play(), (K = y.current) == null || K.goToAndPlay(0), h(V => V + 1), u > 0 && u === HITS$3 - 1 && (P(), miningFallAudio.play(), h(0));
                 else return
         }, P = async () => {
             var C;
@@ -11318,7 +11300,7 @@ const POPOVER_TIME_MS$2 = 1e3,
                 return
             }
             if (!(n.context.state.inventory.Pickaxe || new Decimal(0)).lessThanOrEqualTo(0))
-                if (t == f && !C) miningAudio.play(), (K = y.current) == null || K.goToAndPlay(0), h(H => H + 1), u > 0 && u === HITS$2 - 1 && (P(), miningFallAudio.play(), h(0));
+                if (t == f && !C) miningAudio.play(), (K = y.current) == null || K.goToAndPlay(0), h(V => V + 1), u > 0 && u === HITS$2 - 1 && (P(), miningFallAudio.play(), h(0));
                 else return
         }, P = async () => {
             var C;
@@ -11467,7 +11449,7 @@ const POPOVER_TIME_MS$1 = 1e3,
                 return
             }
             if (!(n.context.state.inventory["Stone Pickaxe"] || new Decimal(0)).lessThanOrEqualTo(0))
-                if (t === f && !C) miningAudio.play(), (K = y.current) == null || K.goToAndPlay(0), h(H => H + 1), u > 0 && u === HITS$1 - 1 && (P(), miningFallAudio.play(), h(0));
+                if (t === f && !C) miningAudio.play(), (K = y.current) == null || K.goToAndPlay(0), h(V => V + 1), u > 0 && u === HITS$1 - 1 && (P(), miningFallAudio.play(), h(0));
                 else return
         }, P = async () => {
             var C;
@@ -14204,130 +14186,6 @@ const Lore = () => {
             onClick: () => e.send("REFRESH")
         }, "Continue"))
     },
-    positions = [{
-        top: 6.5,
-        left: 9
-    }, {
-        top: 16.5,
-        left: 20
-    }, {
-        top: 25,
-        left: 18.5
-    }, {
-        top: 38.5,
-        left: 3.6
-    }, {
-        top: 37,
-        left: 30.3
-    }, {
-        top: 45,
-        left: 33
-    }, {
-        top: 48,
-        left: 96.8
-    }, {
-        top: 29,
-        left: 97
-    }, {
-        top: 33,
-        left: 61.5
-    }, {
-        top: 13,
-        left: 94
-    }, {
-        top: 2,
-        left: 88
-    }, {
-        top: 3,
-        left: 62
-    }, {
-        top: 5,
-        left: 44
-    }, {
-        top: 15,
-        left: 39
-    }, {
-        top: 20,
-        left: 37.7
-    }, {
-        top: 54,
-        left: 17
-    }, {
-        top: 44,
-        left: 19
-    }, {
-        top: 53,
-        left: 65.5
-    }, {
-        top: 45.3,
-        left: 81.75
-    }, {
-        top: 35,
-        left: 84.3
-    }, {
-        top: 42.3,
-        left: 42
-    }, {
-        top: 34,
-        left: 68
-    }, {
-        top: 3,
-        left: 51
-    }, {
-        top: 2,
-        left: 73
-    }, {
-        top: 11,
-        left: 34
-    }, {
-        top: 33,
-        left: 14
-    }, {
-        top: 49,
-        left: 9
-    }, {
-        top: 57,
-        left: 36
-    }, {
-        top: 12,
-        left: 89
-    }, {
-        top: 15,
-        left: 60
-    }],
-    EasterEggHunt = () => {
-        const {
-            gameService: e
-        } = react.exports.useContext(Context), [{
-            context: {
-                state: A
-            }
-        }] = useActor(e), [t, a] = react.exports.useState(null), [n, s] = react.exports.useState(null), r = () => {
-            e.send("easterEgg.collected"), a(null)
-        };
-        return react.exports.useEffect(() => {
-            const i = availableEgg();
-            if (!A.inventory[i] && A.inventory["Egg Basket"]) {
-                a(i);
-                const m = Math.floor(Math.random() * 29);
-                s(positions[m])
-            }
-        }, [A.inventory]), t ? react.exports.createElement("div", {
-            className: "w-full h-full absolute top-0 left-0"
-        }, react.exports.createElement("img", {
-            src: ITEM_DETAILS[t].image,
-            alt: "",
-            onClick: r,
-            className: "hover:img-highlight cursor-pointer",
-            style: {
-                position: "absolute",
-                top: `${n==null?void 0:n.top}%`,
-                left: `${n==null?void 0:n.left}%`,
-                width: "20px",
-                zIndex: 100
-            }
-        })) : null
-    },
     Resetting = () => React.createElement("span", {
         className: "text-shadow loading"
     }, "Resetting"),
@@ -14374,7 +14232,7 @@ const Lore = () => {
             errorCode: A.context.errorCode
         }), A.matches("blacklisted") && React.createElement(Blacklisted, null), A.matches("minting") && React.createElement(Minting, null), A.matches("synced") && React.createElement(Success, null), A.matches("syncing") && React.createElement(Syncing, null), A.matches("withdrawing") && React.createElement(Withdrawing, null), A.matches("withdrawn") && React.createElement(Withdrawn, null))), React.createElement(ClockIssue, {
             show: A.context.offset > 0
-        }), React.createElement(EasterEggHunt, null), React.createElement(Hud, null), React.createElement(TeamDonation, null), React.createElement(Crops, null), React.createElement(Water, null), React.createElement(Animals, null), React.createElement(Decorations, null), React.createElement(Forest, null), React.createElement(Quarry, null), React.createElement(Town, null), React.createElement(House, null), React.createElement(Tailor, null), React.createElement(Lore, null))
+        }), React.createElement(Hud, null), React.createElement(TeamDonation, null), React.createElement(Crops, null), React.createElement(Water, null), React.createElement(Animals, null), React.createElement(Decorations, null), React.createElement(Forest, null), React.createElement(Quarry, null), React.createElement(Town, null), React.createElement(House, null), React.createElement(Tailor, null), React.createElement(Lore, null))
     };
 let container;
 const sensitivity = 3,
