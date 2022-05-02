@@ -90,8 +90,8 @@ const NETWORK = "mainnet",
     SESSION_CONTRACT = "0x070717e1Bc4c6e46C22B0e0B8821e0aC1D4689c3",
     TOKEN_CONTRACT = "0xD1f9c58e33933a993A3891F8acFe05a68E1afC05",
     DISCORD_REDIRECT = "https://sunflower-land.com/play/",
-    CLIENT_VERSION = "2022-04-29T04:20",
-    RELEASE_VERSION = "v0.2.22-UI-improvements",
+    CLIENT_VERSION = "2022-05-02T22:39",
+    RELEASE_VERSION = "v0.2.23-beta-improvements",
     CONFIG = {
         NETWORK,
         POLYGON_CHAIN_ID,
@@ -3949,13 +3949,10 @@ const INITIAL_SESSION = "0x00000000000000000000000000000000000000000000000000000
                     checking: {
                         id: "checking",
                         invoke: {
-                            src: async () => {
-                                const A = await metamask.getAccount();
-                                return A === metamask.myAccount ? {
-                                    isSameAccount: !0
-                                } : {
-                                    hasV1Data: await metamask.getSunflowerFarmers().hasV1Data(A)
-                                }
+                            src: async () => await metamask.getAccount() === metamask.myAccount ? {
+                                isSameAccount: !0
+                            } : {
+                                hasV1Data: !0
                             },
                             onDone: [{
                                 target: "idle",
@@ -6753,7 +6750,7 @@ const Label = ({
     children: A,
     className: e
 }) => React.createElement("div", {
-    className: classNames("bg-silver-300 ", e),
+    className: classNames("bg-silver-300 text-white text-shadow text-xs object-contain justify-center items-center flex", e),
     style: {
         borderStyle: "solid",
         borderWidth: "5px",
@@ -6763,9 +6760,7 @@ const Label = ({
         borderImageRepeat: "repeat",
         borderRadius: "15px"
     }
-}, React.createElement("div", {
-    className: "flex flex-col text-white text-shadow text-xs object-contain justify-center items-center text-center p-1"
-}, A));
+}, A);
 var selectBox = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeAgMAAABGXkYxAAAABGdBTUEAALGPC/xhBQAAAAxQTFRFAAAAuG9Q6tSqJitEPjZUHQAAAAF0Uk5TAEDm2GYAAABhSURBVBjTY+D/z8DAACKsVgMZfKsOMLyCMDYwvAoHMnijkBl/gAzmXxsYrh4AMhhMCxAMexDNwA/m0g3ALX0FttdqAxID7C+gU+HeuQVhAN0M9k5oAYMphHGAgR/sr/8MAKPEKneqHAQSAAAAAElFTkSuQmCC",
     cancel = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAALBAMAAABbgmoVAAAABGdBTUEAALGPC/xhBQAAABJQTFRFAAAA/5mc////5DtEJitE9nV62ycwCgAAAAF0Uk5TAEDm2GYAAABBSURBVAjXHYzBCcBACAT3YQupRP3LmVSg238r0YOBZWBYyIsB54kByWbNOKkBMbYB+MgAhMVeUR/NMt1SI7e8Lz8UXQ3kGudprwAAAABJRU5ErkJggg==";
 const shortenCount = A => {
@@ -6859,7 +6854,7 @@ const Tab = ({
     onClick: a
 }, A);
 var seed$1 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAQklEQVQImWP8//8/w35vg/8MCMDIVGJvBRZQi3EGYwYGhv9MIFJSR4Th1pK9cLVgQXQJFpAZc058g5rJxeDN840RAGMLE5KOSgWkAAAAAElFTkSuQmCC",
-    tool = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANBAMAAACAxflPAAAABGdBTUEAALGPC/xhBQAAABVQTFRFAAAAwMvcvkovi5u0WmmIcz45GBQlmbZdhwAAAAF0Uk5TAEDm2GYAAABDSURBVAjXY2BgYEhgAAM2MTYwK8UwKQzMdxYD00ABsDibi7MYiE4KSTEGCrCphrG5gbihCQwQLlgxiAsCqWFQUyFcADzlCyeFMcRDAAAAAElFTkSuQmCC",
+    tool$1 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANBAMAAACAxflPAAAABGdBTUEAALGPC/xhBQAAABVQTFRFAAAAwMvcvkovi5u0WmmIcz45GBQlmbZdhwAAAAF0Uk5TAEDm2GYAAABDSURBVAjXY2BgYEhgAAM2MTYwK8UwKQzMdxYD00ABsDibi7MYiE4KSTEGCrCphrG5gbihCQwQLlgxiAsCqWFQUyFcADzlCyeFMcRDAAAAAElFTkSuQmCC",
     gnome$1 = "data:image/gif;base64,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",
     food = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAADwBAMAAADMe/ShAAAABGdBTUEAALGPC/xhBQAAAB5QTFRFAAAA/NCk87R3/8pw/7g//9/A6qBVwXs0/+bO+sOO8n6qWQAAAAF0Uk5TAEDm2GYAAAG7SURBVHja7dzRTcMwEADQrMAKrNAVWIEVWIEVWCHbohipVk/n1HaagtC7r1Ru7qU/J5/jellu4/M2lgMxlgoMBoNnUpXh9RrvW4Rbeh+mfK8kqPna94LBYPAD4OyWoViTAIPB4BPgbIb2sUV4jlBVy9XrFnWg3HZolgkGg8GDjWc115EID1j1sc4WDAaDp+GQYSiyiSIYDAY/CS5pXrb46oxSN6s+WzLBYDB47e5QM7iJXLbIBsBgMPhJcNahNuG322jC3b0qGAwGH4PrclkGX65RzPoxg8cKNhgMBh+D6/vM8ZI526uCwWDwSXAtlOGqA+7ZxgYGg8H9cNahHi6Z9erOjwWDweBpuG4G238rUPWON5tgMBh8Khy2j03CY6tsYDAY/Bx43yxbzyqc/WscDAaD/zb8ayUTDAb/ZzgcL7Hfq+6b2TwPDAaDT4Czktnbq4ZltbC2lp1ZAQaDwafC5dic8b96N0/b6S6ZYDAYfA/uOJGweZ5OQJqnGaYlEwwGg2fgZnOatZodSDNLHfjRwWAw+AFw1lE2D/wKz5HN+EKWuNQGBoPB03A22WvOAoeimWXpGAGDweB2+m+81FTsIhsf3QAAAABJRU5ErkJggg==",
     wood = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAALBAMAAABbgmoVAAAABGdBTUEAALGPC/xhBQAAABJQTFRFAAAA5KZycz456tSquG9QPicx+jG9ZgAAAAF0Uk5TAEDm2GYAAAA6SURBVAjXY2AIDWAAAlZjUxAVbGwYAKZcREGUiaMjkMuq5CIC4gapuEC4ji4BYK4IiGJVUgXpBJkDAGAnCPgUf+iAAAAAAElFTkSuQmCC",
@@ -7172,7 +7167,7 @@ const crops = CROPS(),
             image: ironPickaxe
         }),
         Hammer: l(c({}, TOOLS.Hammer), {
-            image: tool
+            image: tool$1
         }),
         Rod: l(c({}, TOOLS.Rod), {
             image: rod
@@ -7618,7 +7613,7 @@ const useShowScrollbar = A => {
             items: SEEDS()
         },
         Tools: {
-            img: tool,
+            img: tool$1,
             items: TOOLS
         },
         Resources: {
@@ -8188,7 +8183,7 @@ const Menu = () => {
         m(!0), s(!1)
     }, T = () => {
         E(!0), s(!1)
-    }, N = b => {
+    }, M = b => {
         var G;
         ((G = S == null ? void 0 : S.current) == null ? void 0 : G.contains(b.target)) || s(!1)
     }, U = async () => {
@@ -8204,8 +8199,8 @@ const Menu = () => {
     }, J = () => {
         A.send("EXPLORE")
     };
-    return react.exports.useEffect(() => (document.addEventListener("mousedown", N), document.addEventListener("touchstart", N), () => {
-        document.removeEventListener("mousedown", N), document.removeEventListener("touchstart", N)
+    return react.exports.useEffect(() => (document.addEventListener("mousedown", M), document.addEventListener("touchstart", M), () => {
+        document.removeEventListener("mousedown", M), document.removeEventListener("touchstart", M)
     }), []), react.exports.useEffect(() => {
         const b = t.context.farmId ? `${window.location.href.includes("?")?window.location.href.split("?")[0]:window.location.href}?farmId=${t.context.farmId.toString()}` : "https://sunflower-land.com/play/";
         Q(b)
@@ -8909,9 +8904,9 @@ const CropReward = ({
             if (g) {
                 const F = CROPS()[g.name],
                     T = Date.now(),
-                    N = isCropReady(T, g.plantedAt, F.harvestSeconds),
+                    M = isCropReady(T, g.plantedAt, F.harvestSeconds),
                     U = T - g.plantedAt < 1e3;
-                !N && !U && Q(!0)
+                !M && !U && Q(!0)
             }
         }, I = () => {
             Q(!1)
@@ -9835,7 +9830,7 @@ const releaseVersion = CONFIG.RELEASE_VERSION,
         href: "https://github.com/sunflower-land/sunflower-land/releases",
         target: "_blank",
         rel: "noopener noreferrer"
-    }, releaseVersion.split("-")[0])))));
+    }, releaseVersion == null ? void 0 : releaseVersion.split("-")[0])))));
 var minting = "./assets/minting.8df1c1f8.gif",
     richBegger = "./assets/rich_begger.5ae0fd9b.gif",
     syncingAnimation = "./assets/syncing.2364d1a3.gif";
@@ -10234,18 +10229,18 @@ const TAB_CONTENT_HEIGHT = 360,
             itemsMintedAt: m
         }), react.exports.useEffect(() => {
             (async () => {
-                const N = await metamask.getInventory().totalSupply();
-                h(N), E(!1)
+                const M = await metamask.getInventory().totalSupply();
+                h(M), E(!1)
             })()
         }, []);
         const C = i.inventory,
-            Q = (T = 1) => n.ingredients.some(N => N.amount.mul(T).greaterThan(C[N.item] || 0)),
+            Q = (T = 1) => n.ingredients.some(M => M.amount.mul(T).greaterThan(C[M.item] || 0)),
             w = (T = 1) => i.balance.lessThan(n.price.mul(T)),
             f = () => {
                 g(!0)
             },
             S = async T => {
-                await new Promise(N => setTimeout(N, 1e3)), r.send("MINT", {
+                await new Promise(M => setTimeout(M, 1e3)), r.send("MINT", {
                     item: n.name,
                     captcha: T
                 }), A()
@@ -10323,12 +10318,12 @@ const TAB_CONTENT_HEIGHT = 360,
             className: "text-shadow text-center mt-2 sm:text-sm"
         }, n.description), a && React.createElement("div", {
             className: "border-t border-white w-full mt-2 pt-1"
-        }, n.ingredients.map((T, N) => {
+        }, n.ingredients.map((T, M) => {
             const U = ITEM_DETAILS[T.item],
                 v = new Decimal(C[T.item] || 0).lessThan(T.amount);
             return React.createElement("div", {
                 className: "flex justify-center items-end",
-                key: N
+                key: M
             }, React.createElement("img", {
                 src: U.image,
                 className: "h-5 me-2"
@@ -11172,7 +11167,7 @@ const TimeLeftPanel = ({
         }, []);
         const T = async R => {
             E(R), r(!0), await new Promise(k => setTimeout(k, POPOVER_TIME_MS$3)), r(!1)
-        }, N = () => {
+        }, M = () => {
             F && S(!0)
         }, U = () => {
             S(!1)
@@ -11210,10 +11205,10 @@ const TimeLeftPanel = ({
         }, J = () => {
             var R, k;
             I || t === y && ((R = n.context.state.inventory[y]) == null ? void 0 : R.gte(1)) || ((k = C.current) == null || k.classList.remove("cursor-not-allowed"), m(!1))
-        }, b = GOLD_RECOVERY_TIME, G = getTimeLeft(D.minedAt, b), M = 100 - G / b * 100;
+        }, b = GOLD_RECOVERY_TIME, G = getTimeLeft(D.minedAt, b), N = 100 - G / b * 100;
         return React.createElement("div", {
             className: "relative z-10",
-            onMouseEnter: N,
+            onMouseEnter: M,
             onMouseLeave: U
         }, !F && React.createElement("div", {
             onMouseEnter: L,
@@ -11243,7 +11238,9 @@ const TimeLeftPanel = ({
             }
         }), React.createElement("div", {
             className: `absolute top-8 transition pointer-events-none w-28 z-20 ${i?"opacity-100":"opacity-0"}`
-        }, React.createElement(Label, null, "Equip ", y.toLowerCase()))), React.createElement(Spritesheet, {
+        }, React.createElement(Label, {
+            className: "p-2"
+        }, "Equip ", y.toLowerCase()))), React.createElement(Spritesheet, {
             style: {
                 width: `${GRID_WIDTH_PX*5}px`,
                 opacity: B ? 1 : 0,
@@ -11285,7 +11282,7 @@ const TimeLeftPanel = ({
                 left: "29px"
             }
         }, React.createElement(ProgressBar, {
-            percentage: M,
+            percentage: N,
             seconds: G
         }), React.createElement(TimeLeftPanel, {
             text: "Recovers in:",
@@ -11320,7 +11317,7 @@ const POPOVER_TIME_MS$2 = 1e3,
         }, []);
         const T = async R => {
             E(R), r(!0), await new Promise(k => setTimeout(k, POPOVER_TIME_MS$2)), r(!1)
-        }, N = () => {
+        }, M = () => {
             F && S(!0)
         }, U = () => {
             S(!1)
@@ -11359,10 +11356,10 @@ const POPOVER_TIME_MS$2 = 1e3,
         }, J = () => {
             var R, k;
             I || t === y && ((R = n.context.state.inventory[y]) == null ? void 0 : R.gte(1)) || ((k = C.current) == null || k.classList.remove("cursor-not-allowed"), m(!1))
-        }, b = STONE_RECOVERY_TIME, G = getTimeLeft(D.minedAt, b), M = 100 - G / b * 100;
+        }, b = STONE_RECOVERY_TIME, G = getTimeLeft(D.minedAt, b), N = 100 - G / b * 100;
         return React.createElement("div", {
             className: "relative z-10",
-            onMouseEnter: N,
+            onMouseEnter: M,
             onMouseLeave: U
         }, !F && React.createElement("div", {
             onMouseEnter: L,
@@ -11392,7 +11389,9 @@ const POPOVER_TIME_MS$2 = 1e3,
             }
         }), React.createElement("div", {
             className: `absolute top-10 transition pointer-events-none w-28 z-20 ${i?"opacity-100":"opacity-0"}`
-        }, React.createElement(Label, null, "Equip ", y.toLowerCase()))), React.createElement(Spritesheet, {
+        }, React.createElement(Label, {
+            className: "p-2"
+        }, "Equip ", y.toLowerCase()))), React.createElement(Spritesheet, {
             style: {
                 width: `${GRID_WIDTH_PX*5}px`,
                 opacity: B ? 1 : 0,
@@ -11434,7 +11433,7 @@ const POPOVER_TIME_MS$2 = 1e3,
                 left: "29px"
             }
         }, React.createElement(ProgressBar, {
-            percentage: M,
+            percentage: N,
             seconds: G
         }), React.createElement(TimeLeftPanel, {
             text: "Recovers in:",
@@ -11469,7 +11468,7 @@ const POPOVER_TIME_MS$1 = 1e3,
         }, []);
         const T = async R => {
             E(R), r(!0), await new Promise(k => setTimeout(k, POPOVER_TIME_MS$1)), r(!1)
-        }, N = () => {
+        }, M = () => {
             F && S(!0)
         }, U = () => {
             S(!1)
@@ -11508,10 +11507,10 @@ const POPOVER_TIME_MS$1 = 1e3,
         }, J = () => {
             var R, k;
             I || t === y && ((R = n.context.state.inventory[y]) == null ? void 0 : R.gte(1)) || ((k = C.current) == null || k.classList.remove("cursor-not-allowed"), m(!1))
-        }, b = IRON_RECOVERY_TIME, G = getTimeLeft(D.minedAt, b), M = 100 - G / b * 100;
+        }, b = IRON_RECOVERY_TIME, G = getTimeLeft(D.minedAt, b), N = 100 - G / b * 100;
         return React.createElement("div", {
             className: "relative z-10",
-            onMouseEnter: N,
+            onMouseEnter: M,
             onMouseLeave: U
         }, !F && React.createElement("div", {
             onMouseEnter: L,
@@ -11541,7 +11540,9 @@ const POPOVER_TIME_MS$1 = 1e3,
             }
         }), React.createElement("div", {
             className: `absolute top-5 transition pointer-events-none w-28 z-20 ${i?"opacity-100":"opacity-0"}`
-        }, React.createElement(Label, null, "Equip ", y.toLowerCase()))), React.createElement(Spritesheet, {
+        }, React.createElement(Label, {
+            className: "p-2"
+        }, "Equip ", y.toLowerCase()))), React.createElement(Spritesheet, {
             style: {
                 width: `${GRID_WIDTH_PX*5}px`,
                 opacity: B ? 1 : 0,
@@ -11583,7 +11584,7 @@ const POPOVER_TIME_MS$1 = 1e3,
                 left: "29px"
             }
         }, React.createElement(ProgressBar, {
-            percentage: M,
+            percentage: N,
             seconds: G
         }), React.createElement(TimeLeftPanel, {
             text: "Recovers in:",
@@ -11836,6 +11837,7 @@ var shakeSheet = "./assets/shake_sheet.b89d2e79.png",
     stump = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAOBAMAAADUAYG5AAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAAuG9Q6tSqwoVpPolIPicx5KZycz45yX49mgAAAAF0Uk5TAEDm2GYAAABlSURBVAjXY2BgYC8vL2AAgbK0tHQQzZ5mbJwGEgpLTkszS0VmBIGkVIGMcLW0tKRSBgZW8SIlJfXCAAbH8tLy8vByEQbX8NBC8dDSEAYGVxAjBGSia3k5mGZgKS93ADMY3EuABABq4BlOdpE5TgAAAABJRU5ErkJggg==";
 const POPOVER_TIME_MS = 1e3,
     HITS = 3,
+    tool = "Axe",
     Tree = ({
         treeIndex: A
     }) => {
@@ -11844,35 +11846,35 @@ const POPOVER_TIME_MS = 1e3,
             selectedItem: t
         } = react.exports.useContext(Context), [a] = useActor(e), [n, s] = react.exports.useState(!0), [r, i] = react.exports.useState(!1), [m, d] = react.exports.useState(), [E, u] = react.exports.useState(0), [h, B] = react.exports.useState(!1), g = react.exports.useRef(null), C = react.exports.useRef(), Q = react.exports.useRef(), [w, f] = react.exports.useState(!1);
         react.exports.useEffect(() => {
-            const M = R => {
+            const N = R => {
                 g.current && !g.current.contains(R.target) && u(0)
             };
-            return document.addEventListener("click", M, !0), () => {
-                document.removeEventListener("click", M, !0)
+            return document.addEventListener("click", N, !0), () => {
+                document.removeEventListener("click", N, !0)
             }
         }, []);
         const S = a.context.state.trees[A],
             I = !canChop(S),
-            y = async M => {
-                d(M), s(!0), await new Promise(R => setTimeout(R, POPOVER_TIME_MS)), s(!1)
+            y = async N => {
+                d(N), s(!0), await new Promise(R => setTimeout(R, POPOVER_TIME_MS)), s(!1)
             }, D = () => {
                 f(!0)
             }, F = () => {
                 f(!1)
-            }, T = getRequiredAxeAmount(a.context.state.inventory), N = a.context.state.inventory.Axe || new Decimal(0), U = (t === "Axe" || T.eq(0)) && N.gte(T), v = async () => {
+            }, T = getRequiredAxeAmount(a.context.state.inventory), M = a.context.state.inventory.Axe || new Decimal(0), U = (t === "Axe" || T.eq(0)) && M.gte(T), v = async () => {
                 var R, k, O;
                 if (a.matches("readonly")) {
                     (R = C.current) == null || R.goToAndPlay(0);
                     return
                 }!U || ((k = C.current) == null ? void 0 : k.getInfo("isPlaying")) || (chopAudio.play(), (O = C.current) == null || O.goToAndPlay(0), u(Y => Y + 1), E > 0 && E === HITS - 1 && (P(), treeFallAudio.play(), u(0)))
             }, P = async () => {
-                var M;
+                var N;
                 u(0);
                 try {
                     e.send("tree.chopped", {
                         index: A,
                         item: t
-                    }), B(!0), (M = Q.current) == null || M.goToAndPlay(0), y(React.createElement("div", {
+                    }), B(!0), (N = Q.current) == null || N.goToAndPlay(0), y(React.createElement("div", {
                         className: "flex"
                     }, React.createElement("img", {
                         src: wood,
@@ -11897,11 +11899,11 @@ const POPOVER_TIME_MS = 1e3,
                     }, R.message))
                 }
             }, L = () => {
-                var M;
-                a.matches("readonly") || U || ((M = g.current) == null || M.classList.add("cursor-not-allowed"), i(!0))
+                var N;
+                a.matches("readonly") || U || ((N = g.current) == null || N.classList.add("cursor-not-allowed"), i(!0))
             }, J = () => {
-                var M;
-                a.matches("readonly") || U || ((M = g.current) == null || M.classList.remove("cursor-not-allowed"), i(!1))
+                var N;
+                a.matches("readonly") || U || ((N = g.current) == null || N.classList.remove("cursor-not-allowed"), i(!1))
             }, b = getTimeLeft(S.choppedAt, TREE_RECOVERY_SECONDS), G = 100 - b / TREE_RECOVERY_SECONDS * 100;
         return React.createElement("div", {
             className: "relative",
@@ -11921,8 +11923,8 @@ const POPOVER_TIME_MS = 1e3,
                 transform: `translateX(-${GRID_WIDTH_PX*2.5}px)`,
                 imageRendering: "pixelated"
             },
-            getInstance: M => {
-                C.current = M
+            getInstance: N => {
+                C.current = N
             },
             image: shakeSheet,
             widthFrame: 266,
@@ -11932,12 +11934,14 @@ const POPOVER_TIME_MS = 1e3,
             direction: "forward",
             autoplay: !1,
             loop: !0,
-            onLoopComplete: M => {
-                M.pause()
+            onLoopComplete: N => {
+                N.pause()
             }
         }), React.createElement("div", {
             className: `absolute bottom-8 -right-[1rem] transition pointer-events-none w-28 z-20 ${r?"opacity-100":"opacity-0"}`
-        }, React.createElement(Label, null, "Equip an axe first"))), React.createElement(Spritesheet, {
+        }, React.createElement(Label, {
+            className: "p-2"
+        }, "Equip ", tool.toLowerCase()))), React.createElement(Spritesheet, {
             style: {
                 width: `${GRID_WIDTH_PX*4}px`,
                 transform: `translateX(-${GRID_WIDTH_PX*2.5}px)`,
@@ -11946,8 +11950,8 @@ const POPOVER_TIME_MS = 1e3,
                 imageRendering: "pixelated"
             },
             className: "absolute bottom-0 pointer-events-none",
-            getInstance: M => {
-                Q.current = M
+            getInstance: N => {
+                Q.current = N
             },
             image: choppedSheet,
             widthFrame: 266,
@@ -11957,8 +11961,8 @@ const POPOVER_TIME_MS = 1e3,
             direction: "forward",
             autoplay: !1,
             loop: !0,
-            onLoopComplete: M => {
-                M.pause()
+            onLoopComplete: N => {
+                N.pause()
             }
         }), I && React.createElement(React.Fragment, null, React.createElement("img", {
             src: stump,
@@ -14449,7 +14453,7 @@ const Signing = () => React.createElement(React.Fragment, null, React.createElem
             className: "text-xs"
         }, "NO SFF TOKENS OR FARM FOUND ON ACCOUNT")) : e.matches({
             airdropping: "success"
-        }) ? React.createElement(React.Fragment, null, React.createElement("span", null, "Succesfully airdropped!"), React.createElement("div", {
+        }) ? React.createElement(React.Fragment, null, React.createElement("span", null, "Successfully airdropped!"), React.createElement("div", {
             className: "flex items-center border-2 rounded-md border-black p-2 mt-2 mb-2 bg-[#e43b44]"
         }, React.createElement("img", {
             src: alert,
