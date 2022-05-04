@@ -90,8 +90,8 @@ const NETWORK = "mainnet",
     SESSION_CONTRACT = "0x070717e1Bc4c6e46C22B0e0B8821e0aC1D4689c3",
     TOKEN_CONTRACT = "0xD1f9c58e33933a993A3891F8acFe05a68E1afC05",
     DISCORD_REDIRECT = "https://sunflower-land.com/play/",
-    CLIENT_VERSION = "2022-05-04T03:52",
-    RELEASE_VERSION = "v0.2.24-important-dates",
+    CLIENT_VERSION = "2022-05-04T21:43",
+    RELEASE_VERSION = "v0.2.25-enable-discord-auth",
     CONFIG = {
         NETWORK,
         POLYGON_CHAIN_ID,
@@ -517,28 +517,28 @@ class SessionManager {
         mintAmounts: r,
         burnIds: i,
         burnAmounts: m,
-        tokens: E
+        tokens: d
     }) {
-        const d = lib.toWei("0.1"),
+        const E = lib.toWei("0.1"),
             u = await this.getSessionId(n),
-            w = await estimateGasPrice(this.web3);
-        return await new Promise((g, h) => {
-            this.contract.methods.sync(e, t, a, n, s, r, i, m, E).send({
+            h = await estimateGasPrice(this.web3);
+        return await new Promise((g, C) => {
+            this.contract.methods.sync(e, t, a, n, s, r, i, m, d).send({
                 from: this.account,
-                value: d,
-                gasPrice: w
-            }).on("error", function(y) {
+                value: E,
+                gasPrice: h
+            }).on("error", function(Q) {
                 console.log({
-                    error: y
+                    error: Q
                 });
-                const B = parseMetamaskError(y);
-                h(B)
-            }).on("transactionHash", function(y) {
+                const w = parseMetamaskError(Q);
+                C(w)
+            }).on("transactionHash", function(Q) {
                 console.log({
-                    transactionHash: y
+                    transactionHash: Q
                 })
-            }).on("receipt", function(y) {
-                g(y)
+            }).on("receipt", function(Q) {
+                g(Q)
             })
         }), await this.getNextSessionId(n, u)
     }
@@ -552,17 +552,17 @@ class SessionManager {
         tax: i,
         sfl: m
     }) {
-        const E = await this.getSessionId(n),
-            d = await estimateGasPrice(this.web3);
-        return await new Promise((w, R) => {
+        const d = await this.getSessionId(n),
+            E = await estimateGasPrice(this.web3);
+        return await new Promise((h, B) => {
             this.contract.methods.withdraw(e, t, a, n, s, r, m, i).send({
                 from: this.account,
-                gasPrice: d
+                gasPrice: E
             }).on("error", function(g) {
-                const h = parseMetamaskError(g);
+                const C = parseMetamaskError(g);
                 console.log({
-                    parsedIt: h
-                }), R(h)
+                    parsedIt: C
+                }), B(C)
             }).on("transactionHash", function(g) {
                 console.log({
                     transactionHash: g
@@ -570,9 +570,9 @@ class SessionManager {
             }).on("receipt", function(g) {
                 console.log({
                     receipt: g
-                }), w(g)
+                }), h(g)
             })
-        }), await this.getNextSessionId(n, E)
+        }), await this.getNextSessionId(n, d)
     }
 }
 var FarmABI = [{
@@ -3754,11 +3754,9 @@ const INITIAL_SESSION = "0x00000000000000000000000000000000000000000000000000000
                         id: "checkingAccess",
                         invoke: {
                             src: async A => {
-                                var t, a;
-                                return ((t = A.token) == null ? void 0 : t.userAccess.createFarm) ? {
-                                    hasAccess: !0
-                                } : {
-                                    hasAccess: await ((a = metamask.getSunflowerFarmers()) == null ? void 0 : a.hasV1Data())
+                                var t;
+                                return {
+                                    hasAccess: await ((t = metamask.getSunflowerFarmers()) == null ? void 0 : t.hasV1Data())
                                 }
                             },
                             onDone: [{
@@ -5508,21 +5506,21 @@ function craft({
     action: e,
     available: t
 }) {
-    var E, d;
+    var d, E;
     if (!isCraftable(e.item, t || VALID_ITEMS)) throw new Error(`This item is not craftable: ${e.item}`);
     const a = CRAFTABLES()[e.item];
     if (a.disabled) throw new Error("This item is disabled");
     if (e.amount < 1) throw new Error("Invalid amount");
-    if ((E = A.stock[e.item]) == null ? void 0 : E.lt(e.amount)) throw new Error("Not enough stock");
+    if ((d = A.stock[e.item]) == null ? void 0 : d.lt(e.amount)) throw new Error("Not enough stock");
     const s = getBuyPrice(a, A.inventory).mul(e.amount);
     if (a.requires && !A.inventory[a.requires]) throw new Error(`Missing ${a.requires}`);
     if (A.balance.lessThan(s)) throw new Error("Insufficient tokens");
-    const i = a.ingredients.reduce((u, w) => {
-            const R = u[w.item] || new Decimal(0),
-                g = w.amount.mul(e.amount);
-            if (R.lessThan(g)) throw new Error(`Insufficient ingredient: ${w.item}`);
+    const i = a.ingredients.reduce((u, h) => {
+            const B = u[h.item] || new Decimal(0),
+                g = h.amount.mul(e.amount);
+            if (B.lessThan(g)) throw new Error(`Insufficient ingredient: ${h.item}`);
             return l(c({}, u), {
-                [w.item]: R.sub(g)
+                [h.item]: B.sub(g)
             })
         }, A.inventory),
         m = A.inventory[e.item] || new Decimal(0);
@@ -5532,7 +5530,7 @@ function craft({
             [e.item]: m.add(e.amount)
         }),
         stock: l(c({}, A.stock), {
-            [e.item]: (d = A.stock[e.item]) == null ? void 0 : d.minus(e.amount)
+            [e.item]: (E = A.stock[e.item]) == null ? void 0 : E.minus(e.amount)
         })
     })
 }
@@ -5596,12 +5594,12 @@ function harvest({
     delete r[e.index];
     const i = A.inventory[n.name] || new Decimal(0),
         m = n.multiplier || 1,
-        E = l(c({}, A.inventory), {
+        d = l(c({}, A.inventory), {
             [n.name]: i.add(m)
         });
     return l(c({}, A), {
         fields: r,
-        inventory: E
+        inventory: d
     })
 }
 const GOLD_RECOVERY_TIME = 24 * 60 * 60;
@@ -5915,9 +5913,9 @@ async function loadSession(A) {
             itemsMintedAt: r,
             blacklistStatus: i
         } = await sanitizeHTTPResponse(e), m = new Date(a);
-        let E = 0;
-        return Math.abs(m.getTime() - Date.now()) > 1e3 * 30 && (console.log("Not in sync!", m.getTime() - Date.now()), E = m.getTime() - Date.now()), {
-            offset: E,
+        let d = 0;
+        return Math.abs(m.getTime() - Date.now()) > 1e3 * 30 && (console.log("Not in sync!", m.getTime() - Date.now()), d = m.getTime() - Date.now()), {
+            offset: d,
             game: makeGame(t),
             isBlacklisted: n,
             whitelistedAt: s,
@@ -6353,8 +6351,8 @@ function startGame(A) {
                                 offset: r,
                                 isBlacklisted: i,
                                 whitelistedAt: m,
-                                itemsMintedAt: E,
-                                blacklistStatus: d
+                                itemsMintedAt: d,
+                                blacklistStatus: E
                             } = n;
                             return s.farmAddress = A.address, {
                                 state: l(c({}, s), {
@@ -6364,8 +6362,8 @@ function startGame(A) {
                                 isBlacklisted: i,
                                 whitelistedAt: m,
                                 fingerprint: a,
-                                itemsMintedAt: E,
-                                blacklistStatus: d
+                                itemsMintedAt: d,
+                                blacklistStatus: E
                             }
                         }
                         if (A.address) {
@@ -6718,10 +6716,10 @@ const Context = React.createContext({}),
             authService: e
         } = react.exports.useContext(Context$1), [t] = useActor(e), [a] = react.exports.useState(startGame(l(c({}, t.context), {
             isNoob: !1
-        }))), n = useInterpret(a), [s, r] = react.exports.useState(getShortcuts()), i = react.exports.useCallback(E => {
+        }))), n = useInterpret(a), [s, r] = react.exports.useState(getShortcuts()), i = react.exports.useCallback(d => {
             if (n.state.matches("readonly")) return;
-            const d = cacheShortcuts(E);
-            r(d)
+            const E = cacheShortcuts(d);
+            r(E)
         }, [n.state]), m = s.length > 0 ? s[0] : void 0;
         return React.createElement(Context.Provider, {
             value: {
@@ -6782,8 +6780,8 @@ const shortenCount = A => {
         disabled: s,
         locked: r
     }) => {
-        const [i, m] = react.exports.useState(!1), [E, d] = react.exports.useState("");
-        react.exports.useEffect(() => d(shortenCount(a)), [a]);
+        const [i, m] = react.exports.useState(!1), [d, E] = react.exports.useState("");
+        react.exports.useEffect(() => E(shortenCount(a)), [a]);
         const u = !r && !s;
         return React.createElement("div", {
             className: "relative",
@@ -6827,7 +6825,7 @@ const shortenCount = A => {
             className: classNames("absolute -top-4 -right-3 px-0.5 text-xs z-10", {
                 "z-20": i
             })
-        }, i ? a.toString() : E)), (t || i) && !r && !s && React.createElement("img", {
+        }, i ? a.toString() : d)), (t || i) && !r && !s && React.createElement("img", {
             className: "absolute w-14 h-14 top-0.5 left-0.5 pointer-events-none",
             src: selectBox
         }))
@@ -7534,41 +7532,41 @@ const useShowScrollbar = A => {
         const {
             ref: r,
             showScrollbar: i
-        } = useShowScrollbar(TAB_CONTENT_HEIGHT$1), [m] = useScrollIntoView(), E = Object.keys(A), [d, u] = react.exports.useState(!1);
+        } = useShowScrollbar(TAB_CONTENT_HEIGHT$1), [m] = useScrollIntoView(), d = Object.keys(A), [E, u] = react.exports.useState(!1);
         react.exports.useEffect(() => {
-            const B = E.find(S => {
-                    var Q;
-                    return !!((Q = w[S]) == null ? void 0 : Q.length)
+            const w = d.find(S => {
+                    var y;
+                    return !!((y = h[S]) == null ? void 0 : y.length)
                 }),
-                f = getShortcuts()[0] || B && w[B][0];
+                f = getShortcuts()[0] || w && h[w][0];
             f && t(f)
         }, []), react.exports.useEffect(() => u(hasBoost({
             item: e,
             inventory: a
         })), [a, e]);
-        const w = n.reduce((B, f) => {
-                const S = E.find(Q => f in A[Q].items);
+        const h = n.reduce((w, f) => {
+                const S = d.find(y => f in A[y].items);
                 if (S) {
-                    const Q = B[S] || [];
-                    B[S] = [...Q, f]
+                    const y = w[S] || [];
+                    w[S] = [...y, f]
                 }
-                return B
+                return w
             }, {}),
-            R = B => (console.log({
-                category: B,
-                inventoryMapping: w
-            }), Object.keys(w).includes(B)),
-            g = (B = "") => {
-                const f = B.split(" ")[0];
+            B = w => (console.log({
+                category: w,
+                inventoryMapping: h
+            }), Object.keys(h).includes(w)),
+            g = (w = "") => {
+                const f = w.split(" ")[0];
                 return secondsToMidString(getCropTime(f, a))
             },
-            h = B => {
-                s(B), B && ITEM_DETAILS[B].section && m(ITEM_DETAILS[B].section)
+            C = w => {
+                s(w), w && ITEM_DETAILS[w].section && m(ITEM_DETAILS[w].section)
             },
-            y = Object.values(w).every(B => B.length === 0);
+            Q = Object.values(h).every(w => w.length === 0);
         return React.createElement("div", {
             className: "flex flex-col"
-        }, !y && React.createElement(OuterPanel, {
+        }, !Q && React.createElement(OuterPanel, {
             className: "flex-1 mb-3"
         }, e && React.createElement("div", {
             style: {
@@ -7590,7 +7588,7 @@ const useShowScrollbar = A => {
         }, React.createElement("img", {
             src: timer,
             className: "h-5 me-2"
-        }), d && React.createElement("img", {
+        }), E && React.createElement("img", {
             src: lightning,
             className: "h-6 me-2"
         }), React.createElement("span", {
@@ -7603,22 +7601,22 @@ const useShowScrollbar = A => {
             className: classNames("overflow-y-auto", {
                 scrollable: i
             })
-        }, E.map(B => React.createElement("div", {
+        }, d.map(w => React.createElement("div", {
             className: "flex flex-col pl-2",
-            key: B
+            key: w
         }, React.createElement("p", {
             className: "mb-2 underline"
-        }, B), R(B) ? React.createElement("div", {
+        }, w), B(w) ? React.createElement("div", {
             className: "flex mb-2 flex-wrap pl-1.5"
-        }, w[B].map(f => React.createElement(Box, {
+        }, h[w].map(f => React.createElement(Box, {
             count: a[f],
             isSelected: e === f,
             key: f,
-            onClick: () => h(f),
+            onClick: () => C(f),
             image: ITEM_DETAILS[f].image
         }))) : React.createElement("p", {
             className: "text-white text-xs text-shadow mb-2 pl-2.5"
-        }, `No ${B} in inventory`)))))
+        }, `No ${w} in inventory`)))))
     },
     BASKET_CATEGORIES = {
         Seeds: {
@@ -7670,10 +7668,10 @@ const useShowScrollbar = A => {
         const {
             gameService: e,
             shortcutItem: t
-        } = react.exports.useContext(Context), [a] = useActor(e), n = a.context.state.inventory, [s, r] = react.exports.useState("basket"), [i] = react.exports.useState(makeInventoryItems(n)), [m, E] = react.exports.useState(), d = w => {
-            r(w)
-        }, u = w => {
-            t(w), E(w)
+        } = react.exports.useContext(Context), [a] = useActor(e), n = a.context.state.inventory, [s, r] = react.exports.useState("basket"), [i] = react.exports.useState(makeInventoryItems(n)), [m, d] = react.exports.useState(), E = h => {
+            r(h)
+        }, u = h => {
+            t(h), d(h)
         };
         return React.createElement(Panel, {
             className: "pt-5 relative"
@@ -7684,7 +7682,7 @@ const useShowScrollbar = A => {
         }, React.createElement(Tab, {
             className: "flex items-center",
             isActive: s === "basket",
-            onClick: () => d("basket")
+            onClick: () => E("basket")
         }, React.createElement("img", {
             src: seeds$1,
             className: "h-4 sm:h-5 mr-2"
@@ -7693,7 +7691,7 @@ const useShowScrollbar = A => {
         }, "Basket")), React.createElement(Tab, {
             className: "flex items-center",
             isActive: s === "collectibles",
-            onClick: () => d("collectibles")
+            onClick: () => E("collectibles")
         }, React.createElement("img", {
             src: sunflowerPlant$1,
             className: "h-4 sm:h-5 mr-2"
@@ -7706,14 +7704,14 @@ const useShowScrollbar = A => {
         })), s === "basket" && React.createElement(InventoryTabContent, {
             tabItems: BASKET_CATEGORIES,
             selectedItem: m,
-            setDefaultSelectedItem: E,
+            setDefaultSelectedItem: d,
             inventory: n,
             inventoryItems: i,
             onClick: u
         }), s === "collectibles" && React.createElement(InventoryTabContent, {
             tabItems: COLLECTIBLE_CATEGORIES,
             selectedItem: m,
-            setDefaultSelectedItem: E,
+            setDefaultSelectedItem: d,
             inventory: n,
             inventoryItems: i,
             onClick: u
@@ -7750,12 +7748,12 @@ const useShowScrollbar = A => {
             onClose: () => e(!1)
         })), !n.matches("readonly") && React.createElement("div", {
             className: "flex flex-col items-center sm:mt-8"
-        }, r.map((m, E) => {
-            var d, u;
+        }, r.map((m, d) => {
+            var E, u;
             return React.createElement(Box, {
-                key: E,
-                isSelected: E === 0,
-                image: (d = ITEM_DETAILS[m]) == null ? void 0 : d.image,
+                key: d,
+                isSelected: d === 0,
+                image: (E = ITEM_DETAILS[m]) == null ? void 0 : E.image,
                 secondaryImage: (u = ITEM_DETAILS[m]) == null ? void 0 : u.secondaryImage,
                 count: s[m],
                 onClick: () => t(m)
@@ -8133,9 +8131,9 @@ const Settings = ({
         s(!0)
     }, m = () => {
         e(), a.send("RESET")
-    }, E = () => {
+    }, d = () => {
         t.send("AIRDROP")
-    }, d = () => n ? React.createElement("div", {
+    }, E = () => n ? React.createElement("div", {
         className: "p-4 "
     }, React.createElement("div", {
         className: "flex items-center border-2 rounded-md border-black p-2 mt-2 mb-2 bg-[#e43b44]"
@@ -8163,7 +8161,7 @@ const Settings = ({
         onClick: i
     }, "Reset Session"), React.createElement(Button, {
         className: "col  p-1 mt-2",
-        onClick: E
+        onClick: d
     }, "Airdrop V1 Farm"));
     return React.createElement(Modal, {
         show: A,
@@ -8171,7 +8169,7 @@ const Settings = ({
         centered: !0
     }, React.createElement(Panel, {
         className: "p-0"
-    }, d()))
+    }, E()))
 };
 var mobileMenu = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABICAMAAABWSoJpAAAABGdBTUEAALGPC/xhBQAAAEVQTFRFBAMDBAMDBAMDBAMDBAMDBAMDBAMDBAMDBAMDBAMDBAMDBAMDAAAA3NvbDAsLExIS397e3t3dFBMT29ragoGBBAMD////pcoZXQAAAA10Uk5T2+vurLAwNN3e2s9PAPFaF7cAAACmSURBVFjD7ZZLFsIgEATRfIygRo2d+x9VVtE9FUXTvWNTj+ExNRNOcMI6wBRVmqHtX8AkIvt+AUYEqHYB5sNcmmuuum7gTToY+O/Adf8h3nq4HHB9/YCxDTTwO4P+2HT0oN91tG0a1IdTrnpjwLMUXPKmvg3eergccH15phho4Kc2B8VEbw5K7/p6FOeiiAp2vkuVA8fqb+g3ZIF4p+C9jNvGI6AoTyLQhxn4Y1rXAAAAAElFTkSuQmCC",
     radish = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAPBAMAAAAizzN6AAAABGdBTUEAALGPC/xhBQAAAB5QTFRFAAAA9nV6cz45GTw+Y8dNPicxJlxCPolI5DtEoiYzZKA5OwAAAAF0Uk5TAEDm2GYAAABiSURBVAjXY2BLSwAihnQXtxSXMob0EvcSdyBV7uJSXsbAZl5eXpzAwMBsXmzAwMAwo72ik4GBs6OjQ2ICmGqcwMA6s6NjZgCQAoIABobImTOnAlWyRk4FcoA0mGRgUmBgAAAo8RtuZzoP8wAAAABJRU5ErkJggg==",
@@ -8186,16 +8184,16 @@ const Menu = () => {
         authService: A
     } = react.exports.useContext(Context$1), {
         gameService: e
-    } = react.exports.useContext(Context), [t] = useActor(A), [a] = useActor(e), [n, s] = react.exports.useState(!1), [r] = useScrollIntoView(), [i, m] = react.exports.useState(!1), [E, d] = react.exports.useState(!1), [u, w] = react.exports.useState(useIsNewFarm()), [R, g] = react.exports.useState(!1), [h, y] = react.exports.useState(""), [B, f] = react.exports.useState(MENU_LEVELS.ROOT), S = react.exports.useRef(null), Q = () => {
+    } = react.exports.useContext(Context), [t] = useActor(A), [a] = useActor(e), [n, s] = react.exports.useState(!1), [r] = useScrollIntoView(), [i, m] = react.exports.useState(!1), [d, E] = react.exports.useState(!1), [u, h] = react.exports.useState(useIsNewFarm()), [B, g] = react.exports.useState(!1), [C, Q] = react.exports.useState(""), [w, f] = react.exports.useState(MENU_LEVELS.ROOT), S = react.exports.useRef(null), y = () => {
         s(!n)
     }, I = b => {
         r(b), s(!1)
     }, D = () => {
-        w(!0), s(!1)
+        h(!0), s(!1)
     }, F = () => {
         m(!0), s(!1)
     }, T = () => {
-        d(!0), s(!1)
+        E(!0), s(!1)
     }, N = b => {
         var G;
         ((G = S == null ? void 0 : S.current) == null ? void 0 : G.contains(b.target)) || s(!1)
@@ -8216,7 +8214,7 @@ const Menu = () => {
         document.removeEventListener("mousedown", N), document.removeEventListener("touchstart", N)
     }), []), react.exports.useEffect(() => {
         const b = t.context.farmId ? `${window.location.href.includes("?")?window.location.href.split("?")[0]:window.location.href}?farmId=${t.context.farmId.toString()}` : "https://sunflower-land.com/play/";
-        y(b)
+        Q(b)
     }, [t.context.farmId]), React.createElement("div", {
         ref: S,
         className: "w-5/12 sm:w-60 fixed top-2 left-2 z-50 shadow-lg"
@@ -8224,7 +8222,7 @@ const Menu = () => {
         className: "flex justify-center p-1"
     }, React.createElement(Button, {
         className: "mr-2 bg-brown-200 active:bg-brown-200",
-        onClick: Q
+        onClick: y
     }, React.createElement("img", {
         className: "md:hidden w-6",
         src: mobileMenu,
@@ -8244,7 +8242,7 @@ const Menu = () => {
         className: `transition-all ease duration-200 ${n?"max-h-100":"max-h-0"}`
     }, React.createElement("ul", {
         className: `list-none pt-1 transition-all ease duration-200 origin-top ${n?"scale-y-1":"scale-y-0"}`
-    }, B === MENU_LEVELS.ROOT && React.createElement(React.Fragment, null, !a.matches("readonly") && React.createElement("li", {
+    }, w === MENU_LEVELS.ROOT && React.createElement(React.Fragment, null, !a.matches("readonly") && React.createElement("li", {
         className: "p-1"
     }, React.createElement(Button, {
         onClick: U
@@ -8281,7 +8279,7 @@ const Menu = () => {
         onClick: T
     }, React.createElement("span", {
         className: "sm:text-sm flex-1"
-    }, "Settings")))), B !== MENU_LEVELS.ROOT && React.createElement("li", {
+    }, "Settings")))), w !== MENU_LEVELS.ROOT && React.createElement("li", {
         className: "p-1"
     }, React.createElement(Button, {
         onClick: () => f(MENU_LEVELS.ROOT)
@@ -8289,7 +8287,7 @@ const Menu = () => {
         src: arrowLeft,
         className: "w-4 mr-2",
         alt: "left"
-    }))), B === MENU_LEVELS.MAP && React.createElement(React.Fragment, null, React.createElement("li", {
+    }))), w === MENU_LEVELS.MAP && React.createElement(React.Fragment, null, React.createElement("li", {
         className: "p-1"
     }, React.createElement(Button, {
         className: "flex justify-between",
@@ -8333,7 +8331,7 @@ const Menu = () => {
         src: wood,
         className: "w-4 ml-2",
         alt: "wood"
-    })))), B === MENU_LEVELS.VIEW && React.createElement(React.Fragment, null, React.createElement("li", {
+    })))), w === MENU_LEVELS.VIEW && React.createElement(React.Fragment, null, React.createElement("li", {
         className: "p-1"
     }, React.createElement(Button, {
         onClick: F
@@ -8348,15 +8346,15 @@ const Menu = () => {
     }, "Visit Farm"))))))), React.createElement(Share, {
         isOpen: i,
         onClose: () => m(!1),
-        farmURL: h
+        farmURL: C
     }), React.createElement(HowToPlay, {
         isOpen: u,
-        onClose: () => w(!1)
+        onClose: () => h(!1)
     }), React.createElement(Settings, {
-        isOpen: E,
-        onClose: () => d(!1)
-    }), R && React.createElement(Modal, {
-        show: R,
+        isOpen: d,
+        onClose: () => E(!1)
+    }), B && React.createElement(Modal, {
+        show: B,
         onHide: () => g(!1),
         centered: !0
     }, React.createElement(Panel, null, React.createElement("img", {
@@ -8414,20 +8412,20 @@ const song_list = [{
             [a, n] = react.exports.useState(!1),
             [s, r] = react.exports.useState(!0),
             [i, m] = react.exports.useState(0),
-            E = react.exports.useRef(null),
-            d = () => {
-                E.current.paused ? E.current.play() : E.current.pause(), r(!s)
+            d = react.exports.useRef(null),
+            E = () => {
+                d.current.paused ? d.current.play() : d.current.pause(), r(!s)
             },
             u = () => {
                 getSongCount() === i + 1 ? m(0) : m(i + 1)
             },
-            w = getSong(i);
+            h = getSong(i);
         return react.exports.useEffect(() => {
             howler.Howler.mute(a)
         }, [a]), react.exports.useEffect(() => {
-            E.current.volume = A.value
+            d.current.volume = A.value
         }, [A.value]), react.exports.useEffect(() => {
-            navigator.userAgent.match(/chrome|chromium|crios/i) && (r(!1), E.current.pause())
+            navigator.userAgent.match(/chrome|chromium|crios/i) && (r(!1), d.current.pause())
         }, []), React.createElement("div", {
             className: `position-fixed ${e?"-right-6 sm:right-10":"right-2"} sm:right-2 bottom-4 z-50 md:w-56 w-48 h-fit  sm:-translate-x-50 transition-all duration-500 ease-in-out`,
             style: {
@@ -8436,11 +8434,11 @@ const song_list = [{
         }, React.createElement(Panel, {
             className: "pointer-events-auto w-40 sm:w-56"
         }, React.createElement("audio", {
-            ref: E,
+            ref: d,
             onEnded: u,
-            onPause: () => r(!E.current.paused),
-            onPlay: () => r(!E.current.paused),
-            src: w.path,
+            onPause: () => r(!d.current.paused),
+            onPlay: () => r(!d.current.paused),
+            src: h.path,
             className: "d-none",
             autoPlay: !0,
             controls: !0
@@ -8455,10 +8453,10 @@ const song_list = [{
                 whiteSpace: "nowrap",
                 animationPlayState: s ? "running" : "paused"
             }
-        }, w.name, " - ", w.artist)), React.createElement("div", {
+        }, h.name, " - ", h.artist)), React.createElement("div", {
             className: "flex space-x-2 justify-content-between "
         }, React.createElement(Button, {
-            onClick: d,
+            onClick: E,
             className: "w-10 h-8"
         }, React.createElement("img", {
             src: s ? pause : play,
@@ -8571,10 +8569,10 @@ async function addNoise(A, e = .4) {
     t.width = n.naturalWidth, t.height = n.naturalHeight, a.drawImage(n, 0, 0);
     const s = a.getImageData(0, 0, n.naturalWidth, n.naturalHeight);
     for (let i = 0, m = s.data.length; i < m; i += 4) {
-        const E = .93 + Math.random() * e,
-            d = .93 + Math.random() * e,
+        const d = .93 + Math.random() * e,
+            E = .93 + Math.random() * e,
             u = .93 + Math.random() * e;
-        s.data[i] = s.data[i] * p2 * E + er, s.data[i + 1] = s.data[i + 1] * p2 * d + eg, s.data[i + 2] = s.data[i + 2] * p3 * u + eb
+        s.data[i] = s.data[i] * p2 * d + er, s.data[i + 1] = s.data[i + 1] * p2 * E + eg, s.data[i + 2] = s.data[i + 2] * p3 * u + eb
     }
     a.putImageData(s, 0, 0);
     const r = t.toDataURL();
@@ -8678,13 +8676,13 @@ const LIFECYCLE = {
         showCropDetails: t
     }) => {
         const [a, n] = React.useState(0), s = React.useCallback(() => {
-            n(E => E + 1)
+            n(d => d + 1)
         }, []);
         if (React.useEffect(() => {
                 if (A) {
                     s();
-                    const E = window.setInterval(s, 1e3);
-                    return () => window.clearInterval(E)
+                    const d = window.setInterval(s, 1e3);
+                    return () => window.clearInterval(d)
                 }
             }, [A, s]), !A) return React.createElement("img", {
             src: soil,
@@ -8694,17 +8692,17 @@ const LIFECYCLE = {
             i = LIFECYCLE[A.name],
             m = getTimeLeft(A.plantedAt, r.harvestSeconds);
         if (m > 0) {
-            const E = 100 - m / r.harvestSeconds * 100,
-                d = E >= 50;
+            const d = 100 - m / r.harvestSeconds * 100,
+                E = d >= 50;
             return React.createElement("div", {
                 className: "relative w-full h-full"
             }, React.createElement("img", {
-                src: d ? i.almost : i.seedling,
+                src: E ? i.almost : i.seedling,
                 className: classNames("w-full", e)
             }), React.createElement("div", {
                 className: "absolute w-full -bottom-4 z-10"
             }, React.createElement(ProgressBar, {
-                percentage: E,
+                percentage: d,
                 seconds: m
             })), React.createElement(InnerPanel, {
                 className: classNames("ml-10 transition-opacity absolute whitespace-nowrap sm:opacity-0 bottom-5 w-fit left-1 z-20 pointer-events-none", {
@@ -8859,7 +8857,7 @@ const CropReward = ({
                     fieldIndex: t
                 })
             },
-            E = () => {
+            d = () => {
                 e(), s(!1)
             };
         return React.createElement(Modal, {
@@ -8869,16 +8867,16 @@ const CropReward = ({
             className: "flex flex-col items-center justify-between h-52"
         }, React.createElement("span", {
             className: "text-center mb-2"
-        }, "Woohoo! You found a reward"), n ? React.createElement(React.Fragment, null, A.items.map(d => React.createElement("div", {
-            key: d.name,
+        }, "Woohoo! You found a reward"), n ? React.createElement(React.Fragment, null, A.items.map(E => React.createElement("div", {
+            key: E.name,
             className: "flex items-center"
         }, React.createElement("img", {
             className: "w-8 img-highlight mr-2",
-            src: ITEM_DETAILS[d.name].image
+            src: ITEM_DETAILS[E.name].image
         }), React.createElement("span", {
             className: "text-center mb-2"
-        }, `${d.amount} ${d.name}s`))), React.createElement(Button, {
-            onClick: E,
+        }, `${E.amount} ${E.name}s`))), React.createElement(Button, {
+            onClick: d,
             className: "mt-4 w-28"
         }, "Close")) : React.createElement(React.Fragment, null, React.createElement("div", {
             className: "flex items-center justify-between",
@@ -8907,10 +8905,10 @@ const CropReward = ({
     }) => {
         const [a, n] = react.exports.useState(!0), [s, r] = react.exports.useState(), {
             gameService: i
-        } = react.exports.useContext(Context), [m, E] = react.exports.useState(0), [d, u] = react.exports.useState(null), [w] = useActor(i), R = react.exports.useRef(0), g = w.context.state.fields[t], [h, y] = react.exports.useState(!1), B = async F => {
+        } = react.exports.useContext(Context), [m, d] = react.exports.useState(0), [E, u] = react.exports.useState(null), [h] = useActor(i), B = react.exports.useRef(0), g = h.context.state.fields[t], [C, Q] = react.exports.useState(!1), w = async F => {
             r(F), n(!0), await new Promise(T => setTimeout(T, POPOVER_TIME_MS$4)), n(!1)
         }, f = () => {
-            u(null), E(0), i.send("item.harvested", {
+            u(null), d(0), i.send("item.harvested", {
                 index: t
             })
         }, S = () => {
@@ -8919,16 +8917,16 @@ const CropReward = ({
                     T = Date.now(),
                     N = isCropReady(T, g.plantedAt, F.harvestSeconds),
                     U = T - g.plantedAt < 1e3;
-                !N && !U && y(!0)
+                !N && !U && Q(!0)
             }
-        }, Q = () => {
-            y(!1)
+        }, y = () => {
+            Q(!1)
         }, I = () => {
             const F = Date.now();
-            if (!(F - R.current < 100) && (R.current = F, !d)) {
+            if (!(F - B.current < 100) && (B.current = F, !E)) {
                 if ((g == null ? void 0 : g.reward) && isCropReady(F, g.plantedAt, CROPS()[g.name].harvestSeconds)) {
                     if (m < 1) {
-                        E(T => T + 1);
+                        d(T => T + 1);
                         return
                     }
                     u(g.reward);
@@ -8939,14 +8937,14 @@ const CropReward = ({
                         i.send("item.planted", {
                             index: t,
                             item: A
-                        }), plantAudio.play(), B(React.createElement("div", {
+                        }), plantAudio.play(), w(React.createElement("div", {
                             className: "flex items-center justify-center text-xs text-white text-shadow overflow-visible"
                         }, React.createElement("img", {
                             src: ITEM_DETAILS[A].image,
                             className: "w-4 mr-1"
                         }), React.createElement("span", null, "-1")))
                     } catch {
-                        B(React.createElement("img", {
+                        w(React.createElement("img", {
                             className: "w-5",
                             src: cancel
                         }))
@@ -8956,24 +8954,24 @@ const CropReward = ({
                 try {
                     i.send("item.harvested", {
                         index: t
-                    }), harvestAudio.play(), B(React.createElement("div", {
+                    }), harvestAudio.play(), w(React.createElement("div", {
                         className: "flex items-center justify-center text-xs text-white text-shadow overflow-visible"
                     }, React.createElement("img", {
                         src: ITEM_DETAILS[g.name].image,
                         className: "w-4 mr-1"
                     }), React.createElement("span", null, `+${g.multiplier||1}`)))
                 } catch {
-                    B(React.createElement("img", {
+                    w(React.createElement("img", {
                         className: "w-5",
                         src: cancel
                     }))
                 }
-                E(0)
+                d(0)
             }
-        }, D = w.matches("playing") || w.matches("autosaving");
+        }, D = h.matches("playing") || h.matches("autosaving");
         return React.createElement("div", {
             onMouseEnter: S,
-            onMouseLeave: Q,
+            onMouseLeave: y,
             className: classNames("relative group", e),
             style: {
                 width: `${GRID_WIDTH_PX}px`,
@@ -8982,7 +8980,7 @@ const CropReward = ({
         }, React.createElement(Soil, {
             className: "absolute bottom-0",
             field: g,
-            showCropDetails: h
+            showCropDetails: C
         }), React.createElement("div", {
             className: classNames("transition-opacity pointer-events-none absolute -bottom-2 left-1", {
                 "opacity-100": m > 0,
@@ -9003,7 +9001,7 @@ const CropReward = ({
             className: "absolute inset-0 w-full opacity-0 sm:group-hover:opacity-100 sm:hover:!opacity-100 z-20 cursor-pointer",
             onClick: I
         }), React.createElement(CropReward, {
-            reward: d,
+            reward: E,
             onCollected: f,
             fieldIndex: t
         }))
@@ -9550,26 +9548,55 @@ const Frog = () => {
         className: "text-shadow"
     }, "Beta is only accessible to our OG farmers."), React.createElement("span", {
         className: "text-shadow text-xs block mt-4"
-    }, "Stay tuned for updates. We will be going live soon!")),
-    NoFarm = () => {
-        const {
-            authService: A
-        } = react.exports.useContext(Context$1);
-        useActor(A);
-        const e = () => {
-                A.send("EXPLORE")
-            },
-            t = () => {
-                A.send("CREATE_FARM")
-            };
-        return React.createElement(React.Fragment, null, React.createElement(Button, {
-            onClick: t,
-            className: "overflow-hidden mb-2"
-        }, "Create Farm"), React.createElement(Button, {
-            onClick: e,
-            className: "overflow-hidden"
-        }, "Explore a friend's farm"))
+    }, "Stay tuned for updates. We will be going live soon!"));
+var humanDeath$1 = "./assets/suspicious_goblin.ea6c0c3a.gif";
+const NoFarm = () => {
+    var s, r;
+    const {
+        authService: A
+    } = react.exports.useContext(Context$1), [e] = useActor(A), t = () => {
+        A.send("EXPLORE")
+    }, a = () => {
+        A.send("CREATE_FARM")
+    }, n = () => {
+        A.send("CONNECT_TO_DISCORD")
     };
+    return React.createElement(React.Fragment, null, !!((s = e.context.token) == null ? void 0 : s.userAccess.createFarm) || !!((r = e.context.token) == null ? void 0 : r.discordId) ? React.createElement(Button, {
+        onClick: a,
+        className: "overflow-hidden mb-2"
+    }, "Create Farm") : React.createElement("div", {
+        className: "flex flex-col items-center"
+    }, React.createElement("div", {
+        className: "flex items-center mt-4 -mb-4 relative"
+    }, React.createElement("img", {
+        src: humanDeath$1,
+        className: "w-12"
+    }), React.createElement("img", {
+        src: idle,
+        className: "w-12 relative bottom-1",
+        style: {
+            transform: "scaleX(-1)"
+        }
+    }), React.createElement("img", {
+        src: questionMark,
+        className: "absolute z-10 animate-float",
+        style: {
+            right: "18px",
+            width: "13px",
+            top: "-27px"
+        }
+    })), React.createElement("span", {
+        className: "text-sm text-shadow p-2 text-center mb-4"
+    }, "Beta is currently open for testers on Discord."), React.createElement("span", {
+        className: "text-sm text-shadow p-2 text-center mb-2"
+    }, "Only 100,000 spots available!"), React.createElement(Button, {
+        onClick: n,
+        className: "overflow-hidden mb-2"
+    }, "Connect to Discord")), React.createElement(Button, {
+        onClick: t,
+        className: "overflow-hidden"
+    }, "Explore a friend's farm"))
+};
 var goblinDonation = "./assets/goblin_donation.109b941f.gif";
 const CreatingFarm = () => React.createElement("div", {
     className: "flex flex-col items-center p-1"
@@ -9584,8 +9611,39 @@ const CreatingFarm = () => React.createElement("div", {
 }, "Do not refresh your browser!"));
 var upArrow = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAANBAMAAABiGeI2AAAABGdBTUEAALGPC/xhBQAAAA9QTFRFAAAAwMvcWmmIGBQl////ppnnKQAAAAF0Uk5TAEDm2GYAAAA5SURBVAjXY2BgMGYAAmZBAyBp6CIMZIq4OBoAmS5ADoQ0UnFxUoaSzCYuzgZQlQxGSspwktnYgAEATmIItCr5aZYAAAAASUVORK5CYII=",
     downArrow = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAANBAMAAABiGeI2AAAABGdBTUEAALGPC/xhBQAAAA9QTFRFAAAAwMvcWmmIGBQl////ppnnKQAAAAF0Uk5TAEDm2GYAAABBSURBVAjXNcvBDcAgDEPRL2UC2glIFqCBDcj+M+EeuDxZsQM2B/DVK1ftq8mhc6lYcpMyyF5PYN5cb+mhvf0RJhx61QkaI5a88gAAAABJRU5ErkJggg==",
-    arrowRight = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAMBAMAAABGh1qtAAAABGdBTUEAALGPC/xhBQAAAA9QTFRFAAAAwMvcWmmIGBQl////ppnnKQAAAAF0Uk5TAEDm2GYAAAA/SURBVAjXY2BgYDZgAAETYSDBbGziCOQauri4ALkmQArIhVIgQSEDBiMlFUclEKUopAzSYKQE1m+kDDYFZBgAndgJfr1otdoAAAAASUVORK5CYII=";
-const roundToOneDecimal = A => Math.round(A * 10) / 10;
+    arrowRight = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAMBAMAAABGh1qtAAAABGdBTUEAALGPC/xhBQAAAA9QTFRFAAAAwMvcWmmIGBQl////ppnnKQAAAAF0Uk5TAEDm2GYAAAA/SURBVAjXY2BgYDZgAAETYSDBbGziCOQauri4ALkmQArIhVIgQSEDBiMlFUclEKUopAzSYKQE1m+kDDYFZBgAndgJfr1otdoAAAAASUVORK5CYII=",
+    humanDeath = "./assets/human_death.4768086b.gif";
+const Blocked = () => {
+        const {
+            authService: A
+        } = react.exports.useContext(Context$1), e = () => {
+            removeSession(metamask.myAccount), A.send("REFRESH")
+        };
+        return React.createElement("div", {
+            className: "flex flex-col text-center text-shadow items-center p-1"
+        }, React.createElement("div", {
+            className: "flex mb-3 items-center ml-8"
+        }, React.createElement("img", {
+            src: humanDeath,
+            alt: "Warning",
+            className: "w-full"
+        })), React.createElement("p", {
+            className: "text-center mb-3"
+        }, "Beta testers only!"), React.createElement("p", {
+            className: "text-center mb-2 text-xs"
+        }, "You don't have access to the game yet."), React.createElement("p", {
+            className: "text-center mb-4 text-xs"
+        }, "Make sure you have joined the", " ", React.createElement("a", {
+            className: "underline hover:text-white",
+            href: "https://discord.gg/sunflowerland",
+            target: "_blank",
+            rel: "noreferrer"
+        }, "Sunflower Land Discord server,"), ' go to the #verify channel and have the "farmer" role.'), React.createElement(Button, {
+            onClick: e,
+            className: "overflow-hidden mb-2"
+        }, React.createElement("span", null, "Try again")))
+    },
+    roundToOneDecimal = A => Math.round(A * 10) / 10;
 var CharityAddress;
 (function(A) {
     A.TheWaterProject = "0xBCf9bf2F0544252761BCA9c76Fe2aA18733C48db", A.PCF = "0x8c6A1870D922279dB6F91CB6798592c7A7133BBD"
@@ -9640,35 +9698,34 @@ const CHARITIES = lodash_shuffle([{
         }, "Donate & Play"))))
     },
     CreateFarm = () => {
+        var Q;
         const [A, e] = react.exports.useState(1), [t, a] = react.exports.useState(), [n, s] = react.exports.useState(0), {
             authService: r
-        } = react.exports.useContext(Context$1);
-        useActor(r);
-        const [i, m] = react.exports.useState(!1), E = async h => {
-            await new Promise(y => setTimeout(y, 1e3)), r.send("CREATE_FARM", {
+        } = react.exports.useContext(Context$1), [i] = useActor(r), [m, d] = react.exports.useState(!1), E = async w => {
+            await new Promise(f => setTimeout(f, 1e3)), r.send("CREATE_FARM", {
                 charityAddress: t,
                 donation: A,
-                captcha: h
+                captcha: w
             })
-        }, d = h => {
-            e(roundToOneDecimal(Number(h.target.value)))
-        }, u = () => {
-            e(h => roundToOneDecimal(h + .1))
-        }, w = () => {
-            e(A === 1 ? 1 : h => roundToOneDecimal(h - .1))
-        }, R = h => {
-            a(h), m(!0)
-        }, g = h => {
-            if (h < 0 && s(0), h > CHARITIES.length - 1) {
+        }, u = w => {
+            e(roundToOneDecimal(Number(w.target.value)))
+        }, h = () => {
+            e(w => roundToOneDecimal(w + .1))
+        }, B = () => {
+            e(A === 1 ? 1 : w => roundToOneDecimal(w - .1))
+        }, g = w => {
+            a(w), d(!0)
+        }, C = w => {
+            if (w < 0 && s(0), w > CHARITIES.length - 1) {
                 s(CHARITIES.length - 1);
                 return
             }
-            s(h)
+            s(w)
         };
-        return i ? React.createElement(RecaptchaWrapper, {
+        return ((Q = i.context.token) == null ? void 0 : Q.userAccess.createFarm) ? m ? React.createElement(RecaptchaWrapper, {
             sitekey: "6Lfqm6MeAAAAAFS5a0vwAfTGUwnlNoHziyIlOl1s",
             onChange: E,
-            onExpired: () => m(!1),
+            onExpired: () => d(!1),
             className: "w-full m-4 flex items-center justify-center"
         }) : React.createElement("form", {
             className: "mb-4 relative"
@@ -9691,7 +9748,7 @@ const CHARITIES = lodash_shuffle([{
             min: 1,
             value: A,
             required: !0,
-            onChange: d,
+            onChange: u,
             onBlur: () => {
                 A < 1 && e(1)
             }
@@ -9699,36 +9756,36 @@ const CHARITIES = lodash_shuffle([{
             src: upArrow,
             alt: "increment donation value",
             className: "cursor-pointer absolute -right-4 top-0",
-            onClick: u
+            onClick: h
         }), React.createElement("img", {
             src: downArrow,
             alt: "decrement donation value",
             className: "cursor-pointer absolute -right-4 bottom-0",
-            onClick: w
+            onClick: B
         })), React.createElement("span", {
             className: "text-[10px] text-shadow mt-2"
         }, "Minumum of 1 MATIC")), React.createElement("p", {
             className: "text-center mb-3 mt-10"
         }, "Select a charity"), React.createElement(Carousel, {
             activeIndex: n,
-            onSelect: g,
+            onSelect: C,
             prevIcon: React.createElement("img", {
                 src: arrowLeft,
                 alt: "left-arrow",
                 className: "h-5 cursor-pointer absolute left-2 sm:left-4",
-                onClick: () => g(n - 1)
+                onClick: () => C(n - 1)
             }),
             nextIcon: React.createElement("img", {
                 src: arrowRight,
                 alt: "right-arrow",
                 className: "h-5 cursor-pointer absolute right-2 sm:right-4",
-                onClick: () => g(n + 1)
+                onClick: () => C(n + 1)
             })
-        }, CHARITIES.map(h => React.createElement(CarouselItem, {
-            key: h.url
-        }, React.createElement(CharityDetail, l(c({}, h), {
-            onDonateAndPlayClick: R
-        }))))))
+        }, CHARITIES.map(w => React.createElement(CarouselItem, {
+            key: w.url
+        }, React.createElement(CharityDetail, l(c({}, w), {
+            onDonateAndPlayClick: g
+        })))))) : React.createElement(Blocked, null)
     },
     Loading = ({
         text: A
@@ -9785,11 +9842,10 @@ const releaseVersion = CONFIG.RELEASE_VERSION,
         target: "_blank",
         rel: "noopener noreferrer"
     }, releaseVersion == null ? void 0 : releaseVersion.split("-")[0])))));
-var humanDeath$1 = "./assets/human_death.4768086b.gif",
-    minting = "./assets/minting.8df1c1f8.gif",
+var minting = "./assets/minting.8df1c1f8.gif",
     richBegger = "./assets/rich_begger.5ae0fd9b.gif",
     syncingAnimation = "./assets/syncing.2364d1a3.gif";
-const IMAGE_LIST = [goblinDonation, humanDeath$1, humanDeath$1, minting, richBegger, syncingAnimation, background];
+const IMAGE_LIST = [goblinDonation, humanDeath, humanDeath, minting, richBegger, syncingAnimation, background];
 
 function preloadImage(A) {
     return new Promise((e, t) => {
@@ -10026,36 +10082,36 @@ const Action = ({
         } = react.exports.useContext(ToastContext), {
             gameService: r,
             shortcutItem: i
-        } = react.exports.useContext(Context), [m, E] = react.exports.useState(!1), [{
+        } = react.exports.useContext(Context), [m, d] = react.exports.useState(!1), [{
             context: {
-                state: d
+                state: E
             }
-        }] = useActor(r), u = d.inventory, w = (Q = 1) => a.ingredients.some(I => I.amount.mul(Q).greaterThan(u[I.item] || 0)), R = (Q = 1) => d.balance.lessThan(a.price.mul(Q)), g = (Q = 1) => {
+        }] = useActor(r), u = E.inventory, h = (y = 1) => a.ingredients.some(I => I.amount.mul(y).greaterThan(u[I.item] || 0)), B = (y = 1) => E.balance.lessThan(a.price.mul(y)), g = (y = 1) => {
             r.send("item.crafted", {
                 item: a.name,
-                amount: Q
+                amount: y
             }), s({
-                content: "SFL -$" + a.price.mul(Q)
+                content: "SFL -$" + a.price.mul(y)
             }), a.ingredients.map(I => {
                 s({
-                    content: I.item + " -" + I.amount.mul(Q)
+                    content: I.item + " -" + I.amount.mul(y)
                 })
             }), i(a.name)
-        }, h = async Q => {
+        }, C = async y => {
             await new Promise(I => setTimeout(I, 1e3)), r.send("SYNC", {
-                captcha: Q
+                captcha: y
             }), e()
-        }, y = () => {
-            E(!0)
+        }, Q = () => {
+            d(!0)
         };
         if (m) return React.createElement(RecaptchaWrapper, {
             sitekey: "6Lfqm6MeAAAAAFS5a0vwAfTGUwnlNoHziyIlOl1s",
-            onChange: h,
-            onExpired: () => E(!1),
+            onChange: C,
+            onExpired: () => d(!1),
             className: "w-full m-4 flex items-center justify-center"
         });
-        const B = a.supply === 0,
-            f = () => B ? null : a.disabled ? React.createElement("span", {
+        const w = a.supply === 0,
+            f = () => w ? null : a.disabled ? React.createElement("span", {
                 className: "text-xs mt-1 text-shadow"
             }, "Locked") : (S == null ? void 0 : S.equals(0)) ? React.createElement("div", null, React.createElement("p", {
                 className: "text-xxs no-wrap text-center my-1 underline"
@@ -10063,27 +10119,27 @@ const Action = ({
                 className: "text-xxs text-center"
             }, "Sync your farm to the Blockchain to restock"), React.createElement(Button, {
                 className: "text-xs mt-1",
-                onClick: y
+                onClick: Q
             }, "Sync")) : React.createElement(React.Fragment, null, React.createElement(Button, {
-                disabled: R() || w() || (S == null ? void 0 : S.lessThan(1)),
+                disabled: B() || h() || (S == null ? void 0 : S.lessThan(1)),
                 className: "text-xs mt-1",
                 onClick: () => g()
             }, "Craft ", t && "1"), t && React.createElement(Button, {
-                disabled: R(10) || w(10) || (S == null ? void 0 : S.lessThan(10)),
+                disabled: B(10) || h(10) || (S == null ? void 0 : S.lessThan(10)),
                 className: "text-xs mt-1 whitespace-nowrap",
                 onClick: () => g(10)
             }, "Craft 10")),
-            S = d.stock[a.name] || new Decimal(0);
+            S = E.stock[a.name] || new Decimal(0);
         return React.createElement("div", {
             className: "flex"
         }, React.createElement("div", {
             className: "w-3/5 flex flex-wrap h-fit"
-        }, Object.values(A).map(Q => React.createElement(Box, {
-            isSelected: a.name === Q.name,
-            key: Q.name,
-            onClick: () => n(Q),
-            image: ITEM_DETAILS[Q.name].image,
-            count: u[Q.name]
+        }, Object.values(A).map(y => React.createElement(Box, {
+            isSelected: a.name === y.name,
+            key: y.name,
+            onClick: () => n(y),
+            image: ITEM_DETAILS[y.name].image,
+            count: u[y.name]
         }))), React.createElement(OuterPanel, {
             className: "flex-1 w-1/3"
         }, React.createElement("div", {
@@ -10100,9 +10156,9 @@ const Action = ({
             className: "text-shadow text-center mt-2 sm:text-sm"
         }, a.description), React.createElement("div", {
             className: "border-t border-white w-full mt-2 pt-1"
-        }, a.ingredients.map((Q, I) => {
-            const D = ITEM_DETAILS[Q.item],
-                F = new Decimal(u[Q.item] || 0).lessThan(Q.amount);
+        }, a.ingredients.map((y, I) => {
+            const D = ITEM_DETAILS[y.item],
+                F = new Decimal(u[y.item] || 0).lessThan(y.amount);
             return React.createElement("div", {
                 className: "flex justify-center items-end",
                 key: I
@@ -10113,7 +10169,7 @@ const Action = ({
                 className: classNames("text-xs text-shadow text-center mt-2 ", {
                     "text-red-500": F
                 })
-            }, Q.amount.toNumber()))
+            }, y.amount.toNumber()))
         }), React.createElement("div", {
             className: "flex justify-center items-end"
         }, React.createElement("img", {
@@ -10121,7 +10177,7 @@ const Action = ({
             className: "h-5 mr-1"
         }), React.createElement("span", {
             className: classNames("text-xs text-shadow text-center mt-2 ", {
-                "text-red-500": R()
+                "text-red-500": B()
             })
         }, `$${a.price.toNumber()}`))), f())))
     };
@@ -10179,18 +10235,18 @@ const TAB_CONTENT_HEIGHT = 360,
                 state: i,
                 itemsMintedAt: m
             }
-        }] = useActor(r), [E, d] = react.exports.useState(!0), [u, w] = react.exports.useState(), [R, g] = react.exports.useState(!1);
+        }] = useActor(r), [d, E] = react.exports.useState(!0), [u, h] = react.exports.useState(), [B, g] = react.exports.useState(!1);
         console.log({
             itemsMintedAt: m
         }), react.exports.useEffect(() => {
             (async () => {
                 const N = await metamask.getInventory().totalSupply();
-                w(N), d(!1)
+                h(N), E(!1)
             })()
         }, []);
-        const h = i.inventory,
-            y = (T = 1) => n.ingredients.some(N => N.amount.mul(T).greaterThan(h[N.item] || 0)),
-            B = (T = 1) => i.balance.lessThan(n.price.mul(T)),
+        const C = i.inventory,
+            Q = (T = 1) => n.ingredients.some(N => N.amount.mul(T).greaterThan(C[N.item] || 0)),
+            w = (T = 1) => i.balance.lessThan(n.price.mul(T)),
             f = () => {
                 g(!0)
             },
@@ -10200,14 +10256,14 @@ const TAB_CONTENT_HEIGHT = 360,
                     captcha: T
                 }), A()
             };
-        if (E) return React.createElement("div", {
+        if (d) return React.createElement("div", {
             className: "h-60"
         }, React.createElement("span", {
             className: "loading"
         }, "Loading..."));
-        let Q = 0;
-        u && n.supply && (Q = n.supply - ((F = u[n.name]) == null ? void 0 : F.toNumber()));
-        const I = Q <= 0,
+        let y = 0;
+        u && n.supply && (y = n.supply - ((F = u[n.name]) == null ? void 0 : F.toNumber()));
+        const I = y <= 0,
             D = () => {
                 if (I) return null;
                 if (!t && n.disabled) return React.createElement("span", {
@@ -10236,12 +10292,12 @@ const TAB_CONTENT_HEIGHT = 360,
                     className: "text-xs text-shadow text-center mt-2"
                 }, `${n.requires}s only`));
                 if (!!a) return React.createElement(React.Fragment, null, React.createElement(Button, {
-                    disabled: B() || y(),
+                    disabled: w() || Q(),
                     className: "text-xs mt-1",
                     onClick: f
                 }, "Craft"))
             };
-        return R ? React.createElement(React.Fragment, null, React.createElement(RecaptchaWrapper, {
+        return B ? React.createElement(React.Fragment, null, React.createElement(RecaptchaWrapper, {
             sitekey: "6Lfqm6MeAAAAAFS5a0vwAfTGUwnlNoHziyIlOl1s",
             onChange: S,
             onExpired: () => g(!1),
@@ -10253,7 +10309,7 @@ const TAB_CONTENT_HEIGHT = 360,
         }, React.createElement(Items, {
             items: e,
             selected: n.name,
-            inventory: h,
+            inventory: C,
             onClick: s
         }), React.createElement(OuterPanel, {
             className: "flex-1 min-w-[42%] flex flex-col justify-between items-center"
@@ -10261,9 +10317,9 @@ const TAB_CONTENT_HEIGHT = 360,
             className: "flex flex-col justify-center items-center p-2 relative w-full"
         }, I && React.createElement("span", {
             className: "bg-blue-600 text-shadow border text-xxs absolute left-0 -top-4 p-1 rounded-md"
-        }, "Sold out"), !!n.supply && Q > 0 && React.createElement("span", {
+        }, "Sold out"), !!n.supply && y > 0 && React.createElement("span", {
             className: "bg-blue-600 text-shadow border  text-xxs absolute left-0 -top-4 p-1 rounded-md"
-        }, `${Q} left`), React.createElement("span", {
+        }, `${y} left`), React.createElement("span", {
             className: "text-shadow text-center"
         }, n.name), React.createElement("img", {
             src: ITEM_DETAILS[n.name].image,
@@ -10275,7 +10331,7 @@ const TAB_CONTENT_HEIGHT = 360,
             className: "border-t border-white w-full mt-2 pt-1"
         }, n.ingredients.map((T, N) => {
             const U = ITEM_DETAILS[T.item],
-                v = new Decimal(h[T.item] || 0).lessThan(T.amount);
+                v = new Decimal(C[T.item] || 0).lessThan(T.amount);
             return React.createElement("div", {
                 className: "flex justify-center items-end",
                 key: N
@@ -10294,7 +10350,7 @@ const TAB_CONTENT_HEIGHT = 360,
             className: "h-5 mr-1"
         }), React.createElement("span", {
             className: classNames("text-xs text-shadow text-center mt-2 ", {
-                "text-red-500": B()
+                "text-red-500": w()
             })
         }, `${n.price.toNumber()}`))), D()), React.createElement("a", {
             href: `https://opensea.io/assets/matic/0x22d5f9b75c524fec1d6619787e582644cd4d7422/${KNOWN_IDS[n.name]}`,
@@ -10783,32 +10839,31 @@ const Flags = () => {
     }, "Do not refresh your browser")),
     Withdrawing = () => React.createElement("span", {
         className: "loading"
-    }, "Withdrawing");
-var humanDeath = "./assets/suspicious_goblin.ea6c0c3a.gif";
-const Blacklisted = () => {
-    const {
-        gameService: A
-    } = react.exports.useContext(Context), e = () => {
-        A.send("CONTINUE")
+    }, "Withdrawing"),
+    Blacklisted = () => {
+        const {
+            gameService: A
+        } = react.exports.useContext(Context), e = () => {
+            A.send("CONTINUE")
+        };
+        return React.createElement("div", {
+            className: "flex flex-col items-center p-2"
+        }, React.createElement("span", {
+            className: "text-shadow text-center"
+        }, "Goblins detected!"), React.createElement("img", {
+            src: humanDeath$1,
+            className: "w-1/4 mt-2"
+        }), React.createElement("span", {
+            className: "text-shadow text-xs text-center mt-2 mb-2"
+        }, "The anti-bot detection system is relatively new and has picked up some strange behaviour. Some actions may be temporarily restricted."), React.createElement("a", {
+            href: "https://forms.gle/ajhNS6kr3c6U3YLT9",
+            className: "underline text-center text-xs hover:text-blue-500 mt-1 mb-2 block",
+            target: "_blank",
+            rel: "noopener noreferrer"
+        }, "Share details to help us improve our system"), React.createElement(Button, {
+            onClick: e
+        }, "Continue Playing"))
     };
-    return React.createElement("div", {
-        className: "flex flex-col items-center p-2"
-    }, React.createElement("span", {
-        className: "text-shadow text-center"
-    }, "Goblins detected!"), React.createElement("img", {
-        src: humanDeath,
-        className: "w-1/4 mt-2"
-    }), React.createElement("span", {
-        className: "text-shadow text-xs text-center mt-2 mb-2"
-    }, "The anti-bot detection system is relatively new and has picked up some strange behaviour. Some actions may be temporarily restricted."), React.createElement("a", {
-        href: "https://forms.gle/ajhNS6kr3c6U3YLT9",
-        className: "underline text-center text-xs hover:text-blue-500 mt-1 mb-2 block",
-        target: "_blank",
-        rel: "noopener noreferrer"
-    }, "Share details to help us improve our system"), React.createElement(Button, {
-        onClick: e
-    }, "Continue Playing"))
-};
 class SpriteSheetInstance extends React.Component {}
 const ID = function() {
     return "_" + Math.random().toString(36).substr(2, 9)
@@ -10826,15 +10881,15 @@ class Spritesheet extends React.Component {
                 background: r,
                 backgroundSize: i,
                 backgroundRepeat: m,
-                backgroundPosition: E,
-                onClick: d,
+                backgroundPosition: d,
+                onClick: E,
                 onDoubleClick: u,
-                onMouseMove: w,
-                onMouseEnter: R,
+                onMouseMove: h,
+                onMouseEnter: B,
                 onMouseLeave: g,
-                onMouseOver: h,
-                onMouseOut: y,
-                onMouseDown: B,
+                onMouseOver: C,
+                onMouseOut: Q,
+                onMouseDown: w,
                 onMouseUp: f
             } = this.props, S = {
                 position: "relative",
@@ -10846,8 +10901,8 @@ class Spritesheet extends React.Component {
                 backgroundImage: `url(${r})`,
                 backgroundSize: i,
                 backgroundRepeat: m,
-                backgroundPosition: E
-            }, Q = {
+                backgroundPosition: d
+            }, y = {
                 overflow: "hidden",
                 backgroundRepeat: "no-repeat",
                 display: "table-cell",
@@ -10857,7 +10912,7 @@ class Spritesheet extends React.Component {
                 transformOrigin: "0 50%"
             }, I = React.createElement("div", {
                 className: "react-responsive-spritesheet-container__move",
-                style: Q
+                style: y
             }), D = React.createElement("div", {
                 className: "react-responsive-spritesheet-container",
                 style: S
@@ -10865,14 +10920,14 @@ class Spritesheet extends React.Component {
             return React.createElement("div", {
                 className: `react-responsive-spritesheet ${this.id} ${t}`,
                 style: a,
-                onClick: () => d(this.setInstance()),
+                onClick: () => E(this.setInstance()),
                 onDoubleClick: () => u(this.setInstance()),
-                onMouseMove: () => w(this.setInstance()),
-                onMouseEnter: () => R(this.setInstance()),
+                onMouseMove: () => h(this.setInstance()),
+                onMouseEnter: () => B(this.setInstance()),
                 onMouseLeave: () => g(this.setInstance()),
-                onMouseOver: () => h(this.setInstance()),
-                onMouseOut: () => y(this.setInstance()),
-                onMouseDown: () => B(this.setInstance()),
+                onMouseOver: () => C(this.setInstance()),
+                onMouseOut: () => Q(this.setInstance()),
+                onMouseDown: () => w(this.setInstance()),
                 onMouseUp: () => f(this.setInstance())
             }, D)
         });
@@ -11112,37 +11167,37 @@ const TimeLeftPanel = ({
         const {
             gameService: e,
             selectedItem: t
-        } = react.exports.useContext(Context), [a] = useActor(e), [n] = useActor(e), [s, r] = react.exports.useState(!0), [i, m] = react.exports.useState(!1), [E, d] = react.exports.useState(), [u, w] = react.exports.useState(0), [R, g] = react.exports.useState(!1), h = react.exports.useRef(null), y = react.exports.useRef(), B = react.exports.useRef(), [f, S] = react.exports.useState(!1), Q = a.matches("readonly"), I = "Iron Pickaxe", D = n.context.state.gold[A], F = !canMine$2(D);
+        } = react.exports.useContext(Context), [a] = useActor(e), [n] = useActor(e), [s, r] = react.exports.useState(!0), [i, m] = react.exports.useState(!1), [d, E] = react.exports.useState(), [u, h] = react.exports.useState(0), [B, g] = react.exports.useState(!1), C = react.exports.useRef(null), Q = react.exports.useRef(), w = react.exports.useRef(), [f, S] = react.exports.useState(!1), y = a.matches("readonly"), I = "Iron Pickaxe", D = n.context.state.gold[A], F = !canMine$2(D);
         react.exports.useEffect(() => {
-            const C = k => {
-                h.current && !h.current.contains(k.target) && w(0)
+            const R = k => {
+                C.current && !C.current.contains(k.target) && h(0)
             };
-            return document.addEventListener("click", C, !0), () => {
-                document.removeEventListener("click", C, !0)
+            return document.addEventListener("click", R, !0), () => {
+                document.removeEventListener("click", R, !0)
             }
         }, []);
-        const T = async C => {
-            d(C), r(!0), await new Promise(k => setTimeout(k, POPOVER_TIME_MS$3)), r(!1)
+        const T = async R => {
+            E(R), r(!0), await new Promise(k => setTimeout(k, POPOVER_TIME_MS$3)), r(!1)
         }, N = () => {
             F && S(!0)
         }, U = () => {
             S(!1)
         }, v = () => {
             var O, Y, K;
-            const C = (O = y.current) == null ? void 0 : O.getInfo("isPlaying");
-            if (Q) {
-                miningAudio.play(), (Y = y.current) == null || Y.goToAndPlay(0);
+            const R = (O = Q.current) == null ? void 0 : O.getInfo("isPlaying");
+            if (y) {
+                miningAudio.play(), (Y = Q.current) == null || Y.goToAndPlay(0);
                 return
             }
             if (!(n.context.state.inventory["Iron Pickaxe"] || new Decimal(0)).lessThanOrEqualTo(0))
-                if (t == I && !C) miningAudio.play(), (K = y.current) == null || K.goToAndPlay(0), w(V => V + 1), u > 0 && u === HITS$3 - 1 && (P(), miningFallAudio.play(), w(0));
+                if (t == I && !R) miningAudio.play(), (K = Q.current) == null || K.goToAndPlay(0), h(V => V + 1), u > 0 && u === HITS$3 - 1 && (P(), miningFallAudio.play(), h(0));
                 else return
         }, P = async () => {
-            var C;
+            var R;
             try {
                 e.send("gold.mined", {
                     index: A
-                }), g(!0), (C = B.current) == null || C.goToAndPlay(0), T(React.createElement("div", {
+                }), g(!0), (R = w.current) == null || R.goToAndPlay(0), T(React.createElement("div", {
                     className: "flex"
                 }, React.createElement("img", {
                     src: gold,
@@ -11156,11 +11211,11 @@ const TimeLeftPanel = ({
                 }, k.message))
             }
         }, L = () => {
-            var C, k;
-            Q || t === I && ((C = n.context.state.inventory[I]) == null ? void 0 : C.gte(1)) || ((k = h.current) == null || k.classList.add("cursor-not-allowed"), m(!0))
+            var R, k;
+            y || t === I && ((R = n.context.state.inventory[I]) == null ? void 0 : R.gte(1)) || ((k = C.current) == null || k.classList.add("cursor-not-allowed"), m(!0))
         }, J = () => {
-            var C, k;
-            Q || t === I && ((C = n.context.state.inventory[I]) == null ? void 0 : C.gte(1)) || ((k = h.current) == null || k.classList.remove("cursor-not-allowed"), m(!1))
+            var R, k;
+            y || t === I && ((R = n.context.state.inventory[I]) == null ? void 0 : R.gte(1)) || ((k = C.current) == null || k.classList.remove("cursor-not-allowed"), m(!1))
         }, b = GOLD_RECOVERY_TIME, G = getTimeLeft(D.minedAt, b), M = 100 - G / b * 100;
         return React.createElement("div", {
             className: "relative z-10",
@@ -11169,7 +11224,7 @@ const TimeLeftPanel = ({
         }, !F && React.createElement("div", {
             onMouseEnter: L,
             onMouseLeave: J,
-            ref: h,
+            ref: C,
             className: "group cursor-pointer  w-full h-full",
             onClick: v
         }, React.createElement(Spritesheet, {
@@ -11178,8 +11233,8 @@ const TimeLeftPanel = ({
                 width: `${GRID_WIDTH_PX*5}px`,
                 imageRendering: "pixelated"
             },
-            getInstance: C => {
-                y.current = C
+            getInstance: R => {
+                Q.current = R
             },
             image: sparkSheet$2,
             widthFrame: 91,
@@ -11189,8 +11244,8 @@ const TimeLeftPanel = ({
             direction: "forward",
             autoplay: !1,
             loop: !0,
-            onLoopComplete: C => {
-                C.pause()
+            onLoopComplete: R => {
+                R.pause()
             }
         }), React.createElement("div", {
             className: `absolute top-8 transition pointer-events-none w-28 z-20 ${i?"opacity-100":"opacity-0"}`
@@ -11199,13 +11254,13 @@ const TimeLeftPanel = ({
         }, "Equip ", I.toLowerCase()))), React.createElement(Spritesheet, {
             style: {
                 width: `${GRID_WIDTH_PX*5}px`,
-                opacity: R ? 1 : 0,
+                opacity: B ? 1 : 0,
                 transition: "opacity 0.2s ease-in",
                 imageRendering: "pixelated"
             },
             className: "pointer-events-none z-20",
-            getInstance: C => {
-                B.current = C
+            getInstance: R => {
+                w.current = R
             },
             image: dropSheet$2,
             widthFrame: 91,
@@ -11215,8 +11270,8 @@ const TimeLeftPanel = ({
             direction: "forward",
             autoplay: !1,
             loop: !0,
-            onLoopComplete: C => {
-                C.pause()
+            onLoopComplete: R => {
+                R.pause()
             }
         }), React.createElement("img", {
             src: empty$2,
@@ -11230,7 +11285,7 @@ const TimeLeftPanel = ({
                 "opacity-0": u === 0
             })
         }, React.createElement(HealthBar, {
-            percentage: R ? 0 : 100 - u / 3 * 100
+            percentage: B ? 0 : 100 - u / 3 * 100
         })), F && React.createElement(React.Fragment, null, React.createElement("div", {
             className: "absolute",
             style: {
@@ -11249,7 +11304,7 @@ const TimeLeftPanel = ({
                 "opacity-100": s,
                 "opacity-0": !s
             })
-        }, E))
+        }, d))
     };
 var sparkSheet$1 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAccAAABCBAMAAADQ2ABeAAAABGdBTUEAALGPC/xhBQAAAC1QTFRFAAAAUFVsdKp8oa/DYWqHe4ehISdCytTjPohIjJy1N0JmWmmJ6/D3/uhhwczdX4B5dAAAAAF0Uk5TAEDm2GYAAAJ9SURBVGje7ZgxSxxBFMcnJxx3xQlCgu3hJ5Csh72spEkXB7+BhQlWkWmusFqutLzx4GqZC0fK3A0cARNkk41YBpKBbU3W+Qy+2dV0iW9kNznN+3XC3z//9968tyhjBEEQBEEQBEEQBEEQxN+mRUXOL+dU5AN5gOY/WBwq8reYf/7I/RKc36HWORj/Hdrccr+T3qtT4oo0Xs02924zIbExXuNsmTn4kEgfcdPkINVB3has9WFlqVnT+pgPLw1+kAti1cf6orLUbGjf+3hfegxyXfyyThHWWWWppbUxuilyaDP0IBcCIU5WbyrAWMtqUkNHQD5Az9HmRWLnCEV2rn84xFjLt1WkZsw688EMJ1506i/YjYQaRbez7WEd67SC1Kx+VshxD/xVUSRudx6dFkV6WMc6qyD1tVzPMnwS8w2380WRfLuLt/6sb6ybaXmp2e6bJEk+adxhqysQJ8bginz8HMQfuOjirUcznLVXavBWWh6psY0PMN5qNJFwd773MYMMQx6shc/ECazwIspaKZv1S0/N9n4orY/cXUPI61aN9MR9JjFJll+HnK/Bg3XHeJhirMewlX3EPxO8UrPGnv2ptbJJjJFH1mo9dUV+vV1cWxb7nIciQX1WC+txlsj+7X9o+aUG+Rksu4IuYmYTZbDsU3gqkwNMkafiIw/DTf7U3/rPZ8cvNWu4DR44c0xLIjgOsTN/hxDX3N3pbMFitsu29kvNGjsjLeVUHfcw6mhXT+RAqR7Gu7a0yYNgK9xYKd3aLzXIX4K5OkZ1hEU72h01nHVt6Ql/EYQb7fKt/VIz1stBqhuFGmm9ktOuwtorNUEQBEEQBEEQBEEQxMPlCgiQ0gHzt4teAAAAAElFTkSuQmCC",
     dropSheet$1 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAn0AAABCCAMAAAAVHpCuAAAABGdBTUEAALGPC/xhBQAAADxQTFRFAAAA2eDrdYOeU2KClqW9Y3SRbXyZfYyneYafg5KuobDDISdC6/D3PohITJ5HN0Jm////wczdWmmJjJy1VJu2eAAAAAF0Uk5TAEDm2GYAAAVzSURBVHja7ZvrkpswDIXTbtgQkoCx3/9d6wsXGwLIiQTd7DnTmeZH5+DInyVZoacTBEEQBEEQBEEQBEEQBEEQBEEQBEEQ9EkykubKC0GG9qSuh097AT9oAp8x4nArbVzqM8APWsl9MiCqxrRepgF+0M54j/QpVVUVCIR2zK2WPtMqZeHTVycl9aAP6ZJ/ZdWVCaztKx192v6x7V9pc18h0v4pVe5xq9aARiauhvFomyT32YKrlPYF+Pv7m739M5K3aoOkt9dtl+sCnPj0YEhdPtzD4lu1yGzRgD5u+EJITcSKQIxHMPr2j5k+bXQMNmaLPwU+E38QqFcmHbeE9o+bPtuLxQ9hnC0i38m1eTF8UoXFmCqAce7oszL8Y78xrbKWdxN/Aoqc9GlHnJu/VZUYfta2ujgwqrORpi+kVUy2fwp+tmKFAZxHUBk+5vqEoQN99q+rY64J9PFz4enzYEs1lxA7ft0ArnIEal0xpz+XT63rZcx4qvHixyKlT6S5hPj3rC09flVVlvzvAHiaVUSf0ItW4W7jZjr+vsFf3hVuICL0ufGEK70SQ+DxKUL1drzzuqc0/ahFprnc+UeOz38hUjXqakqrQpeuT79UIgdcXUTqrZlu1zBqYYT9qIz3C4aW7teHs//xq2hcn36pZK6+u5zj+LIr1Fzul474X4hMFv9fJNbw29f5HIa0f8To20P9XDH83CERW+V6lH3SEf/YKMmlUok1D2pHnzlXYRanC08fW3tjlq7BMvVXS45a+vezy53ez2anL8mlUm+a50LtduzazeJ0UVj6NBd9jjNjJpTwTbXnNmyjlucrVJPU+lJypX75F07SqnVCczbaxFWPUNPiY+w0pHDlpPA/j36VmhM+G8B2gM1/4PlNb2od0/fmZXfBerqBrxSuFesn1SvrJG1bD4vvZlJk+qirTgJEi49p40lwmFhwwRcW0t6HUu6W7x70dnadW7PRt2QdpaOwe/mFa806bpmGqRH9u2xZR7l0cCcmVoL1E8JJhf1mb7vlpZ/Fsfbpt7Yd1q11ex9mZvptwJ9ba8MwV1xadR/c4trvXnZPtmodtUzjzpHp27KOupJoJkVKrBTr5BkZqfV2d/h9ffnxhG43zPP28T4s28awTfCTsvYD57dGLSvWXXCH3cumb816bJmm5Z3yiA3rqC5M3An0EazjZySHcz0+t6a53+9/S4+rbjnpC9Zejd7R+r0x1vqqXXDji0fW3XojIGPRmswsKfBRYv0afXnbqKI3KzcL+819Od+IuQ8+uT74CNnfuu4ktmrVJO/J5vSX29YjfUNLRjtJxFiHn8Ejd0JizdxGNXuNeNnflnTv7RbRN5ZMiBxiXdcpftkwbq9apbtHp2/Tevwfp7lTI3KsXSqN3bcTa/Y20lPrwzeUvko7rG1uNVyIHGJd1yl+UxhZVh3vXgZ929aDce69PSPW/Rynf9fNajU4+ds4Ta2r9N27ZrIJCVZz5adjrJfgo+K3tWrnFO+eL1w08+2ADMbxEyjLp8Y6WGW5Z29jnR7OtcL+6DtKM5hztWYHWT8vvBm5b3XVs91zhYtovx2Q5N3Y7q5L+gLEWPdWOe652zgLz8rhfNxunmY3/XX/8vHgIuRQ6zGmuX3fuvVs90Lhoua+zYBExt3UiJa8abEerWbujNtYzwv7kr/1voV/abwz36jvSOvsjEe2Xtg9roBExmrYOVLuI8U6wi91Z93GJ6l10TzWiVWHWed3e/RVT3ePNSD1E+hoX4QY61zb17bxtcP5MXoDvmP961fw+N/iE52h06+U9KET8x+M9zk+wofzBEFHHX4EAoIgCIIgCIIgCIIgCIIgCIIgCIIgCIIgCIIgCIJ+iP4BLFEE+T4oO28AAAAASUVORK5CYII=",
@@ -11262,38 +11317,38 @@ const POPOVER_TIME_MS$2 = 1e3,
         const {
             gameService: e,
             selectedItem: t
-        } = react.exports.useContext(Context), [a] = useActor(e), [n] = useActor(e), [s, r] = react.exports.useState(!0), [i, m] = react.exports.useState(!1), [E, d] = react.exports.useState(), [u, w] = react.exports.useState(0), [R, g] = react.exports.useState(!1), h = react.exports.useRef(null), y = react.exports.useRef(), B = react.exports.useRef(), [f, S] = react.exports.useState(!1), Q = a.matches("readonly"), I = "Pickaxe", D = n.context.state.stones[A], F = !canMine$1(D);
+        } = react.exports.useContext(Context), [a] = useActor(e), [n] = useActor(e), [s, r] = react.exports.useState(!0), [i, m] = react.exports.useState(!1), [d, E] = react.exports.useState(), [u, h] = react.exports.useState(0), [B, g] = react.exports.useState(!1), C = react.exports.useRef(null), Q = react.exports.useRef(), w = react.exports.useRef(), [f, S] = react.exports.useState(!1), y = a.matches("readonly"), I = "Pickaxe", D = n.context.state.stones[A], F = !canMine$1(D);
         react.exports.useEffect(() => {
-            const C = k => {
-                h.current && !h.current.contains(k.target) && w(0)
+            const R = k => {
+                C.current && !C.current.contains(k.target) && h(0)
             };
-            return document.addEventListener("click", C, !0), () => {
-                document.removeEventListener("click", C, !0)
+            return document.addEventListener("click", R, !0), () => {
+                document.removeEventListener("click", R, !0)
             }
         }, []);
-        const T = async C => {
-            d(C), r(!0), await new Promise(k => setTimeout(k, POPOVER_TIME_MS$2)), r(!1)
+        const T = async R => {
+            E(R), r(!0), await new Promise(k => setTimeout(k, POPOVER_TIME_MS$2)), r(!1)
         }, N = () => {
             F && S(!0)
         }, U = () => {
             S(!1)
         }, v = () => {
             var O, Y, K;
-            const C = (O = y.current) == null ? void 0 : O.getInfo("isPlaying");
-            if (Q) {
-                miningAudio.play(), (Y = y.current) == null || Y.goToAndPlay(0);
+            const R = (O = Q.current) == null ? void 0 : O.getInfo("isPlaying");
+            if (y) {
+                miningAudio.play(), (Y = Q.current) == null || Y.goToAndPlay(0);
                 return
             }
             if (!(n.context.state.inventory.Pickaxe || new Decimal(0)).lessThanOrEqualTo(0))
-                if (t == I && !C) miningAudio.play(), (K = y.current) == null || K.goToAndPlay(0), w(V => V + 1), u > 0 && u === HITS$2 - 1 && (P(), miningFallAudio.play(), w(0));
+                if (t == I && !R) miningAudio.play(), (K = Q.current) == null || K.goToAndPlay(0), h(V => V + 1), u > 0 && u === HITS$2 - 1 && (P(), miningFallAudio.play(), h(0));
                 else return
         }, P = async () => {
-            var C;
-            w(0);
+            var R;
+            h(0);
             try {
                 e.send("stone.mined", {
                     index: A
-                }), g(!0), (C = B.current) == null || C.goToAndPlay(0), T(React.createElement("div", {
+                }), g(!0), (R = w.current) == null || R.goToAndPlay(0), T(React.createElement("div", {
                     className: "flex"
                 }, React.createElement("img", {
                     src: stone,
@@ -11307,11 +11362,11 @@ const POPOVER_TIME_MS$2 = 1e3,
                 }, k.message))
             }
         }, L = () => {
-            var C, k;
-            Q || t === I && ((C = n.context.state.inventory[I]) == null ? void 0 : C.gte(1)) || ((k = h.current) == null || k.classList.add("cursor-not-allowed"), m(!0))
+            var R, k;
+            y || t === I && ((R = n.context.state.inventory[I]) == null ? void 0 : R.gte(1)) || ((k = C.current) == null || k.classList.add("cursor-not-allowed"), m(!0))
         }, J = () => {
-            var C, k;
-            Q || t === I && ((C = n.context.state.inventory[I]) == null ? void 0 : C.gte(1)) || ((k = h.current) == null || k.classList.remove("cursor-not-allowed"), m(!1))
+            var R, k;
+            y || t === I && ((R = n.context.state.inventory[I]) == null ? void 0 : R.gte(1)) || ((k = C.current) == null || k.classList.remove("cursor-not-allowed"), m(!1))
         }, b = STONE_RECOVERY_TIME, G = getTimeLeft(D.minedAt, b), M = 100 - G / b * 100;
         return React.createElement("div", {
             className: "relative z-10",
@@ -11320,7 +11375,7 @@ const POPOVER_TIME_MS$2 = 1e3,
         }, !F && React.createElement("div", {
             onMouseEnter: L,
             onMouseLeave: J,
-            ref: h,
+            ref: C,
             className: "group cursor-pointer  w-full h-full",
             onClick: v
         }, React.createElement(Spritesheet, {
@@ -11329,8 +11384,8 @@ const POPOVER_TIME_MS$2 = 1e3,
                 width: `${GRID_WIDTH_PX*5}px`,
                 imageRendering: "pixelated"
             },
-            getInstance: C => {
-                y.current = C
+            getInstance: R => {
+                Q.current = R
             },
             image: sparkSheet$1,
             widthFrame: 91,
@@ -11340,8 +11395,8 @@ const POPOVER_TIME_MS$2 = 1e3,
             direction: "forward",
             autoplay: !1,
             loop: !0,
-            onLoopComplete: C => {
-                C.pause()
+            onLoopComplete: R => {
+                R.pause()
             }
         }), React.createElement("div", {
             className: `absolute top-10 transition pointer-events-none w-28 z-20 ${i?"opacity-100":"opacity-0"}`
@@ -11350,13 +11405,13 @@ const POPOVER_TIME_MS$2 = 1e3,
         }, "Equip ", I.toLowerCase()))), React.createElement(Spritesheet, {
             style: {
                 width: `${GRID_WIDTH_PX*5}px`,
-                opacity: R ? 1 : 0,
+                opacity: B ? 1 : 0,
                 transition: "opacity 0.2s ease-in",
                 imageRendering: "pixelated"
             },
             className: "pointer-events-none z-20",
-            getInstance: C => {
-                B.current = C
+            getInstance: R => {
+                w.current = R
             },
             image: dropSheet$1,
             widthFrame: 91,
@@ -11366,8 +11421,8 @@ const POPOVER_TIME_MS$2 = 1e3,
             direction: "forward",
             autoplay: !1,
             loop: !0,
-            onLoopComplete: C => {
-                C.pause()
+            onLoopComplete: R => {
+                R.pause()
             }
         }), React.createElement("img", {
             src: empty$1,
@@ -11381,7 +11436,7 @@ const POPOVER_TIME_MS$2 = 1e3,
                 "opacity-0": u === 0
             })
         }, React.createElement(HealthBar, {
-            percentage: R ? 0 : 100 - u / 3 * 100
+            percentage: B ? 0 : 100 - u / 3 * 100
         })), F && React.createElement(React.Fragment, null, React.createElement("div", {
             className: "absolute",
             style: {
@@ -11400,7 +11455,7 @@ const POPOVER_TIME_MS$2 = 1e3,
                 "opacity-100": s,
                 "opacity-0": !s
             })
-        }, E))
+        }, d))
     };
 var sparkSheet = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAccAAABCCAMAAAAVKO1fAAAABGdBTUEAALGPC/xhBQAAAGxQTFRFAAAA3trPv7qz08y/vMTQwrOX1cu0oZWBtK+oybecm6W1zca8en+YqpV9ycCqjYBusZBatZ2As77QJCpTdKp8uKqShIyjlqG34OjvsZ9yfFMgkGIn0trojJy1PohIN0Jm2eTpWmmJ/uhhwczd+klCGgAAAAF0Uk5TAEDm2GYAAAK5SURBVHja7ZjtjtowFETTdtuFhQQSgvNp4sTv/46dmwQKK63Uaq9R0p0jfiAhHdCM7VwTRYQQQgghhBBCCCGEEEIIIYQQQp7MwAjYI1lM2OyRm4b8Y40Di/wfNg17ZI9cMgtKYHjaF62hxjfn3FswdagIXsqyfHlIevoev/RAAqldA7x3Loxa8nXvolagTEHblmWk7g4cSDD1saoqyPX1k1oS9rIrdWvcJkmCIucqVWsMHEgYtT/X4Kfzo71p1NXDHWo1trsY/CjbsclU8egOH0gYtfdngPUxuqtGXx2ixrbdAezFscckXVUg+uro1E1SUMnLNfpq9RqjvZkKBIm8yj89+hUEoq+Gu+sn+VnkWCUB1HONTrFHU0xF7qRI7MjrJ9b7FQSirYbr1PU3+VnRfa+ealRTo7e9KW5F7u57jOwaAlFXO5zVXY9F3IwjlJ77UT3WqKVGa3gumiJr23QcVx96XEcg6mrsb4dF0kzDMGhCqMcaldRSI87SEhsynS4eIF1ZIJrqaH7iwl1Xx3pW6wxRj+q5RhW1macb9Bgn23iuUWdg/YtArF9c1t18jbE4tev6teuctfXx2Oir5VjVUpv5ypjhCRnH340psyzebtNVBaKpvkCGqyiEIj/0GKbwtq4v2up5WtVR53LlSFOUJ0VuCgyueBsP+ecvHU8LRFUtbtv8qhoIe8j77iRuay/a6uvtUUWNHrP0W5KivAJFFmaPHq93089dOj4OZFhw1nBjZdT1wdqjyDu4BZ0e79W3vwF0esQujONNlm2lSIMetf5k+DCQz8sDZj0uku5w6MeVgRUyqfulq3NjzGZTyGmKIveoVcif8autX2IgkF9EL/u8764sX53nUqWcqYW5kn/lQGb9I6tQ5+/56oEQQgghhBBCCCGEEEIIIYQQQgghhBBCCCGEEBKU31OIyvSNJfRAAAAAAElFTkSuQmCC",
     dropSheet = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAn0AAABCCAMAAAAVHpCuAAAABGdBTUEAALGPC/xhBQAAAFdQTFRFAAAA3+XrfYynU2KCcoGbaXiRl6e6YnOMWGuFipuwbn2WkqG1m6W1eYafgpSqobDDJCpTPohIyNDNgpiXN0Jm2eTpqba0VnN4WmmJTJ5HjJy1////wczdwv/DOgAAAAF0Uk5TAEDm2GYAAAXQSURBVHja7Zztepw4DIVnt8lkphRIAgzG9P6vc23zZUgGpEQalvacp0+bH+1ByC+ybENPJwiCIAiC/hK1QcgD9FjZAF8dBPygHSpfXfjSVwA/6OHVr61v70G3urXWIiPQA6feib4291Ke5qGjNmgKttbXvtt72zr46kuWZRet+bdtUyxtQN3MNNS+pLjdCt/+pWmq0f5ZLG2OCZ9GIzY37bZbirj9U7hevLTBBs8Ra59KHRxqkiJ9xprYHVUQSI8T4lCThvZPnr6TOcX0YYMH6qbEvKPi7KlwvV/4pYHFxLZijYXUZl2d/i/PPAvn87mjz0mPvo5tVfqwp6MjY6WSa8d51wT6fE063x5BX3DXnOHdFA9prXZFF8DezJg8S8b5tuj4KDQmxDl9cjO8RdFTgq9jzUbMiea4e8Egmyqe3lrUXSqw3W21KNRYHBDKw2fjH3Q01STHgto+nAlXqge8FWd4SKbNC1u04eRVF78i0ZpvF0G301aLzBVR79ToM+F8IPMKZ/9qdeJhe7+zLT+JK9r4J6Aoi587HygCeAHBWu3dkwedew1bi91xB07a/uf4pW600rxXWmSi+FniMlvuSkZ1qwWSn6nayyVMveefP2U3Z5ec2dkyW3GBo3aYAkmPVlu/pK76XbNUmj6H26+qqn7FMFqx5XVsfWd5LWndyqxAPo9apFvhWCtGzevH6sQVPafni5+vslywMFW/g6pqqn1+oWONkbaWpO+etcAhx33rb6/UWNaKUXPpu53f3z19/hwiyXK5ibGPeh658dKxDgeF3z5M+WBtpYeRNpS8t3RY1opR8+m7ved5aNOLfyTpG6Lu/ozx07KW2NxZs/7m0n3demXrSNhaMWqutafvmiTXQN9zoM/IPjJVJR32urUIIXesa7c5+lWyeQlh0UezniWGmiVm1Kzcv5au70uuTkmg7yUX6co66yqq2aL47WE9vCSbfvmVVV7UrK0jkvVsUiDPEKyomfOOoy9Lnl+u15fncDiQPhkh+Jx1aZQY2cm6XexkMwssOerOm7N1RLGe9ZH0ppKT68mVkh7n9fpvfk1enG7hH/5+EoLPW5dmFrcUIrtZL0/xWFPwdtTDiI2vSVAX76SEzGZy8rTOynX0zTYhPaGTfPqRZ5fLxf3VUGErqWF0ZlVpbNQzHN66nwz7r/N4X41sRz19eDV4E+mjJWREo38BjUQfL9fTJQiVtV/GPJk0DWUvyMoNo/tt9tQc3tpl9/k6QMJ7b3876mHE4rJE2joiJmToI8fKSmgqmbn2lyCzPVRS1+lVQ2cptN3yZ1qH7I6PNZO+jaijurGY3luZhPR9ZPQC2nZTycy1P7WNn8219JT9Bo4twwZwWVZih2B/qHXIbrTwoL/KsB11TN9YligrG2pCukOgRWVdvwFurtvoO9aNyvrmzLycW9l5h3dN7dv3h3Ev66aXWtTzeZH+KgPFevp/blivSZBzzaePPYyz/ytg/Racd3/ib403L18lEdnDumnm+DFhpETdxpWp4NC3ZT1Cxzyopue6++ZlFv96U8kfRjrbb6UxkXnpvL1kENnDumnm+C1hFIk6rkwc+jatR+jY9JFz7XuyOP7QoDWSw7hke+UWHNqlP9jozF87ayNAyF7W9+Cj47cetXeK2Qilg2a+nZDoY9DxNQlS+NRc++D7Pezh60KnVXfuMDbzZzPcwn3zN2/fT+m9RAjZy/rziZfeB65H3SzpC6WDaL+dkAm6Yd1IvAFarnunOP5td94wfshOvQ63t59L7MRqN+spp19ZhNy3HoZvgqQrHY1UQsbzgaYdvYm3sJ3r0YlZWVnD2HxSWb+6Bjym+BWP6bysTHL2H6ETvMaEn1L8HX4f2P5L4dPDb7th+mbgCvDF+KnEP1a/RddwOv2d+B3MX4u6R+ZHme0D4Xc4/9H4MY/PIZ99CNrx2YcgCIIgCIIgCIIgCIIgCIIgCIIgCIIgCIIgCIIgCIIgCIKgA+s/hMq9ed60oY4AAAAASUVORK5CYII=",
@@ -11413,38 +11468,38 @@ const POPOVER_TIME_MS$1 = 1e3,
         const {
             gameService: e,
             selectedItem: t
-        } = react.exports.useContext(Context), [a] = useActor(e), [n] = useActor(e), [s, r] = react.exports.useState(!0), [i, m] = react.exports.useState(!1), [E, d] = react.exports.useState(), [u, w] = react.exports.useState(0), [R, g] = react.exports.useState(!1), h = react.exports.useRef(null), y = react.exports.useRef(), B = react.exports.useRef(), [f, S] = react.exports.useState(!1), Q = a.matches("readonly"), I = "Stone Pickaxe", D = n.context.state.iron[A], F = !canMine(D);
+        } = react.exports.useContext(Context), [a] = useActor(e), [n] = useActor(e), [s, r] = react.exports.useState(!0), [i, m] = react.exports.useState(!1), [d, E] = react.exports.useState(), [u, h] = react.exports.useState(0), [B, g] = react.exports.useState(!1), C = react.exports.useRef(null), Q = react.exports.useRef(), w = react.exports.useRef(), [f, S] = react.exports.useState(!1), y = a.matches("readonly"), I = "Stone Pickaxe", D = n.context.state.iron[A], F = !canMine(D);
         react.exports.useEffect(() => {
-            const C = k => {
-                h.current && !h.current.contains(k.target) && w(0)
+            const R = k => {
+                C.current && !C.current.contains(k.target) && h(0)
             };
-            return document.addEventListener("click", C, !0), () => {
-                document.removeEventListener("click", C, !0)
+            return document.addEventListener("click", R, !0), () => {
+                document.removeEventListener("click", R, !0)
             }
         }, []);
-        const T = async C => {
-            d(C), r(!0), await new Promise(k => setTimeout(k, POPOVER_TIME_MS$1)), r(!1)
+        const T = async R => {
+            E(R), r(!0), await new Promise(k => setTimeout(k, POPOVER_TIME_MS$1)), r(!1)
         }, N = () => {
             F && S(!0)
         }, U = () => {
             S(!1)
         }, v = () => {
             var O, Y, K;
-            const C = (O = y.current) == null ? void 0 : O.getInfo("isPlaying");
-            if (Q) {
-                miningAudio.play(), (Y = y.current) == null || Y.goToAndPlay(0);
+            const R = (O = Q.current) == null ? void 0 : O.getInfo("isPlaying");
+            if (y) {
+                miningAudio.play(), (Y = Q.current) == null || Y.goToAndPlay(0);
                 return
             }
             if (!(n.context.state.inventory["Stone Pickaxe"] || new Decimal(0)).lessThanOrEqualTo(0))
-                if (t === I && !C) miningAudio.play(), (K = y.current) == null || K.goToAndPlay(0), w(V => V + 1), u > 0 && u === HITS$1 - 1 && (P(), miningFallAudio.play(), w(0));
+                if (t === I && !R) miningAudio.play(), (K = Q.current) == null || K.goToAndPlay(0), h(V => V + 1), u > 0 && u === HITS$1 - 1 && (P(), miningFallAudio.play(), h(0));
                 else return
         }, P = async () => {
-            var C;
-            w(0);
+            var R;
+            h(0);
             try {
                 e.send("iron.mined", {
                     index: A
-                }), g(!0), (C = B.current) == null || C.goToAndPlay(0), T(React.createElement("div", {
+                }), g(!0), (R = w.current) == null || R.goToAndPlay(0), T(React.createElement("div", {
                     className: "flex"
                 }, React.createElement("img", {
                     src: ironOre,
@@ -11458,11 +11513,11 @@ const POPOVER_TIME_MS$1 = 1e3,
                 }, k.message))
             }
         }, L = () => {
-            var C, k;
-            Q || t === I && ((C = n.context.state.inventory[I]) == null ? void 0 : C.gte(1)) || ((k = h.current) == null || k.classList.add("cursor-not-allowed"), m(!0))
+            var R, k;
+            y || t === I && ((R = n.context.state.inventory[I]) == null ? void 0 : R.gte(1)) || ((k = C.current) == null || k.classList.add("cursor-not-allowed"), m(!0))
         }, J = () => {
-            var C, k;
-            Q || t === I && ((C = n.context.state.inventory[I]) == null ? void 0 : C.gte(1)) || ((k = h.current) == null || k.classList.remove("cursor-not-allowed"), m(!1))
+            var R, k;
+            y || t === I && ((R = n.context.state.inventory[I]) == null ? void 0 : R.gte(1)) || ((k = C.current) == null || k.classList.remove("cursor-not-allowed"), m(!1))
         }, b = IRON_RECOVERY_TIME, G = getTimeLeft(D.minedAt, b), M = 100 - G / b * 100;
         return React.createElement("div", {
             className: "relative z-10",
@@ -11471,7 +11526,7 @@ const POPOVER_TIME_MS$1 = 1e3,
         }, !F && React.createElement("div", {
             onMouseEnter: L,
             onMouseLeave: J,
-            ref: h,
+            ref: C,
             className: "group cursor-pointer  w-full h-full",
             onClick: v
         }, React.createElement(Spritesheet, {
@@ -11480,8 +11535,8 @@ const POPOVER_TIME_MS$1 = 1e3,
                 width: `${GRID_WIDTH_PX*5}px`,
                 imageRendering: "pixelated"
             },
-            getInstance: C => {
-                y.current = C
+            getInstance: R => {
+                Q.current = R
             },
             image: sparkSheet,
             widthFrame: 91,
@@ -11491,8 +11546,8 @@ const POPOVER_TIME_MS$1 = 1e3,
             direction: "forward",
             autoplay: !1,
             loop: !0,
-            onLoopComplete: C => {
-                C.pause()
+            onLoopComplete: R => {
+                R.pause()
             }
         }), React.createElement("div", {
             className: `absolute top-5 transition pointer-events-none w-28 z-20 ${i?"opacity-100":"opacity-0"}`
@@ -11501,13 +11556,13 @@ const POPOVER_TIME_MS$1 = 1e3,
         }, "Equip ", I.toLowerCase()))), React.createElement(Spritesheet, {
             style: {
                 width: `${GRID_WIDTH_PX*5}px`,
-                opacity: R ? 1 : 0,
+                opacity: B ? 1 : 0,
                 transition: "opacity 0.2s ease-in",
                 imageRendering: "pixelated"
             },
             className: "pointer-events-none z-20",
-            getInstance: C => {
-                B.current = C
+            getInstance: R => {
+                w.current = R
             },
             image: dropSheet,
             widthFrame: 91,
@@ -11517,8 +11572,8 @@ const POPOVER_TIME_MS$1 = 1e3,
             direction: "forward",
             autoplay: !1,
             loop: !0,
-            onLoopComplete: C => {
-                C.pause()
+            onLoopComplete: R => {
+                R.pause()
             }
         }), React.createElement("img", {
             src: empty,
@@ -11532,7 +11587,7 @@ const POPOVER_TIME_MS$1 = 1e3,
                 "opacity-0": u === 0
             })
         }, React.createElement(HealthBar, {
-            percentage: R ? 0 : 100 - u / 3 * 100
+            percentage: B ? 0 : 100 - u / 3 * 100
         })), F && React.createElement(React.Fragment, null, React.createElement("div", {
             className: "absolute",
             style: {
@@ -11551,7 +11606,7 @@ const POPOVER_TIME_MS$1 = 1e3,
                 "opacity-100": s,
                 "opacity-0": !s
             })
-        }, E))
+        }, d))
     },
     Quarry = () => React.createElement(React.Fragment, null, React.createElement("div", {
         className: "absolute",
@@ -11668,13 +11723,13 @@ const teamDonationMachine = createMachine({
     TeamDonation = () => {
         const [A, e] = useMachine(teamDonationMachine), {
             gameService: t
-        } = react.exports.useContext(Context), [a] = useActor(t), [n, s] = react.exports.useState(1), r = d => {
-            s(roundToOneDecimal(Number(d.target.value)))
+        } = react.exports.useContext(Context), [a] = useActor(t), [n, s] = react.exports.useState(1), r = E => {
+            s(roundToOneDecimal(Number(E.target.value)))
         }, i = () => {
-            s(d => roundToOneDecimal(d + .1))
+            s(E => roundToOneDecimal(E + .1))
         }, m = () => {
-            n === .2 ? s(.2) : n < .2 ? s(.1) : s(d => roundToOneDecimal(d - .1))
-        }, E = () => {
+            n === .2 ? s(.2) : n < .2 ? s(.1) : s(E => roundToOneDecimal(E - .1))
+        }, d = () => {
             s(1), e("BEGGER_CLICK"), beggarAudio.play()
         };
         return React.createElement("div", {
@@ -11693,7 +11748,7 @@ const teamDonationMachine = createMachine({
             style: {
                 width: `${GRID_WIDTH_PX*1.8}px`
             },
-            onClick: E
+            onClick: d
         }) : React.createElement("img", {
             id: "begger",
             src: begger,
@@ -11701,7 +11756,7 @@ const teamDonationMachine = createMachine({
             style: {
                 width: `${GRID_WIDTH_PX*1.8}px`
             },
-            onClick: E
+            onClick: d
         }), React.createElement(Modal, {
             centered: !0,
             show: !A.matches("idle"),
@@ -11783,7 +11838,7 @@ const teamDonationMachine = createMachine({
             className: "flex flex-col items-center"
         }, React.createElement("img", {
             id: "richBegger",
-            src: humanDeath$1
+            src: humanDeath
         }), React.createElement("p", {
             className: "my-4"
         }, "Oh no! Something went wrong!")))))
@@ -11800,29 +11855,29 @@ const POPOVER_TIME_MS = 1e3,
         const {
             gameService: e,
             selectedItem: t
-        } = react.exports.useContext(Context), [a] = useActor(e), [n, s] = react.exports.useState(!0), [r, i] = react.exports.useState(!1), [m, E] = react.exports.useState(), [d, u] = react.exports.useState(0), [w, R] = react.exports.useState(!1), g = react.exports.useRef(null), h = react.exports.useRef(), y = react.exports.useRef(), [B, f] = react.exports.useState(!1);
+        } = react.exports.useContext(Context), [a] = useActor(e), [n, s] = react.exports.useState(!0), [r, i] = react.exports.useState(!1), [m, d] = react.exports.useState(), [E, u] = react.exports.useState(0), [h, B] = react.exports.useState(!1), g = react.exports.useRef(null), C = react.exports.useRef(), Q = react.exports.useRef(), [w, f] = react.exports.useState(!1);
         react.exports.useEffect(() => {
-            const M = C => {
-                g.current && !g.current.contains(C.target) && u(0)
+            const M = R => {
+                g.current && !g.current.contains(R.target) && u(0)
             };
             return document.addEventListener("click", M, !0), () => {
                 document.removeEventListener("click", M, !0)
             }
         }, []);
         const S = a.context.state.trees[A],
-            Q = !canChop(S),
+            y = !canChop(S),
             I = async M => {
-                E(M), s(!0), await new Promise(C => setTimeout(C, POPOVER_TIME_MS)), s(!1)
+                d(M), s(!0), await new Promise(R => setTimeout(R, POPOVER_TIME_MS)), s(!1)
             }, D = () => {
                 f(!0)
             }, F = () => {
                 f(!1)
             }, T = getRequiredAxeAmount(a.context.state.inventory), N = a.context.state.inventory.Axe || new Decimal(0), U = (t === "Axe" || T.eq(0)) && N.gte(T), v = async () => {
-                var C, k, O;
+                var R, k, O;
                 if (a.matches("readonly")) {
-                    (C = h.current) == null || C.goToAndPlay(0);
+                    (R = C.current) == null || R.goToAndPlay(0);
                     return
-                }!U || ((k = h.current) == null ? void 0 : k.getInfo("isPlaying")) || (chopAudio.play(), (O = h.current) == null || O.goToAndPlay(0), u(Y => Y + 1), d > 0 && d === HITS - 1 && (P(), treeFallAudio.play(), u(0)))
+                }!U || ((k = C.current) == null ? void 0 : k.getInfo("isPlaying")) || (chopAudio.play(), (O = C.current) == null || O.goToAndPlay(0), u(Y => Y + 1), E > 0 && E === HITS - 1 && (P(), treeFallAudio.play(), u(0)))
             }, P = async () => {
                 var M;
                 u(0);
@@ -11830,16 +11885,16 @@ const POPOVER_TIME_MS = 1e3,
                     e.send("tree.chopped", {
                         index: A,
                         item: t
-                    }), R(!0), (M = y.current) == null || M.goToAndPlay(0), I(React.createElement("div", {
+                    }), B(!0), (M = Q.current) == null || M.goToAndPlay(0), I(React.createElement("div", {
                         className: "flex"
                     }, React.createElement("img", {
                         src: wood,
                         className: "w-5 h-5 mr-2"
                     }), React.createElement("span", {
                         className: "text-sm text-white text-shadow"
-                    }, `+${S.wood}`))), await new Promise(C => setTimeout(C, 2e3)), R(!1)
-                } catch (C) {
-                    if (C.message === CHOP_ERRORS.NO_AXES) {
+                    }, `+${S.wood}`))), await new Promise(R => setTimeout(R, 2e3)), B(!1)
+                } catch (R) {
+                    if (R.message === CHOP_ERRORS.NO_AXES) {
                         I(React.createElement("div", {
                             className: "flex"
                         }, React.createElement("img", {
@@ -11852,7 +11907,7 @@ const POPOVER_TIME_MS = 1e3,
                     }
                     I(React.createElement("span", {
                         className: "text-xs text-white text-shadow"
-                    }, C.message))
+                    }, R.message))
                 }
             }, L = () => {
                 var M;
@@ -11866,7 +11921,7 @@ const POPOVER_TIME_MS = 1e3,
             style: {
                 height: "106px"
             }
-        }, !Q && React.createElement("div", {
+        }, !y && React.createElement("div", {
             onMouseEnter: L,
             onMouseLeave: J,
             ref: g,
@@ -11880,7 +11935,7 @@ const POPOVER_TIME_MS = 1e3,
                 imageRendering: "pixelated"
             },
             getInstance: M => {
-                h.current = M
+                C.current = M
             },
             image: shakeSheet,
             widthFrame: 266,
@@ -11901,13 +11956,13 @@ const POPOVER_TIME_MS = 1e3,
             style: {
                 width: `${GRID_WIDTH_PX*4}px`,
                 transform: `translateX(-${GRID_WIDTH_PX*2.5}px)`,
-                opacity: w ? 1 : 0,
+                opacity: h ? 1 : 0,
                 transition: "opacity 0.2s ease-in",
                 imageRendering: "pixelated"
             },
             className: "absolute bottom-0 pointer-events-none",
             getInstance: M => {
-                y.current = M
+                Q.current = M
             },
             image: choppedSheet,
             widthFrame: 266,
@@ -11920,7 +11975,7 @@ const POPOVER_TIME_MS = 1e3,
             onLoopComplete: M => {
                 M.pause()
             }
-        }), Q && React.createElement(React.Fragment, null, React.createElement("img", {
+        }), y && React.createElement(React.Fragment, null, React.createElement("img", {
             src: stump,
             className: "absolute",
             style: {
@@ -11938,14 +11993,14 @@ const POPOVER_TIME_MS = 1e3,
         })), React.createElement(TimeLeftPanel, {
             text: "Recovers in:",
             timeLeft: b,
-            showTimeLeft: B
+            showTimeLeft: w
         })), React.createElement("div", {
             className: classNames("transition-opacity pointer-events-none absolute top-4 left-2", {
-                "opacity-100": d > 0,
-                "opacity-0": d === 0
+                "opacity-100": E > 0,
+                "opacity-0": E === 0
             })
         }, React.createElement(HealthBar, {
-            percentage: w ? 0 : 100 - d / 3 * 100
+            percentage: h ? 0 : 100 - E / 3 * 100
         })), React.createElement("div", {
             className: classNames("transition-opacity absolute -bottom-5 w-40 -left-16 z-20 pointer-events-none", {
                 "opacity-100": n,
@@ -12068,44 +12123,44 @@ function getTax(A) {
 const WithdrawTokens = ({
     onWithdraw: A
 }) => {
-    var Q;
+    var y;
     const {
         authService: e
     } = react.exports.useContext(Context$1), [t] = useActor(e), {
         gameService: a
-    } = react.exports.useContext(Context), [n] = useActor(a), [s, r] = react.exports.useState(new Decimal(0)), [i, m] = react.exports.useState(new Decimal(0)), [E, d] = react.exports.useState(!0);
+    } = react.exports.useContext(Context), [n] = useActor(a), [s, r] = react.exports.useState(new Decimal(0)), [i, m] = react.exports.useState(new Decimal(0)), [d, E] = react.exports.useState(!0);
     react.exports.useEffect(() => {
-        d(!0), (async () => {
+        E(!0), (async () => {
             const {
                 game: D
             } = await getOnChainState({
                 id: n.context.state.id,
                 farmAddress: n.context.state.farmAddress
             });
-            m(D.balance), d(!1)
+            m(D.balance), E(!1)
         })()
     }, []);
     const u = I => typeof I != "string" ? I : new Decimal(0),
-        w = () => {
+        h = () => {
             s > new Decimal(0) ? A(lib.toWei(s.toString())) : r(new Decimal(0))
         },
-        R = I => {
+        B = I => {
             I.target.value === "" ? r(new Decimal(0)) : r(new Decimal(Number(I.target.value)))
         },
         g = () => {
             r(i.minus(new Decimal(.01)))
         },
-        h = () => {
+        C = () => {
             u(s).plus(.1).toNumber() < i.toDecimalPlaces(2, 1).toNumber() && r(I => u(I).plus(.1))
         },
-        y = () => {
+        Q = () => {
             u(s).toNumber() > .01 && u(s).minus(.1).toNumber() >= 0 && r(I => u(I).minus(.1))
         };
-    if (E) return React.createElement("span", {
+    if (d) return React.createElement("span", {
         className: "text-shadow loading"
     }, "Loading");
-    const B = getTax(typeof s != "string" ? s : new Decimal(0)) / 10,
-        f = (Q = t.context.token) == null ? void 0 : Q.userAccess.withdraw,
+    const w = getTax(typeof s != "string" ? s : new Decimal(0)) / 10,
+        f = (y = t.context.token) == null ? void 0 : y.userAccess.withdraw,
         S = u(s).gte(i) || u(s).lt(0);
     return f ? React.createElement(React.Fragment, null, React.createElement("div", {
         className: "flex flex-wrap"
@@ -12125,17 +12180,17 @@ const WithdrawTokens = ({
         step: "0.1",
         min: 0,
         value: typeof s == "string" ? "" : s.toDecimalPlaces(2, Decimal.ROUND_DOWN).toNumber(),
-        onChange: R
+        onChange: B
     }), React.createElement("img", {
         src: upArrow,
         alt: "increment donation value",
         className: "cursor-pointer w-3 absolute -right-4 top-0",
-        onClick: h
+        onClick: C
     }), React.createElement("img", {
         src: downArrow,
         alt: "decrement donation value",
         className: "cursor-pointer w-3 absolute -right-4 bottom-0",
-        onClick: y
+        onClick: Q
     })), React.createElement(Button, {
         className: "w-24 ml-6",
         onClick: g
@@ -12143,7 +12198,7 @@ const WithdrawTokens = ({
         className: "text-xs"
     }, React.createElement("span", {
         className: "text-xs"
-    }, B, "% fee"), React.createElement("a", {
+    }, w, "% fee"), React.createElement("a", {
         className: "underline ml-2",
         href: "https://docs.sunflower-land.com/fundamentals/withdrawing",
         target: "_blank",
@@ -12152,7 +12207,7 @@ const WithdrawTokens = ({
         className: "flex items-center mt-4"
     }, React.createElement("span", {
         className: ""
-    }, `You will receive: ${u(s).mul((100-B)/100).toFixed(1)}`), React.createElement("img", {
+    }, `You will receive: ${u(s).mul((100-w)/100).toFixed(1)}`), React.createElement("img", {
         src: token,
         className: "w-4 ml-2 img-highlight"
     })), React.createElement("div", {
@@ -12173,7 +12228,7 @@ const WithdrawTokens = ({
     }), React.createElement("span", {
         className: "text-xs"
     }, "ANY PROGRESS THAT HAS NOT BEEN SYNCED ON CHAIN WILL BE LOST.")), React.createElement(Button, {
-        onClick: w,
+        onClick: h,
         disabled: S
     }, "Withdraw")) : React.createElement("span", null, "Available May 9th")
 };
@@ -12214,87 +12269,87 @@ const WithdrawItems = ({
             n(!0);
             const g = async () => {
                 const {
-                    game: h
+                    game: C
                 } = await getOnChainState({
                     id: t.context.state.id,
                     farmAddress: t.context.state.farmAddress
                 });
-                r(h.inventory), n(!1)
+                r(C.inventory), n(!1)
             };
             m({}), g()
         }, []);
-        const E = () => {
-                const g = Object.keys(i).map(y => KNOWN_IDS[y]),
-                    h = Object.keys(i).map(y => {
-                        var B;
-                        return lib.toWei((B = i[y]) == null ? void 0 : B.toString(), getItemUnit(y))
+        const d = () => {
+                const g = Object.keys(i).map(Q => KNOWN_IDS[Q]),
+                    C = Object.keys(i).map(Q => {
+                        var w;
+                        return lib.toWei((w = i[Q]) == null ? void 0 : w.toString(), getItemUnit(Q))
                     });
-                A(g, h)
+                A(g, C)
             },
-            d = g => {
-                m(h => l(c({}, h), {
-                    [g]: (h[g] || new Decimal(0)).add(1)
-                })), r(h => {
-                    var y;
-                    return l(c({}, h), {
-                        [g]: (y = h[g]) == null ? void 0 : y.minus(1)
+            E = g => {
+                m(C => l(c({}, C), {
+                    [g]: (C[g] || new Decimal(0)).add(1)
+                })), r(C => {
+                    var Q;
+                    return l(c({}, C), {
+                        [g]: (Q = C[g]) == null ? void 0 : Q.minus(1)
                     })
                 })
             },
             u = g => {
-                r(h => l(c({}, h), {
-                    [g]: (h[g] || new Decimal(0)).add(1)
-                })), m(h => {
-                    var y;
-                    return l(c({}, h), {
-                        [g]: (y = h[g]) == null ? void 0 : y.minus(1)
+                r(C => l(c({}, C), {
+                    [g]: (C[g] || new Decimal(0)).add(1)
+                })), m(C => {
+                    var Q;
+                    return l(c({}, C), {
+                        [g]: (Q = C[g]) == null ? void 0 : Q.minus(1)
                     })
                 })
             };
         if (a) return React.createElement("span", {
             className: "text-shadow loading"
         }, "Loading");
-        const w = Object.keys(s).filter(g => {
-            var h;
-            return (h = s[g]) == null ? void 0 : h.gt(0)
+        const h = Object.keys(s).filter(g => {
+            var C;
+            return (C = s[g]) == null ? void 0 : C.gt(0)
         });
         console.log({
-            inventoryItems: w
+            inventoryItems: h
         });
-        const R = Object.keys(i).filter(g => {
-            var h;
-            return (h = i[g]) == null ? void 0 : h.gt(0)
+        const B = Object.keys(i).filter(g => {
+            var C;
+            return (C = i[g]) == null ? void 0 : C.gt(0)
         });
         return React.createElement(React.Fragment, null, React.createElement("span", {
             className: "text-shadow text-base"
         }, "Select items to withdraw"), React.createElement("div", {
             className: "flex flex-wrap h-fit"
-        }, w.map(g => React.createElement(Box, {
+        }, h.map(g => React.createElement(Box, {
             count: s[g],
             key: g,
-            onClick: () => d(g),
+            onClick: () => E(g),
             image: ITEM_DETAILS[g].image,
             locked: !canWithdraw({
                 item: g,
                 game: t.context.state
             })
-        })), w.length < 4 && new Array(4 - w.length).fill(null).map((g, h) => React.createElement(Box, {
+        })), h.length < 4 && new Array(4 - h.length).fill(null).map((g, C) => React.createElement(Box, {
             disabled: !0,
-            key: h
+            key: C
         }))), React.createElement("div", {
             className: "mt-2"
         }, React.createElement("span", {
             className: "text-shadow text-base"
         }, "Selected"), React.createElement("div", {
             className: "flex flex-wrap h-fit mt-2"
-        }, R.map(g => React.createElement(Box, {
+        }, B.map(g => React.createElement(Box, {
             count: i[g],
             key: g,
             onClick: () => u(g),
             image: ITEM_DETAILS[g].image
-        })), R.length < 4 && new Array(4 - R.length).fill(null).map((g, h) => React.createElement(Box, {
+        })), B.length < 4 && new Array(4 - B.length).fill(null).map((g, C) => React.createElement(Box, {
             disabled: !0,
-            key: h
+            key: C
         })))), React.createElement("div", {
             className: "flex items-center mt-2 mb-2"
         }, React.createElement("img", {
@@ -12315,8 +12370,8 @@ const WithdrawItems = ({
         }), React.createElement("span", {
             className: "text-xs"
         }, "ANY PROGRESS THAT HAS NOT BEEN SYNCED ON CHAIN WILL BE LOST.")), React.createElement(Button, {
-            onClick: E,
-            disabled: R.length <= 0
+            onClick: d,
+            disabled: B.length <= 0
         }, "Withdraw"), React.createElement("span", {
             className: "text-xs underline"
         }, React.createElement("a", {
@@ -12334,30 +12389,30 @@ const WithdrawItems = ({
             ids: [],
             amounts: [],
             sfl: "0"
-        }), [r, i] = react.exports.useState(!1), m = async w => {
+        }), [r, i] = react.exports.useState(!1), m = async h => {
             console.log({
-                sfl: w
+                sfl: h
             }), s.current = {
                 ids: [],
                 amounts: [],
-                sfl: w
+                sfl: h
             }, i(!0)
-        }, E = async (w, R) => {
+        }, d = async (h, B) => {
             s.current = {
-                ids: w,
-                amounts: R,
+                ids: h,
+                amounts: B,
                 sfl: "0"
             }, i(!0)
-        }, d = async w => {
-            await new Promise(R => setTimeout(R, 1e3)), e.send("WITHDRAW", l(c({}, s.current), {
-                captcha: w
+        }, E = async h => {
+            await new Promise(B => setTimeout(B, 1e3)), e.send("WITHDRAW", l(c({}, s.current), {
+                captcha: h
             })), A()
         };
         return t.context.whitelistedAt ? React.createElement("div", {
             className: "p-2 text-sm text-center"
         }, "The anti-bot detection system is relatively new and has picked up some strange behaviour. Withdrawing is temporarily restricted while the team investigates this case. Thanks for your patience!") : r ? React.createElement(React.Fragment, null, React.createElement(RecaptchaWrapper, {
             sitekey: "6Lfqm6MeAAAAAFS5a0vwAfTGUwnlNoHziyIlOl1s",
-            onChange: d,
+            onChange: E,
             onExpired: () => i(!1),
             className: "w-full m-4 flex items-center justify-center"
         }), React.createElement("p", {
@@ -12365,7 +12420,7 @@ const WithdrawItems = ({
         }, "Any unsaved progress will be lost.")) : a === "tokens" ? React.createElement(WithdrawTokens, {
             onWithdraw: m
         }) : a === "items" ? React.createElement(WithdrawItems, {
-            onWithdraw: E
+            onWithdraw: d
         }) : React.createElement("div", {
             className: "p-2 flex flex-col justify-center"
         }, React.createElement("span", {
@@ -12469,11 +12524,11 @@ const Deposit = () => {
         var g;
         const {
             gameService: A
-        } = react.exports.useContext(Context), [e] = useActor(A), [t, a] = react.exports.useState(!1), [n, s] = react.exports.useState(TOOL_TIP_MESSAGE), [r, i] = react.exports.useState(!1), [m, E] = react.exports.useState(null), d = (g = e.context.state) == null ? void 0 : g.farmAddress, u = () => {
-            navigator.clipboard.writeText(d), s("Copied!"), setTimeout(() => {
+        } = react.exports.useContext(Context), [e] = useActor(A), [t, a] = react.exports.useState(!1), [n, s] = react.exports.useState(TOOL_TIP_MESSAGE), [r, i] = react.exports.useState(!1), [m, d] = react.exports.useState(null), E = (g = e.context.state) == null ? void 0 : g.farmAddress, u = () => {
+            navigator.clipboard.writeText(E), s("Copied!"), setTimeout(() => {
                 s(TOOL_TIP_MESSAGE)
             }, 2e3)
-        }, w = m === 0, R = m === 1;
+        }, h = m === 0, B = m === 1;
         return React.createElement("div", null, React.createElement("div", {
             className: "h-14 w-full",
             style: {
@@ -12497,7 +12552,7 @@ const Deposit = () => {
             className: "h-8 mr-2 z-50"
         }), React.createElement("div", {
             className: "flex flex-1 justify-center items-center"
-        }, React.createElement("span", null, shortAddress$1(d)), React.createElement("span", {
+        }, React.createElement("span", null, shortAddress$1(E)), React.createElement("span", {
             className: "cursor-pointer ml-3",
             onMouseEnter: () => i(!0),
             onMouseLeave: () => i(!1),
@@ -12513,7 +12568,7 @@ const Deposit = () => {
             }
         }, React.createElement("span", {
             className: "text-[10px] sm:text-xs mt-2 break-all select-text"
-        }, d), React.createElement("span", {
+        }, E), React.createElement("span", {
             className: "cursor-pointer ml-3 mt-2",
             onClick: () => a(!1)
         }, React.createElement(CloseEyeSvg, null)))), React.createElement("div", {
@@ -12524,15 +12579,15 @@ const Deposit = () => {
             className: "flex mb-3"
         }, React.createElement(Button, {
             className: classNames("mr-1", {
-                "bg-brown-300": w
+                "bg-brown-300": h
             }),
-            onClick: () => E(0)
+            onClick: () => d(0)
         }, "SFL Token"), React.createElement(Button, {
             className: classNames("ml-1", {
-                "bg-brown-300": R
+                "bg-brown-300": B
             }),
-            onClick: () => E(1)
-        }, "SFL Items")), w && React.createElement(SFLTokenInstructions, null), R && React.createElement(SFLItemsInstructions, null), React.createElement("div", {
+            onClick: () => d(1)
+        }, "SFL Items")), h && React.createElement(SFLTokenInstructions, null), B && React.createElement(SFLItemsInstructions, null), React.createElement("div", {
             className: "flex items-center border-2 rounded-md border-black p-2 bg-[#e43b44]"
         }, React.createElement("img", {
             src: alert,
@@ -12631,15 +12686,15 @@ const CraftingItems = ({
             context: {
                 state: r
             }
-        }] = useActor(n), i = r.inventory, m = (R = 1) => e.ingredients.some(g => g.amount.mul(R).greaterThan(i[g.item] || 0)), E = (R = 1) => r.balance.lessThan(e.price.mul(R)), d = Object.keys(i).includes(e.name), u = !(E() || m()), w = (R = 1) => {
+        }] = useActor(n), i = r.inventory, m = (B = 1) => e.ingredients.some(g => g.amount.mul(B).greaterThan(i[g.item] || 0)), d = (B = 1) => r.balance.lessThan(e.price.mul(B)), E = Object.keys(i).includes(e.name), u = !(d() || m()), h = (B = 1) => {
             n.send("item.crafted", {
                 item: e.name,
-                amount: R
+                amount: B
             }), a({
-                content: "SFL -$" + e.price.mul(R)
+                content: "SFL -$" + e.price.mul(B)
             }), e.ingredients.map(g => {
                 a({
-                    content: g.item + " -" + g.amount.mul(R)
+                    content: g.item + " -" + g.amount.mul(B)
                 })
             }), s(e.name)
         };
@@ -12647,12 +12702,12 @@ const CraftingItems = ({
             className: "flex"
         }, React.createElement("div", {
             className: "w-3/5 flex flex-wrap h-fit"
-        }, Object.values(A).map(R => React.createElement(Box, {
-            isSelected: e.name === R.name,
-            key: R.name,
-            onClick: () => t(R),
-            image: ITEM_DETAILS[R.name].image,
-            count: i[R.name]
+        }, Object.values(A).map(B => React.createElement(Box, {
+            isSelected: e.name === B.name,
+            key: B.name,
+            onClick: () => t(B),
+            image: ITEM_DETAILS[B.name].image,
+            count: i[B.name]
         }))), React.createElement(OuterPanel, {
             className: "flex-1 w-1/3"
         }, React.createElement("div", {
@@ -12665,22 +12720,22 @@ const CraftingItems = ({
             alt: e.name
         }), React.createElement("span", {
             className: "text-shadow text-center mt-2 sm:text-sm"
-        }, e.description), !d && React.createElement("div", {
+        }, e.description), !E && React.createElement("div", {
             className: "border-t border-white w-full mt-2 pt-1"
-        }, e.ingredients.map((R, g) => {
-            const h = ITEM_DETAILS[R.item],
-                y = new Decimal(i[R.item] || 0).lessThan(R.amount);
+        }, e.ingredients.map((B, g) => {
+            const C = ITEM_DETAILS[B.item],
+                Q = new Decimal(i[B.item] || 0).lessThan(B.amount);
             return React.createElement("div", {
                 className: "flex justify-center items-end",
                 key: g
             }, React.createElement("img", {
-                src: h.image,
+                src: C.image,
                 className: "h-5 me-2"
             }), React.createElement("span", {
                 className: classNames("text-xs text-shadow text-center mt-2 ", {
-                    "text-red-500": y
+                    "text-red-500": Q
                 })
-            }, R.amount.toNumber()))
+            }, B.amount.toNumber()))
         }), React.createElement("div", {
             className: "flex justify-center items-end"
         }, React.createElement("img", {
@@ -12688,13 +12743,13 @@ const CraftingItems = ({
             className: "h-5 mr-1"
         }), React.createElement("span", {
             className: classNames("text-xs text-shadow text-center mt-2 ", {
-                "text-red-500": E()
+                "text-red-500": d()
             })
         }, `$${e.price.toNumber()}`))), React.createElement(Button, {
-            disabled: d || !u,
-            className: `${d?"pe-none":""} text-xs mt-1`,
-            onClick: () => w()
-        }, d ? "Already crafted" : "Craft"))))
+            disabled: E || !u,
+            className: `${E?"pe-none":""} text-xs mt-1`,
+            onClick: () => h()
+        }, E ? "Already crafted" : "Craft"))))
     },
     Crafting$1 = ({
         onClose: A
@@ -12878,27 +12933,27 @@ const Seeds = ({
             context: {
                 state: r
             }
-        }] = useActor(n), [i, m] = react.exports.useState(!1), [E, d] = react.exports.useState(!1), u = r.inventory, w = getBuyPrice(e, u), R = (D = 1) => {
+        }] = useActor(n), [i, m] = react.exports.useState(!1), [d, E] = react.exports.useState(!1), u = r.inventory, h = getBuyPrice(e, u), B = (D = 1) => {
             n.send("item.crafted", {
                 item: e.name,
                 amount: D
             }), a({
-                content: "SFL -$" + w.mul(D).toString()
+                content: "SFL -$" + h.mul(D).toString()
             }), s(e.name)
         }, g = () => {
-            d(!0)
-        }, h = async D => {
+            E(!0)
+        }, C = async D => {
             await new Promise(F => setTimeout(F, 1e3)), n.send("SYNC", {
                 captcha: D
             }), A()
-        }, y = (D = 1) => r.balance.lessThan(w.mul(D).toString()), B = e.name.split(" ")[0], f = CROPS()[B], S = r.stock[e.name] || new Decimal$1(0), Q = makeBulkSeedBuyAmount(S);
+        }, Q = (D = 1) => r.balance.lessThan(h.mul(D).toString()), w = e.name.split(" ")[0], f = CROPS()[w], S = r.stock[e.name] || new Decimal$1(0), y = makeBulkSeedBuyAmount(S);
         if (react.exports.useEffect(() => m(hasBoost({
                 item: e.name,
                 inventory: u
-            })), [u, e.name, r.inventory]), E) return React.createElement(RecaptchaWrapper, {
+            })), [u, e.name, r.inventory]), d) return React.createElement(RecaptchaWrapper, {
             sitekey: "6Lfqm6MeAAAAAFS5a0vwAfTGUwnlNoHziyIlOl1s",
-            onChange: h,
-            onExpired: () => d(!1),
+            onChange: C,
+            onExpired: () => E(!1),
             className: "w-full m-4 flex items-center justify-center"
         });
         const I = () => {
@@ -12918,14 +12973,14 @@ const Seeds = ({
             return F && ((T = u[e.name]) == null ? void 0 : T.gt(F)) ? React.createElement("span", {
                 className: "text-xs mt-1 text-shadow text-center"
             }, "No space left") : React.createElement(React.Fragment, null, React.createElement(Button, {
-                disabled: y() || (S == null ? void 0 : S.lessThan(1)),
+                disabled: Q() || (S == null ? void 0 : S.lessThan(1)),
                 className: "text-xs mt-1",
-                onClick: () => R(1)
-            }, "Buy 1"), Q > 1 && React.createElement(Button, {
-                disabled: y(Q),
+                onClick: () => B(1)
+            }, "Buy 1"), y > 1 && React.createElement(Button, {
+                disabled: Q(y),
                 className: "text-xs mt-1",
-                onClick: () => R(Q)
-            }, "Buy ", Q))
+                onClick: () => B(y)
+            }, "Buy ", y))
         };
         return React.createElement("div", {
             className: "flex"
@@ -12968,9 +13023,9 @@ const Seeds = ({
             className: "h-5 mr-1"
         }), React.createElement("span", {
             className: classNames("text-xs text-shadow text-center mt-2", {
-                "text-red-500": y()
+                "text-red-500": Q()
             })
-        }, `$${w}`))), I())))
+        }, `$${h}`))), I())))
     },
     Plants = () => {
         const [A, e] = react.exports.useState(CROPS().Sunflower), {
@@ -12981,25 +13036,25 @@ const Seeds = ({
             context: {
                 state: r
             }
-        }] = useActor(s), [i, m] = react.exports.useState(!1), E = r.inventory, d = (f = 1) => {
+        }] = useActor(s), [i, m] = react.exports.useState(!1), d = r.inventory, E = (f = 1) => {
             s.send("item.sell", {
                 item: A.name,
                 amount: f
             }), t({
-                content: "SFL +$" + R(A).mul(f).toString()
+                content: "SFL +$" + B(A).mul(f).toString()
             })
-        }, u = new Decimal(E[A.name] || 0), w = u.equals(0), R = f => getSellPrice(f, E), g = () => {
-            d(1)
-        }, h = () => {
-            d(u.toNumber()), n(!1)
-        }, y = () => {
+        }, u = new Decimal(d[A.name] || 0), h = u.equals(0), B = f => getSellPrice(f, d), g = () => {
+            E(1)
+        }, C = () => {
+            E(u.toNumber()), n(!1)
+        }, Q = () => {
             u.equals(1) ? g() : n(!0)
-        }, B = () => {
+        }, w = () => {
             n(!1)
         };
         return react.exports.useEffect(() => {
-            m(hasSellBoost(E))
-        }, [E, r.inventory]), React.createElement("div", {
+            m(hasSellBoost(d))
+        }, [d, r.inventory]), React.createElement("div", {
             className: "flex"
         }, React.createElement("div", {
             className: "w-3/5 flex flex-wrap h-fit"
@@ -13008,7 +13063,7 @@ const Seeds = ({
             key: f.name,
             onClick: () => e(f),
             image: ITEM_DETAILS[f.name].image,
-            count: E[f.name]
+            count: d[f.name]
         }))), React.createElement(OuterPanel, {
             className: "flex-1 w-1/3"
         }, React.createElement("div", {
@@ -13033,18 +13088,18 @@ const Seeds = ({
             className: "h-6 me-2"
         }), React.createElement("span", {
             className: "text-xs text-shadow text-center mt-2 "
-        }, `$${R(A)}`))), React.createElement(Button, {
+        }, `$${B(A)}`))), React.createElement(Button, {
             disabled: u.lessThan(1),
             className: "text-xs mt-1",
             onClick: g
         }, "Sell 1"), React.createElement(Button, {
-            disabled: w,
+            disabled: h,
             className: "text-xs mt-1 whitespace-nowrap",
-            onClick: y
+            onClick: Q
         }, "Sell All"))), React.createElement(Modal, {
             centered: !0,
             show: a,
-            onHide: B
+            onHide: w
         }, React.createElement(Panel, {
             className: "md:w-4/5 m-auto"
         }, React.createElement("div", {
@@ -13058,13 +13113,13 @@ const Seeds = ({
         }, "Total: ", u.toNumber())), React.createElement("div", {
             className: "flex justify-content-around p-1"
         }, React.createElement(Button, {
-            disabled: w,
+            disabled: h,
             className: "text-xs",
-            onClick: h
+            onClick: C
         }, "Yes"), React.createElement(Button, {
-            disabled: w,
+            disabled: h,
             className: "text-xs ml-2",
-            onClick: B
+            onClick: w
         }, "No")))))
     },
     MarketItems = ({
@@ -13163,19 +13218,19 @@ async function loadWishingWell() {
         t = metamask.getWishingWell().lastCollected(),
         a = metamask.getPair().getBalance(),
         n = metamask.getToken().balanceOf(wishingWellAddress),
-        [s, r, i, m, E] = await Promise.all([A, e, a, t, n]);
-    let d;
+        [s, r, i, m, d] = await Promise.all([A, e, a, t, n]);
+    let E;
     const u = new Date().getTime() / 1e3 - m;
     if (u <= LOCKED_SECONDS) {
-        const w = LOCKED_SECONDS - u;
-        d = secondsToLongString(w)
+        const h = LOCKED_SECONDS - u;
+        E = secondsToLongString(h)
     }
     return {
         myTokensInWell: s,
-        totalTokensInWell: E,
+        totalTokensInWell: d,
         canCollect: r,
         lpTokens: i,
-        lockedTime: d
+        lockedTime: E
     }
 }
 const API_URL = CONFIG.API_URL;
@@ -13534,23 +13589,23 @@ var baldMan = "data:image/gif;base64,R0lGODdhEgAUAMQAAAAAABkUJhgUJRkVJhkUJb+GZuW
 const Mail = () => {
         const [A, e] = react.exports.useState(!1), [t, a] = react.exports.useState(!1), [n, s] = react.exports.useState([]), [r, i] = react.exports.useState(!1), m = async () => {
             a(!0);
-            const d = getReadMessages();
+            const E = getReadMessages();
             let u = await getInbox();
-            u = u.map(w => l(c({}, w), {
-                unread: !(d == null ? void 0 : d.includes(w.id))
+            u = u.map(h => l(c({}, h), {
+                unread: !(E == null ? void 0 : E.includes(h.id))
             })), s(u), cleanupCache(u), a(!1)
-        }, E = d => {
-            if (!n[d].unread) return;
+        }, d = E => {
+            if (!n[E].unread) return;
             const u = [...n];
-            u[d].unread = !1, s(u), updateCache(u[d].id)
+            u[E].unread = !1, s(u), updateCache(u[E].id)
         };
         return react.exports.useEffect(() => {
             m()
         }, []), react.exports.useEffect(() => {
             A && m()
         }, [A]), react.exports.useEffect(() => {
-            const d = n.some(u => u.unread);
-            i(d)
+            const E = n.some(u => u.unread);
+            i(E)
         }, [n]), React.createElement("div", {
             className: "z-5 absolute align-items-center w-10",
             style: {
@@ -13573,7 +13628,7 @@ const Mail = () => {
         }, React.createElement(Inbox, {
             inbox: n,
             isLoading: t,
-            onRead: E
+            onRead: d
         })))
     },
     Town = () => React.createElement("div", {
@@ -13614,47 +13669,17 @@ const Mail = () => {
     }, React.createElement("span", {
         className: "text-center"
     }, "Something went wrong!"), React.createElement("img", {
-        src: humanDeath$1,
+        src: humanDeath,
         className: "h-20 my-2"
     }), React.createElement("span", {
         className: "text-xs text-center mt-2 mb-1"
     }, "Looks like we were unable to connect. Please refresh and try again.")),
-    Blocked = () => {
-        const {
-            authService: A
-        } = react.exports.useContext(Context$1), e = () => {
-            removeSession(metamask.myAccount), A.send("REFRESH")
-        };
-        return React.createElement("div", {
-            className: "flex flex-col text-center text-shadow items-center p-1"
-        }, React.createElement("div", {
-            className: "flex mb-3 items-center ml-8"
-        }, React.createElement("img", {
-            src: humanDeath$1,
-            alt: "Warning",
-            className: "w-full"
-        })), React.createElement("p", {
-            className: "text-center mb-3"
-        }, "Beta testers only!"), React.createElement("p", {
-            className: "text-center mb-2 text-xs"
-        }, "You don't have access to the game yet."), React.createElement("p", {
-            className: "text-center mb-4 text-xs"
-        }, "Make sure you have joined the", " ", React.createElement("a", {
-            className: "underline hover:text-white",
-            href: "https://discord.gg/sunflowerland",
-            target: "_blank",
-            rel: "noreferrer"
-        }, "Sunflower Land Discord server,"), ' go to the #verify channel and have the "farmer" role.'), React.createElement(Button, {
-            onClick: e,
-            className: "overflow-hidden mb-2"
-        }, React.createElement("span", null, "Try again")))
-    },
     DuplicateUser = () => React.createElement("div", {
         className: "flex flex-col text-center text-shadow items-center p-1"
     }, React.createElement("div", {
         className: "flex mb-3 items-center ml-8"
     }, React.createElement("img", {
-        src: humanDeath$1,
+        src: humanDeath,
         alt: "Warning",
         className: "w-full"
     })), React.createElement("p", {
@@ -13668,7 +13693,7 @@ const Mail = () => {
     }, React.createElement("span", {
         className: "text-shadow text-center"
     }, "Can't connect to Polygon"), React.createElement("img", {
-        src: humanDeath$1,
+        src: humanDeath,
         className: "w-1/2 -mt-4 ml-8"
     }), React.createElement("span", {
         className: "text-shadow text-xs text-center"
@@ -13680,7 +13705,7 @@ const Mail = () => {
     }, React.createElement("div", {
         className: "flex mb-3 items-center ml-8"
     }, React.createElement("img", {
-        src: humanDeath$1,
+        src: humanDeath,
         alt: "Warning",
         className: "w-full"
     })), React.createElement("p", {
@@ -13693,7 +13718,7 @@ const Mail = () => {
     }, React.createElement("div", {
         className: "flex mb-3 items-center ml-8"
     }, React.createElement("img", {
-        src: humanDeath$1,
+        src: humanDeath,
         alt: "Warning",
         className: "w-full"
     })), React.createElement("p", {
@@ -13844,26 +13869,26 @@ const SkillTree = ({
             setToast: e
         } = react.exports.useContext(ToastContext), [t] = useActor(A), {
             state: a
-        } = t.context, [n, s] = React.useState(!1), [r, i] = React.useState(!1), [m, E] = React.useState(!1);
+        } = t.context, [n, s] = React.useState(!1), [r, i] = React.useState(!1), [m, d] = React.useState(!1);
         React.useEffect(() => {
             const I = upgradeAvailable(a);
-            E(I), I && a.farmAddress && skillUpgradeToast(a, e)
+            d(I), I && a.farmAddress && skillUpgradeToast(a, e)
         }, [e, a]);
-        const d = () => {
+        const E = () => {
                 i(!0)
             },
             u = () => {
                 i(!1), s(!0), homeDoorAudio.play()
             },
             {
-                gathering: w,
-                farming: R
+                gathering: h,
+                farming: B
             } = a.skills,
-            g = getLevel(w),
-            h = getLevel(R),
-            y = g + h,
-            B = getRequiredXpToLevelUp(g),
-            f = getRequiredXpToLevelUp(h),
+            g = getLevel(h),
+            C = getLevel(B),
+            Q = g + C,
+            w = getRequiredXpToLevelUp(g),
+            f = getRequiredXpToLevelUp(C),
             S = () => {
                 const D = ["Green Thumb", "Barn Manager", "Seed Specialist", "Wrangler", "Lumberjack", "Prospector", "Logger", "Gold Rush"].map(F => t.context.state.inventory[F] ? React.createElement("img", {
                     key: F,
@@ -13877,7 +13902,7 @@ const SkillTree = ({
                     className: "flex flex-wrap"
                 }, D)
             },
-            Q = () => t.matches("levelling") ? React.createElement("span", {
+            y = () => t.matches("levelling") ? React.createElement("span", {
                 className: "loading"
             }, "Levelling up") : r ? React.createElement(SkillTree, {
                 back: u
@@ -13894,7 +13919,7 @@ const SkillTree = ({
                 className: "text-sm text-shadow"
             }, "Name: ?"), React.createElement("span", {
                 className: "text-sm text-shadow"
-            }, `Level: ${y}`)), React.createElement("div", {
+            }, `Level: ${Q}`)), React.createElement("div", {
                 className: "px-2 overflow-hidden"
             }, React.createElement("div", {
                 className: "flex items-center -mb-.5 md:-mb-2"
@@ -13905,15 +13930,15 @@ const SkillTree = ({
                 className: "w-4 h-4 ml-2"
             })), React.createElement("span", {
                 className: "text-xxs"
-            }, f ? `${R.toNumber()} XP/${f} XP` : `${R.toNumber()} XP`), React.createElement("div", {
+            }, f ? `${B.toNumber()} XP/${f} XP` : `${B.toNumber()} XP`), React.createElement("div", {
                 className: "flex items-center mt-1 flex-wrap"
-            }, new Array(10).fill(null).map((I, D) => D < h ? React.createElement(Label, {
+            }, new Array(10).fill(null).map((I, D) => D < C ? React.createElement(Label, {
                 key: D,
                 className: "w-5 h-7 mr-1 flex flex-col items-center"
             }) : React.createElement(OuterPanel, {
                 key: D,
                 className: "w-5 h-7 mr-1 flex flex-col items-center"
-            })), React.createElement("span", null, h)), React.createElement("div", {
+            })), React.createElement("span", null, C)), React.createElement("div", {
                 className: "flex items-center mt-2 -mb-.5 md:-mb-2"
             }, React.createElement("span", {
                 className: "text-sm"
@@ -13922,7 +13947,7 @@ const SkillTree = ({
                 className: "w-4 h-4 ml-2"
             })), React.createElement("span", {
                 className: "text-xxs"
-            }, B ? `${w.toNumber()} XP/${B} XP` : `${w.toNumber()} XP`), React.createElement("div", {
+            }, w ? `${h.toNumber()} XP/${w} XP` : `${h.toNumber()} XP`), React.createElement("div", {
                 className: "flex items-center mt-1 flex-wrap mb-1 md:mb-0"
             }, new Array(10).fill(null).map((I, D) => D < g ? React.createElement(Label, {
                 key: D,
@@ -13932,7 +13957,7 @@ const SkillTree = ({
                 className: "w-5 h-7 mr-1 flex flex-col items-center"
             })), React.createElement("span", null, g)), React.createElement(Button, {
                 className: "text-xs mt-3",
-                onClick: d
+                onClick: E
             }, "View all skills"))), React.createElement(InnerPanel, {
                 className: "flex w-1/2 sm:w-1/3 mt-2"
             }, React.createElement("img", {
@@ -13988,7 +14013,7 @@ const SkillTree = ({
             src: close,
             className: "h-6 cursor-pointer top-3 right-4 absolute",
             onClick: () => s(!1)
-        }), Q())))
+        }), y())))
     };
 var tailor = "./assets/tailor.3917066c.gif";
 const TailorSale = ({
@@ -14182,7 +14207,7 @@ const Lore = () => {
         }, React.createElement("span", {
             className: "text-shadow text-center"
         }, "Clock not in sync"), React.createElement("img", {
-            src: humanDeath,
+            src: humanDeath$1,
             className: "w-12"
         }), React.createElement("span", {
             className: "text-shadow text-xs text-center"
@@ -14407,7 +14432,7 @@ const Signing = () => React.createElement(React.Fragment, null, React.createElem
     }, "Full screen required!"), React.createElement("div", {
         className: "flex mb-3 items-center"
     }, React.createElement("img", {
-        src: humanDeath,
+        src: humanDeath$1,
         alt: "Warning",
         className: "w-full"
     })), React.createElement("p", {
