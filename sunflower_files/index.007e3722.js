@@ -4,20 +4,20 @@ var X = Object.getOwnPropertyDescriptors;
 var W = Object.getOwnPropertySymbols;
 var q = Object.prototype.hasOwnProperty,
     z = Object.prototype.propertyIsEnumerable;
-var H = (A, e, t) => e in A ? j(A, e, {
+var H = (e, A, t) => A in e ? j(e, A, {
         enumerable: !0,
         configurable: !0,
         writable: !0,
         value: t
-    }) : A[e] = t,
-    c = (A, e) => {
-        for (var t in e || (e = {})) q.call(e, t) && H(A, t, e[t]);
+    }) : e[A] = t,
+    c = (e, A) => {
+        for (var t in A || (A = {})) q.call(A, t) && H(e, t, A[t]);
         if (W)
-            for (var t of W(e)) z.call(e, t) && H(A, t, e[t]);
-        return A
+            for (var t of W(A)) z.call(A, t) && H(e, t, A[t]);
+        return e
     },
-    l = (A, e) => Z(A, X(e));
-var x = (A, e, t) => (H(A, typeof e != "symbol" ? e + "" : e, t), t);
+    l = (e, A) => Z(e, X(A));
+var x = (e, A, t) => (H(e, typeof A != "symbol" ? A + "" : A, t), t);
 import {
     b as buffer,
     p as process,
@@ -48,10 +48,10 @@ import {
     A as Accordion,
     s as p$1,
     t as ReactDOM
-} from "./vendor.a0131968.js";
+} from "./vendor.7a8f3e38.js";
 const p = function() {
-    const e = document.createElement("link").relList;
-    if (e && e.supports && e.supports("modulepreload")) return;
+    const A = document.createElement("link").relList;
+    if (A && A.supports && A.supports("modulepreload")) return;
     for (const n of document.querySelectorAll('link[rel="modulepreload"]')) a(n);
     new MutationObserver(n => {
         for (const s of n)
@@ -81,7 +81,7 @@ window.EventEmitter = EventEmitter;
 const NETWORK = "mainnet",
     DONATION_ADDRESS = "0x6D18a54E0fd87FCb84a0510A3eCd8855b7226715",
     POLYGON_CHAIN_ID = 137,
-    API_URL$c = "https://api.sunflower-land.com",
+    API_URL$b = "https://api.sunflower-land.com",
     WISHING_WELL_CONTRACT = "0xBE403A6054af56629D7d591A8fBD8cce3dc66771",
     BETA_CONTRACT = "0x48AfE14AE52987F6fE6E2F69aB74DC7Ac5a10fd2",
     FARM_CONTRACT = "0x2B4A66557A79263275826AD31a4cDDc2789334bD",
@@ -90,13 +90,13 @@ const NETWORK = "mainnet",
     SESSION_CONTRACT = "0x070717e1Bc4c6e46C22B0e0B8821e0aC1D4689c3",
     TOKEN_CONTRACT = "0xD1f9c58e33933a993A3891F8acFe05a68E1afC05",
     DISCORD_REDIRECT = "https://sunflower-land.com/play/",
-    CLIENT_VERSION = "2022-05-04T21:43",
-    RELEASE_VERSION = "v0.2.25-enable-discord-auth",
+    CLIENT_VERSION = "2022-05-05T06:58",
+    RELEASE_VERSION = "v0.2.26-beta-improvements",
     CONFIG = {
         NETWORK,
         POLYGON_CHAIN_ID,
         DONATION_ADDRESS,
-        API_URL: API_URL$c,
+        API_URL: API_URL$b,
         DISCORD_REDIRECT,
         WISHING_WELL_CONTRACT,
         BETA_CONTRACT,
@@ -465,11 +465,11 @@ var SessionABI = [{
     type: "function"
 }];
 const MINIMUM_GAS_PRICE = 40;
-async function estimateGasPrice(A, e = 1) {
+async function estimateGasPrice(e, A = 1) {
     const t = MINIMUM_GAS_PRICE * 1e9;
     try {
-        const a = await A.eth.getGasPrice();
-        let n = a ? Number(a) * e : void 0;
+        const a = await e.eth.getGasPrice();
+        let n = a ? Number(a) * A : void 0;
         return (!n || n < t) && (n = t), console.log({
             gasPrice: n
         }), n
@@ -478,38 +478,38 @@ async function estimateGasPrice(A, e = 1) {
     }
 }
 
-function parseMetamaskError(A) {
+function parseMetamaskError(e) {
     return console.log({
-        parse: A
-    }), A.code === 4001 ? new Error(ERRORS.REJECTED_TRANSACTION) : A.code === -32603 ? (console.log("Congested!"), new Error(ERRORS.NETWORK_CONGESTED)) : A
+        parse: e
+    }), e.code === 4001 ? new Error(ERRORS.REJECTED_TRANSACTION) : e.code === -32603 ? (console.log("Congested!"), new Error(ERRORS.NETWORK_CONGESTED)) : e
 }
 const address$6 = CONFIG.SESSION_CONTRACT;
 class SessionManager {
-    constructor(e, t) {
+    constructor(A, t) {
         x(this, "web3");
         x(this, "account");
         x(this, "contract");
-        this.web3 = e, this.account = t, this.contract = new this.web3.eth.Contract(SessionABI, address$6)
+        this.web3 = A, this.account = t, this.contract = new this.web3.eth.Contract(SessionABI, address$6)
     }
-    async getSessionId(e, t = 0) {
+    async getSessionId(A, t = 0) {
         await new Promise(a => setTimeout(a, 3e3 * t));
         try {
-            return await this.contract.methods.getSessionId(e).call({
+            return await this.contract.methods.getSessionId(A).call({
                 from: this.account
             })
         } catch (a) {
             const n = parseMetamaskError(a);
-            if (t < 3) return this.getSessionId(e, t + 1);
+            if (t < 3) return this.getSessionId(A, t + 1);
             throw n
         }
     }
-    async getNextSessionId(e, t) {
+    async getNextSessionId(A, t) {
         await new Promise(n => setTimeout(n, 3e3));
-        const a = await this.getSessionId(e);
-        return a === t ? this.getNextSessionId(e, t) : a
+        const a = await this.getSessionId(A);
+        return a === t ? this.getNextSessionId(A, t) : a
     }
     async sync({
-        signature: e,
+        signature: A,
         sessionId: t,
         deadline: a,
         farmId: n,
@@ -521,18 +521,18 @@ class SessionManager {
     }) {
         const E = lib.toWei("0.1"),
             u = await this.getSessionId(n),
-            h = await estimateGasPrice(this.web3);
+            w = await estimateGasPrice(this.web3);
         return await new Promise((g, C) => {
-            this.contract.methods.sync(e, t, a, n, s, r, i, m, d).send({
+            this.contract.methods.sync(A, t, a, n, s, r, i, m, d).send({
                 from: this.account,
                 value: E,
-                gasPrice: h
+                gasPrice: w
             }).on("error", function(Q) {
                 console.log({
                     error: Q
                 });
-                const w = parseMetamaskError(Q);
-                C(w)
+                const h = parseMetamaskError(Q);
+                C(h)
             }).on("transactionHash", function(Q) {
                 console.log({
                     transactionHash: Q
@@ -543,7 +543,7 @@ class SessionManager {
         }), await this.getNextSessionId(n, u)
     }
     async withdraw({
-        signature: e,
+        signature: A,
         sessionId: t,
         deadline: a,
         farmId: n,
@@ -554,8 +554,8 @@ class SessionManager {
     }) {
         const d = await this.getSessionId(n),
             E = await estimateGasPrice(this.web3);
-        return await new Promise((h, B) => {
-            this.contract.methods.withdraw(e, t, a, n, s, r, m, i).send({
+        return await new Promise((w, B) => {
+            this.contract.methods.withdraw(A, t, a, n, s, r, m, i).send({
                 from: this.account,
                 gasPrice: E
             }).on("error", function(g) {
@@ -570,7 +570,7 @@ class SessionManager {
             }).on("receipt", function(g) {
                 console.log({
                     receipt: g
-                }), h(g)
+                }), w(g)
             })
         }), await this.getNextSessionId(n, d)
     }
@@ -1133,53 +1133,53 @@ var FarmABI = [{
 }];
 const address$5 = CONFIG.FARM_CONTRACT;
 class Farm {
-    constructor(e, t) {
+    constructor(A, t) {
         x(this, "web3");
         x(this, "account");
         x(this, "farm");
-        this.web3 = e, this.account = t, this.farm = new this.web3.eth.Contract(FarmABI, address$5)
+        this.web3 = A, this.account = t, this.farm = new this.web3.eth.Contract(FarmABI, address$5)
     }
-    async getFarms(e = 0) {
-        await new Promise(t => setTimeout(t, 3e3 * e));
+    async getFarms(A = 0) {
+        await new Promise(t => setTimeout(t, 3e3 * A));
         try {
             return await this.farm.methods.getFarms(this.account).call({
                 from: this.account
             })
         } catch (t) {
             const a = parseMetamaskError(t);
-            if (e < 3) return this.getFarms(e + 1);
+            if (A < 3) return this.getFarms(A + 1);
             throw a
         }
     }
-    async ownerOf(e) {
-        return await this.farm.methods.ownerOf(e).call()
+    async ownerOf(A) {
+        return await this.farm.methods.ownerOf(A).call()
     }
-    async getFarm(e) {
-        return await this.farm.methods.getFarm(e).call()
+    async getFarm(A) {
+        return await this.farm.methods.getFarm(A).call()
     }
     async getNewFarm() {
         await new Promise(a => setTimeout(a, 3e3));
-        const e = await this.getFarms();
-        if (e.length === 0) return this.getNewFarm();
+        const A = await this.getFarms();
+        if (A.length === 0) return this.getNewFarm();
         console.log({
-            farm: e[0]
+            farm: A[0]
         });
-        const t = await this.ownerOf(e[0].tokenId);
+        const t = await this.ownerOf(A[0].tokenId);
         return console.log({
             owner: t
         }), console.log({
             account: this.account
-        }), t !== this.account ? this.getNewFarm() : e[0]
+        }), t !== this.account ? this.getNewFarm() : A[0]
     }
-    async getTotalSupply(e = 0) {
-        await new Promise(t => setTimeout(t, 3e3 * e));
+    async getTotalSupply(A = 0) {
+        await new Promise(t => setTimeout(t, 3e3 * A));
         try {
             return await this.farm.methods.totalSupply().call({
                 from: this.account
             })
         } catch (t) {
             const a = parseMetamaskError(t);
-            if (e < 3) return this.getTotalSupply(e + 1);
+            if (A < 3) return this.getTotalSupply(A + 1);
             throw a
         }
     }
@@ -1326,32 +1326,32 @@ var BetaJSON = [{
 }];
 const address$4 = CONFIG.BETA_CONTRACT;
 class Beta$1 {
-    constructor(e, t) {
+    constructor(A, t) {
         x(this, "web3");
         x(this, "account");
         x(this, "contract");
-        this.web3 = e, this.account = t, this.contract = new this.web3.eth.Contract(BetaJSON, address$4)
+        this.web3 = A, this.account = t, this.contract = new this.web3.eth.Contract(BetaJSON, address$4)
     }
-    async getCreatedAt(e, t = 1) {
+    async getCreatedAt(A, t = 1) {
         await new Promise(a => setTimeout(a, 3e3 * t));
         try {
-            return await this.contract.methods.farmCreatedAt(e).call({
+            return await this.contract.methods.farmCreatedAt(A).call({
                 from: this.account
             })
         } catch (a) {
             const n = parseMetamaskError(a);
-            if (t < 3) return this.getCreatedAt(e, t + 1);
+            if (t < 3) return this.getCreatedAt(A, t + 1);
             throw n
         }
     }
     async createFarm({
-        signature: e,
+        signature: A,
         charity: t,
         donation: a
     }) {
         const n = await estimateGasPrice(this.web3);
         return new Promise((s, r) => {
-            this.contract.methods.createFarm(e, t, a).send({
+            this.contract.methods.createFarm(A, t, a).send({
                 from: this.account,
                 value: a,
                 gasPrice: n
@@ -1497,8 +1497,8 @@ const KNOWN_IDS = {
     "Green Egg": 908,
     "Easter Bunny": 909
 };
-Object.assign({}, ...Object.entries(KNOWN_IDS).map(([A, e]) => ({
-    [e]: A
+Object.assign({}, ...Object.entries(KNOWN_IDS).map(([e, A]) => ({
+    [A]: e
 })));
 const IDS = Object.values(KNOWN_IDS);
 var InventoryJSON = [{
@@ -1960,33 +1960,33 @@ var InventoryJSON = [{
 }];
 const address$3 = CONFIG.INVENTORY_CONTRACT;
 class Inventory$1 {
-    constructor(e, t) {
+    constructor(A, t) {
         x(this, "web3");
         x(this, "account");
         x(this, "contract");
-        this.web3 = e, this.account = t, this.contract = new this.web3.eth.Contract(InventoryJSON, address$3)
+        this.web3 = A, this.account = t, this.contract = new this.web3.eth.Contract(InventoryJSON, address$3)
     }
-    async loadSupplyBatch(e, t = 0) {
+    async loadSupplyBatch(A, t = 0) {
         await new Promise(a => setTimeout(a, 3e3 * t));
         try {
-            return await this.contract.methods.totalSupplyBatch(e).call({
+            return await this.contract.methods.totalSupplyBatch(A).call({
                 from: this.account
             })
         } catch (a) {
             const n = parseMetamaskError(a);
-            if (t < 3) return this.loadSupplyBatch(e, t + 1);
+            if (t < 3) return this.loadSupplyBatch(A, t + 1);
             throw n
         }
     }
     async totalSupply() {
-        const e = Object.values(KNOWN_IDS),
+        const A = Object.values(KNOWN_IDS),
             t = Object.keys(KNOWN_IDS);
-        return (await this.loadSupplyBatch(e)).reduce((n, s, r) => l(c({}, n), {
+        return (await this.loadSupplyBatch(A)).reduce((n, s, r) => l(c({}, n), {
             [t[r]]: new Decimal(s)
         }), {})
     }
-    async getBalances(e) {
-        const t = Array(IDS.length).fill(e);
+    async getBalances(A) {
+        const t = Array(IDS.length).fill(A);
         return await this.contract.methods.balanceOfBatch(t, IDS).call()
     }
 }
@@ -2373,20 +2373,20 @@ var TokenABI = [{
 const address$2 = CONFIG.PAIR_CONTRACT,
     wishingWellAddress$1 = CONFIG.WISHING_WELL_CONTRACT;
 class Pair {
-    constructor(e, t) {
+    constructor(A, t) {
         x(this, "web3");
         x(this, "account");
         x(this, "contract");
-        this.web3 = e, this.account = t, this.contract = new this.web3.eth.Contract(TokenABI, address$2)
+        this.web3 = A, this.account = t, this.contract = new this.web3.eth.Contract(TokenABI, address$2)
     }
     async getBalance() {
         return await this.contract.methods.balanceOf(this.account).call({
             from: this.account
         })
     }
-    async approve(e) {
+    async approve(A) {
         return new Promise((t, a) => {
-            this.contract.methods.approve(wishingWellAddress$1, e).send({
+            this.contract.methods.approve(wishingWellAddress$1, A).send({
                 from: this.account
             }).on("error", function(n) {
                 console.log({
@@ -2782,18 +2782,18 @@ var WishingWellJSON = [{
 }];
 const address$1 = CONFIG.WISHING_WELL_CONTRACT;
 class WishingWell$1 {
-    constructor(e, t) {
+    constructor(A, t) {
         x(this, "web3");
         x(this, "account");
         x(this, "contract");
-        this.web3 = e, this.account = t, this.contract = new this.web3.eth.Contract(WishingWellJSON, address$1)
+        this.web3 = A, this.account = t, this.contract = new this.web3.eth.Contract(WishingWellJSON, address$1)
     }
     async wish() {
-        const e = await estimateGasPrice(this.web3);
+        const A = await estimateGasPrice(this.web3);
         return new Promise((t, a) => {
             this.contract.methods.wish().send({
                 from: this.account,
-                gasPrice: e
+                gasPrice: A
             }).on("error", function(n) {
                 console.log({
                     error: n
@@ -2810,13 +2810,13 @@ class WishingWell$1 {
         })
     }
     async collectFromWell({
-        signature: e,
+        signature: A,
         tokens: t,
         deadline: a
     }) {
         const n = await estimateGasPrice(this.web3);
         return new Promise((s, r) => {
-            this.contract.methods.collectFromWell(e, t, a).send({
+            this.contract.methods.collectFromWell(A, t, a).send({
                 from: this.account,
                 gasPrice: n
             }).on("error", function(i) {
@@ -2835,12 +2835,12 @@ class WishingWell$1 {
         })
     }
     async getBalance() {
-        const e = await this.contract.methods.balanceOf(this.account).call({
+        const A = await this.contract.methods.balanceOf(this.account).call({
             from: this.account
         });
         return console.log({
-            balance: e
-        }), e
+            balance: A
+        }), A
     }
     async canCollect() {
         return await this.contract.methods.canCollect(this.account).call({
@@ -2855,14 +2855,14 @@ class WishingWell$1 {
 }
 const address = CONFIG.TOKEN_CONTRACT;
 class Token {
-    constructor(e, t) {
+    constructor(A, t) {
         x(this, "web3");
         x(this, "account");
         x(this, "contract");
-        this.web3 = e, this.account = t, this.contract = new this.web3.eth.Contract(TokenABI, address)
+        this.web3 = A, this.account = t, this.contract = new this.web3.eth.Contract(TokenABI, address)
     }
-    async balanceOf(e) {
-        return await this.contract.methods.balanceOf(e).call({
+    async balanceOf(A) {
+        return await this.contract.methods.balanceOf(A).call({
             from: this.account
         })
     }
@@ -3242,46 +3242,46 @@ var SunflowerFarmersABI = [{
 const farmContractAddress = "0x6e5Fa679211d7F6b54e14E187D34bA547c5d3fe0",
     farmTokenAddress = "0xdf9B4b57865B403e08c85568442f95c26b7896b0";
 class SunflowerFarmers {
-    constructor(e, t) {
+    constructor(A, t) {
         x(this, "web3");
         x(this, "account");
         x(this, "farm");
         x(this, "token");
-        this.web3 = e, this.account = t, this.farm = new this.web3.eth.Contract(SunflowerFarmersABI, farmContractAddress), this.token = new this.web3.eth.Contract(TokenABI, farmTokenAddress)
+        this.web3 = A, this.account = t, this.farm = new this.web3.eth.Contract(SunflowerFarmersABI, farmContractAddress), this.token = new this.web3.eth.Contract(TokenABI, farmTokenAddress)
     }
-    async hasFarm(e, t = 0) {
+    async hasFarm(A, t = 0) {
         await new Promise(a => setTimeout(a, 3e3 * t));
         try {
-            const a = await this.farm.methods.getLand(e).call({
-                from: e
+            const a = await this.farm.methods.getLand(A).call({
+                from: A
             });
             return console.log({
                 land: a
             }), a.length >= 5
         } catch (a) {
             const n = parseMetamaskError(a);
-            if (t < 3) return this.hasFarm(e, t + 1);
+            if (t < 3) return this.hasFarm(A, t + 1);
             throw n
         }
     }
-    async hasTokens(e, t = 0) {
+    async hasTokens(A, t = 0) {
         await new Promise(a => setTimeout(a, 3e3 * t));
         try {
-            const a = await this.token.methods.balanceOf(e).call({
-                from: e
+            const a = await this.token.methods.balanceOf(A).call({
+                from: A
             });
             return console.log({
                 balance: a
             }), Number(a) > 0
         } catch (a) {
             const n = parseMetamaskError(a);
-            if (t < 3) return this.hasTokens(e, t + 1);
+            if (t < 3) return this.hasTokens(A, t + 1);
             throw n
         }
     }
-    async hasV1Data(e = this.account) {
-        const t = await this.hasTokens(e);
-        return await this.hasFarm(e) || t
+    async hasV1Data(A = this.account) {
+        const t = await this.hasTokens(A);
+        return await this.hasFarm(A) || t
     }
 }
 class Metamask {
@@ -3300,16 +3300,16 @@ class Metamask {
     async initialiseContracts() {
         try {
             if (this.farm = new Farm(this.web3, this.account), this.sunflowerFarmers = new SunflowerFarmers(this.web3, this.account), this.session = new SessionManager(this.web3, this.account), this.beta = new Beta$1(this.web3, this.account), this.inventory = new Inventory$1(this.web3, this.account), this.pair = new Pair(this.web3, this.account), this.token = new Token(this.web3, this.account), this.wishingWell = new WishingWell$1(this.web3, this.account), !await this.healthCheck()) throw new Error("Unable to reach Polygon")
-        } catch (e) {
-            if (e.code === "-32005") console.error("Retrying..."), await new Promise(t => window.setTimeout(t, 3e3));
-            else throw console.error(e), e
+        } catch (A) {
+            if (A.code === "-32005") console.error("Retrying..."), await new Promise(t => window.setTimeout(t, 3e3));
+            else throw console.error(A), A
         }
     }
     async setupWeb3() {
         if (window.ethereum) try {
                 await window.ethereum.enable(), this.web3 = new Web3(window.ethereum)
-            } catch (e) {
-                console.error("Error inside setupWeb3", e)
+            } catch (A) {
+                console.error("Error inside setupWeb3", A)
             } else if (window.web3) this.web3 = new Web3(window.web3.currentProvider);
             else throw new Error(ERRORS.NO_WEB3)
     }
@@ -3323,22 +3323,22 @@ class Metamask {
     async loadAccount() {
         this.account = await this.getAccount()
     }
-    async initialise(e = 0) {
+    async initialise(A = 0) {
         var t;
         try {
             if (await new Promise(n => setTimeout(n, 1e3)), await this.setupWeb3(), await this.loadAccount(), await ((t = this.web3) == null ? void 0 : t.eth.getChainId()) !== CONFIG.POLYGON_CHAIN_ID) throw new Error(ERRORS.WRONG_CHAIN);
             await this.initialiseContracts()
         } catch (a) {
             if (a.message === ERRORS.WRONG_CHAIN || a.message === ERRORS.NO_WEB3) throw a;
-            if (e < 3) return await new Promise(n => setTimeout(n, 2e3)), this.initialise(e + 1);
+            if (A < 3) return await new Promise(n => setTimeout(n, 2e3)), this.initialise(A + 1);
             throw a
         }
     }
-    async signTransaction(e, t = this.account) {
+    async signTransaction(A, t = this.account) {
         if (!this.web3) throw new Error(ERRORS.NO_WEB3);
         const a = this.generateSignatureMessage({
             address: t,
-            nonce: e
+            nonce: A
         });
         try {
             return {
@@ -3349,7 +3349,7 @@ class Metamask {
         }
     }
     generateSignatureMessage({
-        address: e,
+        address: A,
         nonce: t
     }) {
         return `\u{1F33B} Welcome to Sunflower Land! \u{1F33B}
@@ -3365,7 +3365,7 @@ Your authentication status will reset after
 each session.
 
 \u{1F45B} Wallet address:
-${e.substring(0,19)}...${e.substring(24)}
+${A.substring(0,19)}...${A.substring(24)}
 
 \u{1F511} Nonce: ${t}`
     }
@@ -3396,10 +3396,10 @@ ${e.substring(0,19)}...${e.substring(24)}
     }
     async addNetwork() {
         try {
-            const e = this.getDefaultChainParam();
+            const A = this.getDefaultChainParam();
             await window.ethereum.request({
                 method: "wallet_addEthereumChain",
-                params: [c({}, e)]
+                params: [c({}, A)]
             })
         } catch {
             throw new Error(ERRORS.WRONG_CHAIN)
@@ -3408,18 +3408,18 @@ ${e.substring(0,19)}...${e.substring(24)}
     async initialiseNetwork() {
         try {
             await this.switchNetwork()
-        } catch (e) {
-            throw e.code === 4902 && await this.addNetwork(), e
+        } catch (A) {
+            throw A.code === 4902 && await this.addNetwork(), A
         }
     }
-    async donateToTheTeam(e) {
+    async donateToTheTeam(A) {
         var a;
         const t = await estimateGasPrice(this.web3);
         try {
             await ((a = this.web3) == null ? void 0 : a.eth.sendTransaction({
                 from: metamask.myAccount,
                 to: CONFIG.DONATION_ADDRESS,
-                value: lib.toHex(lib.toWei(e.toString(), "ether")),
+                value: lib.toHex(lib.toWei(A.toString(), "ether")),
                 gasPrice: t
             }))
         } catch (n) {
@@ -3454,9 +3454,9 @@ ${e.substring(0,19)}...${e.substring(24)}
         return this.account
     }
     async getBlockNumber() {
-        var e;
+        var A;
         try {
-            const t = await ((e = this.web3) == null ? void 0 : e.eth.getBlockNumber());
+            const t = await ((A = this.web3) == null ? void 0 : A.eth.getBlockNumber());
             if (!t) throw new Error(ERRORS.NETWORK_CONGESTED);
             return t
         } catch (t) {
@@ -3465,55 +3465,27 @@ ${e.substring(0,19)}...${e.substring(24)}
     }
 }
 const metamask = new Metamask,
-    API_URL$b = CONFIG.API_URL;
-async function airdrop({
-    token: A,
-    farmId: e,
-    fromAddress: t
-}) {
-    const a = Math.floor(Date.now() / 864e5),
-        {
-            signature: n
-        } = await metamask.signTransaction(a, t),
-        s = await window.fetch(`${API_URL$b}/airdrop/${e}`, {
-            method: "POST",
-            headers: {
-                "content-type": "application/json;charset=UTF-8",
-                Authorization: `Bearer ${A}`
-            },
-            body: JSON.stringify({
-                signature: n,
-                fromAddress: t
-            })
-        });
-    if (s.status === 429) throw new Error(ERRORS.TOO_MANY_REQUESTS);
-    if (s.status >= 400) throw new Error(ERRORS.FAILED_REQUEST);
-    const r = await s.json();
-    return console.log({
-        data: r
-    }), r
-}
-const API_URL$a = CONFIG.API_URL;
-async function signTransaction(A) {
-    const e = await window.fetch(`${API_URL$a}/farm`, {
+    API_URL$a = CONFIG.API_URL;
+async function signTransaction(e) {
+    const A = await window.fetch(`${API_URL$a}/farm`, {
         method: "POST",
         headers: {
             "content-type": "application/json;charset=UTF-8",
-            Authorization: `Bearer ${A.token}`
+            Authorization: `Bearer ${e.token}`
         },
         body: JSON.stringify({
-            charity: A.charity,
-            donation: A.donation,
-            captcha: A.captcha
+            charity: e.charity,
+            donation: e.donation,
+            captcha: e.captcha
         })
     });
-    if (e.status === 429) throw new Error(ERRORS.TOO_MANY_REQUESTS);
-    if (e.status >= 400) throw new Error(ERRORS.FAILED_REQUEST);
+    if (A.status === 429) throw new Error(ERRORS.TOO_MANY_REQUESTS);
+    if (A.status >= 400) throw new Error(ERRORS.FAILED_REQUEST);
     const {
         signature: t,
         charity: a,
         donation: n
-    } = await e.json();
+    } = await A.json();
     return {
         signature: t,
         charity: a,
@@ -3521,32 +3493,32 @@ async function signTransaction(A) {
     }
 }
 async function createFarm({
-    donation: A,
-    charity: e,
+    donation: e,
+    charity: A,
     token: t,
     captcha: a
 }) {
     const n = await signTransaction({
-        donation: A,
-        charity: e,
+        donation: e,
+        charity: A,
         token: t,
         captcha: a
     });
     return await metamask.getBeta().createFarm(n), await metamask.getFarm().getNewFarm()
 }
 const API_URL$9 = CONFIG.API_URL;
-async function loginRequest(A) {
-    const e = await window.fetch(`${API_URL$9}/login`, {
+async function loginRequest(e) {
+    const A = await window.fetch(`${API_URL$9}/login`, {
         method: "POST",
         headers: {
             "content-type": "application/json;charset=UTF-8"
         },
-        body: JSON.stringify(c({}, A))
+        body: JSON.stringify(c({}, e))
     });
-    if (e.status >= 400) throw new Error(ERRORS.FAILED_REQUEST);
+    if (A.status >= 400) throw new Error(ERRORS.FAILED_REQUEST);
     const {
         token: t
-    } = await e.json();
+    } = await A.json();
     return {
         token: t
     }
@@ -3554,40 +3526,40 @@ async function loginRequest(A) {
 const host = window.location.host.replace(/^www\./, ""),
     LOCAL_STORAGE_KEY$1 = `sb_wiz.zpc.v.${host}-${window.location.pathname}`;
 
-function getSession(A) {
-    const e = localStorage.getItem(LOCAL_STORAGE_KEY$1);
-    return e ? JSON.parse(e)[A] : null
+function getSession(e) {
+    const A = localStorage.getItem(LOCAL_STORAGE_KEY$1);
+    return A ? JSON.parse(A)[e] : null
 }
 
-function saveSession(A, e) {
+function saveSession(e, A) {
     let t = {};
     const a = localStorage.getItem(LOCAL_STORAGE_KEY$1);
     a && (t = JSON.parse(a));
     const n = l(c({}, t), {
-        [A]: e
+        [e]: A
     });
     return localStorage.setItem(LOCAL_STORAGE_KEY$1, JSON.stringify(n))
 }
 
-function removeSession(A) {
-    let e = {};
+function removeSession(e) {
+    let A = {};
     const t = localStorage.getItem(LOCAL_STORAGE_KEY$1);
-    return t && (e = JSON.parse(t)), delete e[A], localStorage.setItem(LOCAL_STORAGE_KEY$1, JSON.stringify(e))
+    return t && (A = JSON.parse(t)), delete A[e], localStorage.setItem(LOCAL_STORAGE_KEY$1, JSON.stringify(A))
 }
 
-function decodeToken(A) {
-    return o(A)
+function decodeToken(e) {
+    return o(e)
 }
 const TOKEN_BUFFER_MS = 1e3 * 60 * 60 * 4;
 async function login() {
-    const A = metamask.myAccount,
-        e = getSession(A);
-    if (e) {
-        const s = decodeToken(e.token),
+    const e = metamask.myAccount,
+        A = getSession(e);
+    if (A) {
+        const s = decodeToken(A.token),
             r = s.exp * 1e3 > Date.now() + TOKEN_BUFFER_MS,
             i = !!s.userAccess;
         if (r && i) return {
-            token: e.token
+            token: A.token
         }
     }
     const t = Math.floor(Date.now() / 864e5),
@@ -3597,39 +3569,39 @@ async function login() {
         {
             token: n
         } = await loginRequest({
-            address: A,
+            address: e,
             signature: a
         });
-    return saveSession(A, {
+    return saveSession(e, {
         token: n
     }), {
         token: n
     }
 }
 const API_URL$8 = CONFIG.API_URL;
-async function oauthoriseRequest(A) {
-    const e = await window.fetch(`${API_URL$8}/oauth`, {
+async function oauthoriseRequest(e) {
+    const A = await window.fetch(`${API_URL$8}/oauth`, {
             method: "POST",
             headers: {
                 "content-type": "application/json;charset=UTF-8",
-                Authorization: `Bearer ${A.token}`
+                Authorization: `Bearer ${e.token}`
             },
             body: JSON.stringify({
-                code: A.code
+                code: e.code
             })
         }),
         {
             token: t,
             errorCode: a
-        } = await e.json();
-    if (e.status >= 400) throw new Error(a || ERRORS.FAILED_REQUEST);
+        } = await A.json();
+    if (A.status >= 400) throw new Error(a || ERRORS.FAILED_REQUEST);
     return {
         token: t
     }
 }
-async function oauthorise(A) {
+async function oauthorise(e) {
     window.history.pushState({}, "", window.location.pathname);
-    const e = metamask.myAccount,
+    const A = metamask.myAccount,
         {
             token: t
         } = await login(),
@@ -3637,9 +3609,9 @@ async function oauthorise(A) {
             token: a
         } = await oauthoriseRequest({
             token: t,
-            code: A
+            code: e
         });
-    return saveSession(e, {
+    return saveSession(A, {
         token: a
     }), {
         token: a
@@ -3647,15 +3619,15 @@ async function oauthorise(A) {
 }
 
 function redirectOAuth() {
-    const A = "946044940008435803",
-        e = encodeURIComponent(CONFIG.DISCORD_REDIRECT),
+    const e = "946044940008435803",
+        A = encodeURIComponent(CONFIG.DISCORD_REDIRECT),
         t = "guilds.members.read";
-    window.location.href = `https://discord.com/api/oauth2/authorize?response_type=code&client_id=${A}&scope=${t}&redirect_uri=${e}&prompt=consent`
+    window.location.href = `https://discord.com/api/oauth2/authorize?response_type=code&client_id=${e}&scope=${t}&redirect_uri=${A}&prompt=consent`
 }
 const INITIAL_SESSION = "0x0000000000000000000000000000000000000000000000000000000000000000",
     getFarmUrl = () => {
-        const A = new URLSearchParams(window.location.search).get("farmId");
-        return parseInt(A)
+        const e = new URLSearchParams(window.location.search).get("farmId");
+        return parseInt(e)
     },
     getDiscordCode = () => new URLSearchParams(window.location.search).get("code"),
     deleteFarmUrl = () => window.history.pushState({}, "", window.location.pathname),
@@ -3753,15 +3725,15 @@ const INITIAL_SESSION = "0x00000000000000000000000000000000000000000000000000000
                     checkingAccess: {
                         id: "checkingAccess",
                         invoke: {
-                            src: async A => {
-                                var t;
+                            src: async e => {
+                                var A;
                                 return {
-                                    hasAccess: await ((t = metamask.getSunflowerFarmers()) == null ? void 0 : t.hasV1Data())
+                                    hasAccess: (A = e.token) == null ? void 0 : A.userAccess.createFarm
                                 }
                             },
                             onDone: [{
                                 target: "noFarmLoaded",
-                                cond: (A, e) => e.data.hasAccess
+                                cond: (e, A) => A.data.hasAccess
                             }, {
                                 target: "checkingSupply"
                             }],
@@ -3775,16 +3747,16 @@ const INITIAL_SESSION = "0x00000000000000000000000000000000000000000000000000000
                         id: "checkingSupply",
                         invoke: {
                             src: async () => {
-                                var e;
+                                var A;
                                 return {
-                                    totalSupply: await ((e = metamask.getFarm()) == null ? void 0 : e.getTotalSupply())
+                                    totalSupply: await ((A = metamask.getFarm()) == null ? void 0 : A.getTotalSupply())
                                 }
                             },
                             onDone: [{
                                 target: "supplyReached",
-                                cond: (A, e) => {
+                                cond: (e, A) => {
                                     var t, a;
-                                    return Number(e.data.totalSupply) >= 1e5 && !((a = (t = A.token) == null ? void 0 : t.userAccess) == null ? void 0 : a.createFarm)
+                                    return Number(A.data.totalSupply) >= 1e5 && !((a = (t = e.token) == null ? void 0 : t.userAccess) == null ? void 0 : a.createFarm)
                                 }
                             }, {
                                 target: "noFarmLoaded"
@@ -3870,7 +3842,6 @@ const INITIAL_SESSION = "0x00000000000000000000000000000000000000000000000000000
                     supplyReached: {}
                 },
                 on: {
-                    AIRDROP: "airdropping",
                     ACCOUNT_CHANGED: {
                         target: "connecting",
                         actions: "resetFarm"
@@ -3933,106 +3904,7 @@ const INITIAL_SESSION = "0x00000000000000000000000000000000000000000000000000000
                     }
                 }
             },
-            minimised: {},
-            airdropping: {
-                initial: "idle",
-                states: {
-                    idle: {
-                        on: {
-                            ACCOUNT_CHANGED: {
-                                target: "#checking"
-                            }
-                        }
-                    },
-                    checking: {
-                        id: "checking",
-                        invoke: {
-                            src: async () => await metamask.getAccount() === metamask.myAccount ? {
-                                isSameAccount: !0
-                            } : {
-                                hasV1Data: !0
-                            },
-                            onDone: [{
-                                target: "idle",
-                                cond: (A, e) => e.data.isSameAccount
-                            }, {
-                                target: "confirmation",
-                                cond: (A, e) => e.data.hasV1Data
-                            }, {
-                                target: "noFarm"
-                            }],
-                            onError: {
-                                target: "error",
-                                actions: "assignErrorMessage"
-                            }
-                        },
-                        on: {
-                            ACCOUNT_CHANGED: {
-                                target: "#checking"
-                            }
-                        }
-                    },
-                    noFarm: {
-                        on: {
-                            ACCOUNT_CHANGED: {
-                                target: "#checking"
-                            }
-                        }
-                    },
-                    confirmation: {
-                        on: {
-                            CONFIRM: {
-                                target: "signing"
-                            },
-                            ACCOUNT_CHANGED: {
-                                target: "#checking"
-                            }
-                        }
-                    },
-                    signing: {
-                        id: "airdropSigning",
-                        invoke: {
-                            src: async A => {
-                                const e = await metamask.getAccount(),
-                                    {
-                                        status: t
-                                    } = await airdrop({
-                                        token: A.rawToken,
-                                        farmId: A.farmId,
-                                        fromAddress: e
-                                    });
-                                return {
-                                    status: t
-                                }
-                            },
-                            onDone: [{
-                                target: "duplicate",
-                                cond: (A, e) => e.data.status === "already_migrated"
-                            }, {
-                                target: "success"
-                            }],
-                            onError: {
-                                target: "error",
-                                actions: "assignErrorMessage"
-                            }
-                        },
-                        on: {
-                            ACCOUNT_CHANGED: {
-                                target: "#checking"
-                            }
-                        }
-                    },
-                    success: {},
-                    error: {},
-                    duplicate: {
-                        on: {
-                            ACCOUNT_CHANGED: {
-                                target: "#checking"
-                            }
-                        }
-                    }
-                }
-            }
+            minimised: {}
         },
         on: {
             CHAIN_CHANGED: {
@@ -4051,27 +3923,27 @@ const INITIAL_SESSION = "0x00000000000000000000000000000000000000000000000000000
             },
             loadFarm: async () => {
                 var n, s;
-                const A = await ((n = metamask.getFarm()) == null ? void 0 : n.getFarms());
-                if ((A == null ? void 0 : A.length) === 0) return;
-                const e = await ((s = metamask.getBeta()) == null ? void 0 : s.getCreatedAt(metamask.myAccount)),
-                    t = A[0],
+                const e = await ((n = metamask.getFarm()) == null ? void 0 : n.getFarms());
+                if ((e == null ? void 0 : e.length) === 0) return;
+                const A = await ((s = metamask.getBeta()) == null ? void 0 : s.getCreatedAt(metamask.myAccount)),
+                    t = e[0],
                     a = await metamask.getSessionManager().getSessionId(t.tokenId);
                 return {
                     farmId: t.tokenId,
                     address: t.account,
                     sessionId: a,
-                    createdAt: e
+                    createdAt: A
                 }
             },
-            createFarm: async (A, e) => {
+            createFarm: async (e, A) => {
                 const {
                     charityAddress: t,
                     donation: a,
                     captcha: n
-                } = e, s = await createFarm({
+                } = A, s = await createFarm({
                     charity: t,
                     donation: a,
-                    token: A.rawToken,
+                    token: e.rawToken,
                     captcha: n
                 });
                 return {
@@ -4082,24 +3954,24 @@ const INITIAL_SESSION = "0x00000000000000000000000000000000000000000000000000000
             },
             login: async () => {
                 const {
-                    token: A
+                    token: e
                 } = await login();
-                return {
-                    token: A
-                }
-            },
-            oauthorise: async () => {
-                const A = getDiscordCode(),
-                    {
-                        token: e
-                    } = await oauthorise(A);
                 return {
                     token: e
                 }
             },
-            visitFarm: async (A, e) => {
+            oauthorise: async () => {
+                const e = getDiscordCode(),
+                    {
+                        token: A
+                    } = await oauthorise(e);
+                return {
+                    token: A
+                }
+            },
+            visitFarm: async (e, A) => {
                 var n;
-                const t = getFarmUrl() || e.farmId,
+                const t = getFarmUrl() || A.farmId,
                     a = await ((n = metamask.getFarm()) == null ? void 0 : n.getFarm(t));
                 return {
                     farmId: a.tokenId,
@@ -4111,16 +3983,16 @@ const INITIAL_SESSION = "0x00000000000000000000000000000000000000000000000000000
         },
         actions: {
             assignFarm: assign({
-                farmId: (A, e) => e.data.farmId,
-                address: (A, e) => e.data.address,
-                sessionId: (A, e) => e.data.sessionId
+                farmId: (e, A) => A.data.farmId,
+                address: (e, A) => A.data.address,
+                sessionId: (e, A) => A.data.sessionId
             }),
             assignToken: assign({
-                token: (A, e) => decodeToken(e.data.token),
-                rawToken: (A, e) => e.data.token
+                token: (e, A) => decodeToken(A.data.token),
+                rawToken: (e, A) => A.data.token
             }),
             assignErrorMessage: assign({
-                errorCode: (A, e) => e.data.message
+                errorCode: (e, A) => A.data.message
             }),
             resetFarm: assign({
                 farmId: () => {},
@@ -4129,23 +4001,23 @@ const INITIAL_SESSION = "0x00000000000000000000000000000000000000000000000000000
                 token: () => {},
                 rawToken: () => {}
             }),
-            clearSession: A => removeSession(metamask.myAccount),
+            clearSession: e => removeSession(metamask.myAccount),
             deleteFarmIdUrl: deleteFarmUrl
         },
         guards: {
-            isFresh: (A, e) => {
+            isFresh: (e, A) => {
                 var a;
-                return ((a = e.data) == null ? void 0 : a.farmId) ? Date.now() / 1e3 - e.data.createdAt < 60 : !1
+                return ((a = A.data) == null ? void 0 : a.farmId) ? Date.now() / 1e3 - A.data.createdAt < 60 : !1
             },
-            hasFarm: (A, e) => {
+            hasFarm: (e, A) => {
                 var t;
-                if ((t = e.data) == null ? void 0 : t.farmId) {
+                if ((t = A.data) == null ? void 0 : t.farmId) {
                     const {
                         farmId: a
-                    } = e.data;
+                    } = A.data;
                     return !!a
                 }
-                return !!A.farmId
+                return !!e.farmId
             },
             hasFarmIdUrl: () => !isNaN(getFarmUrl()),
             hasDiscordCode: () => !!getDiscordCode()
@@ -4153,32 +4025,32 @@ const INITIAL_SESSION = "0x00000000000000000000000000000000000000000000000000000
     }),
     Context$1 = React.createContext({}),
     Provider = ({
-        children: A
+        children: e
     }) => {
-        const e = useInterpret(authMachine);
+        const A = useInterpret(authMachine);
         return React.createElement(Context$1.Provider, {
             value: {
-                authService: e
+                authService: A
             }
-        }, A)
+        }, e)
     };
 var background = "./assets/background.7b66bdbf.png",
     darkBorder = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJAgMAAACd/+6DAAAABGdBTUEAALGPC/xhBQAAAAlQTFRFAAAA7qRoGBQlo4eEUgAAAAF0Uk5TAEDm2GYAAAAZSURBVAjXY+BawcCgGsbAMIGxAQODxIHyAIsgB7CF1qipAAAAAElFTkSuQmCC",
     border$1 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJAgMAAACd/+6DAAAABGdBTUEAALGPC/xhBQAAAAlQTFRFAAAA6tSqGBQlHYAABgAAAAF0Uk5TAEDm2GYAAAAZSURBVAjXY+BawcCgGsbAMIGxAQODxIHyAIsgB7CF1qipAAAAAElFTkSuQmCC";
 const Panel = ({
-        children: A,
-        className: e,
+        children: e,
+        className: A,
         style: t
     }) => React.createElement(OuterPanel, {
-        className: e,
+        className: A,
         style: t
-    }, React.createElement(InnerPanel, null, A)),
+    }, React.createElement(InnerPanel, null, e)),
     InnerPanel = ({
-        children: A,
-        className: e,
+        children: e,
+        className: A,
         style: t
     }) => React.createElement("div", {
-        className: classNames("bg-brown-300 p-1", e),
+        className: classNames("bg-brown-300 p-1", A),
         style: c({
             borderStyle: "solid",
             borderWidth: "6px",
@@ -4188,13 +4060,13 @@ const Panel = ({
             borderImageRepeat: "repeat",
             borderRadius: "20px"
         }, t)
-    }, A),
+    }, e),
     OuterPanel = ({
-        children: A,
-        className: e,
+        children: e,
+        className: A,
         style: t
     }) => React.createElement("div", {
-        className: classNames("bg-brown-600 p-0.5 text-white shadow-lg", e),
+        className: classNames("bg-brown-600 p-0.5 text-white shadow-lg", A),
         style: c({
             borderStyle: "solid",
             borderWidth: "6px",
@@ -4204,29 +4076,29 @@ const Panel = ({
             borderImageRepeat: "repeat",
             borderRadius: "20px"
         }, t)
-    }, A);
+    }, e);
 var token = "./assets/token.e6f7183e.gif";
 const LOCAL_STORAGE_KEY = "inventory.selectedItems";
 
-function cacheShortcuts(A) {
-    const t = getShortcuts().filter(n => n !== A),
-        a = [A, ...t.slice(0, 2)];
+function cacheShortcuts(e) {
+    const t = getShortcuts().filter(n => n !== e),
+        a = [e, ...t.slice(0, 2)];
     return localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(a)), a
 }
 
 function getShortcuts() {
-    const A = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return A ? JSON.parse(A) : []
+    const e = localStorage.getItem(LOCAL_STORAGE_KEY);
+    return e ? JSON.parse(e) : []
 }
 
 function getHalveningRate() {
-    const A = new Date().getTime();
-    return A < 16510392e5 ? .1 : A < 1655475136e3 ? .05 : .025
+    const e = new Date().getTime();
+    return e < 16510392e5 ? .1 : e < 1655475136e3 ? .05 : .025
 }
 
-function marketRate(A) {
-    const e = getHalveningRate();
-    return new Decimal(A).mul(e)
+function marketRate(e) {
+    const A = getHalveningRate();
+    return new Decimal(e).mul(A)
 }
 const CROPS = () => ({
         Sunflower: {
@@ -4370,12 +4242,12 @@ const CROPS = () => ({
         }
     });
 var Section;
-(function(A) {
-    A.Crops = "crops", A.Water = "water", A.Animals = "animals", A.Shop = "shop", A.Town = "town", A.Forest = "forest", A["Sunflower Statue"] = "sunflower-statue", A["Potato Statue"] = "potato-statue", A["Christmas Tree"] = "christmas-tree", A.Scarecrow = "scarecrow", A["Farm Cat"] = "farm-cat", A["Farm Dog"] = "farm-dog", A.Gnome = "gnome", A["Chicken Coop"] = "chicken-coop", A["Sunflower Tombstone"] = "sunflower-tombstone", A["Sunflower Rock"] = "sunflower-rock", A["Goblin Crown"] = "goblin-crown", A.Fountain = "fountain", A.Flags = "flags", A.Beaver = "beaver", A["Nyon Statue"] = "nyon-statue", A.Tent = "tent", A.Bath = "bath", A["Easter Bunny"] = "easter-bunny"
+(function(e) {
+    e.Crops = "crops", e.Water = "water", e.Animals = "animals", e.Shop = "shop", e.Town = "town", e.Forest = "forest", e["Sunflower Statue"] = "sunflower-statue", e["Potato Statue"] = "potato-statue", e["Christmas Tree"] = "christmas-tree", e.Scarecrow = "scarecrow", e["Farm Cat"] = "farm-cat", e["Farm Dog"] = "farm-dog", e.Gnome = "gnome", e["Chicken Coop"] = "chicken-coop", e["Sunflower Tombstone"] = "sunflower-tombstone", e["Sunflower Rock"] = "sunflower-rock", e["Goblin Crown"] = "goblin-crown", e.Fountain = "fountain", e.Flags = "flags", e.Beaver = "beaver", e["Nyon Statue"] = "nyon-statue", e.Tent = "tent", e.Bath = "bath", e["Easter Bunny"] = "easter-bunny"
 })(Section || (Section = {}));
-const useScrollIntoView = () => [e => {
-        if (!e) return;
-        const t = document.getElementById(e);
+const useScrollIntoView = () => [A => {
+        if (!A) return;
+        const t = document.getElementById(A);
         t == null || t.scrollIntoView({
             behavior: "smooth",
             block: "center",
@@ -5364,24 +5236,24 @@ const useScrollIntoView = () => [e => {
 function detectMobile() {
     if ("maxTouchPoints" in navigator) return navigator.maxTouchPoints > 0;
     if (typeof matchMedia != "undefined") {
-        const e = matchMedia("(pointer:coarse)");
-        if (e && e.media === "(pointer:coarse)") return !!e.matches
+        const A = matchMedia("(pointer:coarse)");
+        if (A && A.media === "(pointer:coarse)") return !!A.matches
     }
     if ("orientation" in window) return !0;
-    const A = navigator.userAgent;
-    return /\b(BlackBerry|webOS|iPhone|IEMobile)\b/i.test(A) || /\b(Android|Windows Phone|iPad|iPod)\b/i.test(A)
+    const e = navigator.userAgent;
+    return /\b(BlackBerry|webOS|iPhone|IEMobile)\b/i.test(e) || /\b(Android|Windows Phone|iPad|iPod)\b/i.test(e)
 }
 const useIsMobile = () => {
-    const [A, e] = react.exports.useState(!1);
+    const [e, A] = react.exports.useState(!1);
     return react.exports.useEffect(() => {
-        e(detectMobile())
-    }, []), [A]
+        A(detectMobile())
+    }, []), [e]
 };
 
-function calcDistancePointToLine(A, e, t) {
-    const a = (e.x - A.x) * (e.x - A.x) + (e.y - A.y) * (e.y - A.y);
+function calcDistancePointToLine(e, A, t) {
+    const a = (A.x - e.x) * (A.x - e.x) + (A.y - e.y) * (A.y - e.y);
     if (a == 0) return !1;
-    const n = ((A.y - t.y) * (e.x - A.x) - (A.x - t.x) * (e.y - A.y)) / a;
+    const n = ((e.y - t.y) * (A.x - e.x) - (e.x - t.x) * (A.y - e.y)) / a;
     return Math.abs(n) * Math.sqrt(a)
 }
 class ScreenTracker {
@@ -5389,27 +5261,27 @@ class ScreenTracker {
         x(this, "movements", []);
         x(this, "tracks", 0)
     }
-    track(e) {
+    track(A) {
         if (detectMobile()) return !0;
         this.movements.push({
-            x: e.clientX,
-            y: e.clientY
+            x: A.clientX,
+            y: A.clientY
         })
     }
     calculate() {
         try {
             if (detectMobile()) return !0;
-            let e = !0;
+            let A = !0;
             const t = Math.floor(this.movements.length / 10) || 1;
             let a = [];
             for (let r = 0; r < this.movements.length; r += t) a = [...a, this.movements[r]];
             const s = (r => r.every(i => calcDistancePointToLine(r[0], r[r.length - 1], i) === 0))(a);
             return console.log({
                 points: a
-            }), s ? this.tracks += 3 : this.tracks > 0 && (this.tracks = 0), this.tracks > 10 && (e = !1), this.movements = [], e
-        } catch (e) {
+            }), s ? this.tracks += 3 : this.tracks > 0 && (this.tracks = 0), this.tracks > 10 && (A = !1), this.movements = [], A
+        } catch (A) {
             return console.log({
-                e
+                e: A
             }), !0
         }
     }
@@ -5423,214 +5295,214 @@ class ScreenTracker {
 const screenTracker = new ScreenTracker,
     VALID_SEEDS = ["Sunflower Seed", "Potato Seed", "Beetroot Seed", "Cabbage Seed", "Carrot Seed", "Cauliflower Seed", "Pumpkin Seed", "Parsnip Seed", "Radish Seed", "Wheat Seed"];
 
-function isSeed$1(A) {
-    return VALID_SEEDS.includes(A)
+function isSeed$1(e) {
+    return VALID_SEEDS.includes(e)
 }
-const getCropTime = (A, e) => {
+const getCropTime = (e, A) => {
     var a, n, s, r, i;
-    let t = CROPS()[A].harvestSeconds;
-    return ((a = e["Seed Specialist"]) == null ? void 0 : a.gte(1)) && (t = t * .9), A === "Parsnip" && ((n = e["Mysterious Parsnip"]) == null ? void 0 : n.gte(1)) && (t = t * .5), (((s = e.Nancy) == null ? void 0 : s.greaterThanOrEqualTo(1)) || ((r = e.Scarecrow) == null ? void 0 : r.greaterThanOrEqualTo(1)) || ((i = e.Kuebiko) == null ? void 0 : i.greaterThanOrEqualTo(1))) && (t = t * .85), t
+    let t = CROPS()[e].harvestSeconds;
+    return ((a = A["Seed Specialist"]) == null ? void 0 : a.gte(1)) && (t = t * .9), e === "Parsnip" && ((n = A["Mysterious Parsnip"]) == null ? void 0 : n.gte(1)) && (t = t * .5), (((s = A.Nancy) == null ? void 0 : s.greaterThanOrEqualTo(1)) || ((r = A.Scarecrow) == null ? void 0 : r.greaterThanOrEqualTo(1)) || ((i = A.Kuebiko) == null ? void 0 : i.greaterThanOrEqualTo(1))) && (t = t * .85), t
 };
 
 function getPlantedAt({
-    crop: A,
-    inventory: e,
+    crop: e,
+    inventory: A,
     createdAt: t
 }) {
-    const a = CROPS()[A].harvestSeconds,
-        n = getCropTime(A, e),
+    const a = CROPS()[e].harvestSeconds,
+        n = getCropTime(e, A),
         s = a - n;
     return t - s * 1e3
 }
 
 function getMultiplier({
-    crop: A,
-    inventory: e
+    crop: e,
+    inventory: A
 }) {
     var a, n, s, r;
     let t = 1;
-    return A === "Cauliflower" && ((a = e["Golden Cauliflower"]) == null ? void 0 : a.gte(1)) && (t *= 2), A === "Carrot" && ((n = e["Easter Bunny"]) == null ? void 0 : n.gte(1)) && (t *= 1.2), (((s = e.Scarecrow) == null ? void 0 : s.gte(1)) || ((r = e.Kuebiko) == null ? void 0 : r.gte(1))) && (t *= 1.2), t
+    return e === "Cauliflower" && ((a = A["Golden Cauliflower"]) == null ? void 0 : a.gte(1)) && (t *= 2), e === "Carrot" && ((n = A["Easter Bunny"]) == null ? void 0 : n.gte(1)) && (t *= 1.2), (((s = A.Scarecrow) == null ? void 0 : s.gte(1)) || ((r = A.Kuebiko) == null ? void 0 : r.gte(1))) && (t *= 1.2), t
 }
 
 function plant$1({
-    state: A,
-    action: e,
+    state: e,
+    action: A,
     createdAt: t = Date.now()
 }) {
-    const a = c({}, A.fields);
-    if (e.index < 0) throw new Error("Field does not exist");
-    if (!Number.isInteger(e.index)) throw new Error("Field does not exist");
-    if (e.index >= 5 && e.index <= 9 && !A.inventory["Pumpkin Soup"]) throw new Error("Goblin land!");
-    if (e.index >= 10 && e.index <= 15 && !A.inventory.Sauerkraut) throw new Error("Goblin land!");
-    if (e.index >= 16 && e.index <= 21 && !A.inventory["Roasted Cauliflower"]) throw new Error("Goblin land!");
-    if (e.index > 21) throw new Error("Field does not exist");
-    if (a[e.index]) throw new Error("Crop is already planted");
-    if (!e.item) throw new Error("No seed selected");
-    if (!isSeed$1(e.item)) throw new Error("Not a seed");
-    const s = A.inventory[e.item] || new Decimal(0);
+    const a = c({}, e.fields);
+    if (A.index < 0) throw new Error("Field does not exist");
+    if (!Number.isInteger(A.index)) throw new Error("Field does not exist");
+    if (A.index >= 5 && A.index <= 9 && !e.inventory["Pumpkin Soup"]) throw new Error("Goblin land!");
+    if (A.index >= 10 && A.index <= 15 && !e.inventory.Sauerkraut) throw new Error("Goblin land!");
+    if (A.index >= 16 && A.index <= 21 && !e.inventory["Roasted Cauliflower"]) throw new Error("Goblin land!");
+    if (A.index > 21) throw new Error("Field does not exist");
+    if (a[A.index]) throw new Error("Crop is already planted");
+    if (!A.item) throw new Error("No seed selected");
+    if (!isSeed$1(A.item)) throw new Error("Not a seed");
+    const s = e.inventory[A.item] || new Decimal(0);
     if (s.lessThan(1)) throw new Error("Not enough seeds");
     if (!screenTracker.calculate()) throw new Error("Invalid plant");
     const r = a,
-        i = e.item.split(" ")[0];
-    return r[e.index] = {
+        i = A.item.split(" ")[0];
+    return r[A.index] = {
         plantedAt: getPlantedAt({
             crop: i,
-            inventory: A.inventory,
+            inventory: e.inventory,
             createdAt: t
         }),
         name: i,
         multiplier: getMultiplier({
             crop: i,
-            inventory: A.inventory
+            inventory: e.inventory
         })
-    }, l(c({}, A), {
-        inventory: l(c({}, A.inventory), {
-            [e.item]: s.sub(1)
+    }, l(c({}, e), {
+        inventory: l(c({}, e.inventory), {
+            [A.item]: s.sub(1)
         }),
         fields: r
     })
 }
 const VALID_ITEMS = Object.keys(c(c(c({}, TOOLS), SEEDS()), FOODS()));
 
-function isCraftable(A, e) {
-    return e.includes(A)
+function isCraftable(e, A) {
+    return A.includes(e)
 }
 
-function getBuyPrice(A, e) {
+function getBuyPrice(e, A) {
     var t;
-    return isSeed$1(A.name) && ((t = e.Kuebiko) == null ? void 0 : t.gte(1)) ? new Decimal(0) : A.price
+    return isSeed$1(e.name) && ((t = A.Kuebiko) == null ? void 0 : t.gte(1)) ? new Decimal(0) : e.price
 }
 
 function craft({
-    state: A,
-    action: e,
+    state: e,
+    action: A,
     available: t
 }) {
     var d, E;
-    if (!isCraftable(e.item, t || VALID_ITEMS)) throw new Error(`This item is not craftable: ${e.item}`);
-    const a = CRAFTABLES()[e.item];
+    if (!isCraftable(A.item, t || VALID_ITEMS)) throw new Error(`This item is not craftable: ${A.item}`);
+    const a = CRAFTABLES()[A.item];
     if (a.disabled) throw new Error("This item is disabled");
-    if (e.amount < 1) throw new Error("Invalid amount");
-    if ((d = A.stock[e.item]) == null ? void 0 : d.lt(e.amount)) throw new Error("Not enough stock");
-    const s = getBuyPrice(a, A.inventory).mul(e.amount);
-    if (a.requires && !A.inventory[a.requires]) throw new Error(`Missing ${a.requires}`);
-    if (A.balance.lessThan(s)) throw new Error("Insufficient tokens");
-    const i = a.ingredients.reduce((u, h) => {
-            const B = u[h.item] || new Decimal(0),
-                g = h.amount.mul(e.amount);
-            if (B.lessThan(g)) throw new Error(`Insufficient ingredient: ${h.item}`);
+    if (A.amount < 1) throw new Error("Invalid amount");
+    if ((d = e.stock[A.item]) == null ? void 0 : d.lt(A.amount)) throw new Error("Not enough stock");
+    const s = getBuyPrice(a, e.inventory).mul(A.amount);
+    if (a.requires && !e.inventory[a.requires]) throw new Error(`Missing ${a.requires}`);
+    if (e.balance.lessThan(s)) throw new Error("Insufficient tokens");
+    const i = a.ingredients.reduce((u, w) => {
+            const B = u[w.item] || new Decimal(0),
+                g = w.amount.mul(A.amount);
+            if (B.lessThan(g)) throw new Error(`Insufficient ingredient: ${w.item}`);
             return l(c({}, u), {
-                [h.item]: B.sub(g)
+                [w.item]: B.sub(g)
             })
-        }, A.inventory),
-        m = A.inventory[e.item] || new Decimal(0);
-    return l(c({}, A), {
-        balance: A.balance.sub(s),
+        }, e.inventory),
+        m = e.inventory[A.item] || new Decimal(0);
+    return l(c({}, e), {
+        balance: e.balance.sub(s),
         inventory: l(c({}, i), {
-            [e.item]: m.add(e.amount)
+            [A.item]: m.add(A.amount)
         }),
-        stock: l(c({}, A.stock), {
-            [e.item]: (E = A.stock[e.item]) == null ? void 0 : E.minus(e.amount)
+        stock: l(c({}, e.stock), {
+            [A.item]: (E = e.stock[A.item]) == null ? void 0 : E.minus(A.amount)
         })
     })
 }
-const getSellPrice = (A, e) => {
+const getSellPrice = (e, A) => {
         var a;
-        let t = A.sellPrice;
-        return ((a = e["Green Thumb"]) == null ? void 0 : a.greaterThanOrEqualTo(1)) && (t = t.mul(1.05)), t
+        let t = e.sellPrice;
+        return ((a = A["Green Thumb"]) == null ? void 0 : a.greaterThanOrEqualTo(1)) && (t = t.mul(1.05)), t
     },
-    hasSellBoost = A => {
-        var e;
-        return ((e = A["Green Thumb"]) == null ? void 0 : e.greaterThanOrEqualTo(1)) || !1
+    hasSellBoost = e => {
+        var A;
+        return ((A = e["Green Thumb"]) == null ? void 0 : A.greaterThanOrEqualTo(1)) || !1
     },
     hasBoost = ({
-        item: A,
-        inventory: e
+        item: e,
+        inventory: A
     }) => {
         var t, a, n, s, r, i, m;
-        return !!(isSeed$1(A) && (((t = e.Nancy) == null ? void 0 : t.greaterThanOrEqualTo(1)) || ((a = e.Scarecrow) == null ? void 0 : a.greaterThanOrEqualTo(1)) || ((n = e.Kuebiko) == null ? void 0 : n.greaterThanOrEqualTo(1))) || A === "Carrot Seed" && ((s = e["Carrot Sword"]) == null ? void 0 : s.greaterThanOrEqualTo(1)) || A === "Parsnip Seed" && ((r = e["Mysterious Parsnip"]) == null ? void 0 : r.greaterThanOrEqualTo(1)) || A === "Parsnip Seed" && ((i = e["Mysterious Parsnip"]) == null ? void 0 : i.greaterThanOrEqualTo(1)) || A === "Cauliflower Seed" && ((m = e["Golden Cauliflower"]) == null ? void 0 : m.greaterThanOrEqualTo(1)))
+        return !!(isSeed$1(e) && (((t = A.Nancy) == null ? void 0 : t.greaterThanOrEqualTo(1)) || ((a = A.Scarecrow) == null ? void 0 : a.greaterThanOrEqualTo(1)) || ((n = A.Kuebiko) == null ? void 0 : n.greaterThanOrEqualTo(1))) || e === "Carrot Seed" && ((s = A["Carrot Sword"]) == null ? void 0 : s.greaterThanOrEqualTo(1)) || e === "Parsnip Seed" && ((r = A["Mysterious Parsnip"]) == null ? void 0 : r.greaterThanOrEqualTo(1)) || e === "Parsnip Seed" && ((i = A["Mysterious Parsnip"]) == null ? void 0 : i.greaterThanOrEqualTo(1)) || e === "Cauliflower Seed" && ((m = A["Golden Cauliflower"]) == null ? void 0 : m.greaterThanOrEqualTo(1)))
     };
 
-function isCrop(A) {
-    return A in CROPS()
+function isCrop(e) {
+    return e in CROPS()
 }
 
 function sell({
-    state: A,
-    action: e
+    state: e,
+    action: A
 }) {
-    if (!isCrop(e.item)) throw new Error("Not for sale");
-    if (e.amount <= 0) throw new Error("Invalid amount");
-    const t = CROPS()[e.item],
-        a = A.inventory[e.item] || new Decimal(0);
-    if (a.lessThan(e.amount)) throw new Error("Insufficient crops to sell");
-    const n = getSellPrice(t, A.inventory);
-    return l(c({}, A), {
-        balance: A.balance.add(n.mul(e.amount)).toDecimalPlaces(18, Decimal.ROUND_DOWN),
-        inventory: l(c({}, A.inventory), {
-            [t.name]: a.sub(1 * e.amount)
+    if (!isCrop(A.item)) throw new Error("Not for sale");
+    if (A.amount <= 0) throw new Error("Invalid amount");
+    const t = CROPS()[A.item],
+        a = e.inventory[A.item] || new Decimal(0);
+    if (a.lessThan(A.amount)) throw new Error("Insufficient crops to sell");
+    const n = getSellPrice(t, e.inventory);
+    return l(c({}, e), {
+        balance: e.balance.add(n.mul(A.amount)).toDecimalPlaces(18, Decimal.ROUND_DOWN),
+        inventory: l(c({}, e.inventory), {
+            [t.name]: a.sub(1 * A.amount)
         })
     })
 }
 
 function harvest({
-    state: A,
-    action: e,
+    state: e,
+    action: A,
     createdAt: t = Date.now()
 }) {
-    const a = c({}, A.fields);
-    if (e.index < 0) throw new Error("Field does not exist");
-    if (!Number.isInteger(e.index)) throw new Error("Field does not exist");
-    if (e.index >= 5 && e.index <= 9 && !A.inventory["Pumpkin Soup"]) throw new Error("Goblin land!");
-    if (e.index >= 10 && e.index <= 15 && !A.inventory.Sauerkraut) throw new Error("Goblin land!");
-    if (e.index >= 16 && e.index <= 21 && !A.inventory["Roasted Cauliflower"]) throw new Error("Goblin land!");
-    if (e.index > 21) throw new Error("Field does not exist");
-    const n = a[e.index];
+    const a = c({}, e.fields);
+    if (A.index < 0) throw new Error("Field does not exist");
+    if (!Number.isInteger(A.index)) throw new Error("Field does not exist");
+    if (A.index >= 5 && A.index <= 9 && !e.inventory["Pumpkin Soup"]) throw new Error("Goblin land!");
+    if (A.index >= 10 && A.index <= 15 && !e.inventory.Sauerkraut) throw new Error("Goblin land!");
+    if (A.index >= 16 && A.index <= 21 && !e.inventory["Roasted Cauliflower"]) throw new Error("Goblin land!");
+    if (A.index > 21) throw new Error("Field does not exist");
+    const n = a[A.index];
     if (!n) throw new Error("Nothing was planted");
     const s = CROPS()[n.name];
     if (t - n.plantedAt < s.harvestSeconds * 1e3) throw new Error("Not ready");
     if (!screenTracker.calculate()) throw new Error("Invalid harvest");
     const r = a;
-    delete r[e.index];
-    const i = A.inventory[n.name] || new Decimal(0),
+    delete r[A.index];
+    const i = e.inventory[n.name] || new Decimal(0),
         m = n.multiplier || 1,
-        d = l(c({}, A.inventory), {
+        d = l(c({}, e.inventory), {
             [n.name]: i.add(m)
         });
-    return l(c({}, A), {
+    return l(c({}, e), {
         fields: r,
         inventory: d
     })
 }
 const GOLD_RECOVERY_TIME = 24 * 60 * 60;
 var MINE_ERRORS$2;
-(function(A) {
-    A.NO_PICKAXES = "No pickaxes left", A.NO_ROCK = "No rock", A.STILL_GROWING = "Rock is still recovering"
+(function(e) {
+    e.NO_PICKAXES = "No pickaxes left", e.NO_ROCK = "No rock", e.STILL_GROWING = "Rock is still recovering"
 })(MINE_ERRORS$2 || (MINE_ERRORS$2 = {}));
 
-function canMine$2(A, e = Date.now()) {
+function canMine$2(e, A = Date.now()) {
     const t = GOLD_RECOVERY_TIME;
-    return e - A.minedAt > t * 1e3
+    return A - e.minedAt > t * 1e3
 }
 
 function mineGold({
-    state: A,
-    action: e,
+    state: e,
+    action: A,
     createdAt: t = Date.now()
 }) {
-    const a = A.gold[e.index];
+    const a = e.gold[A.index];
     if (!a) throw new Error(MINE_ERRORS$2.NO_ROCK);
     if (!canMine$2(a, t)) throw new Error(MINE_ERRORS$2.STILL_GROWING);
-    const n = A.inventory["Iron Pickaxe"] || new Decimal(0);
+    const n = e.inventory["Iron Pickaxe"] || new Decimal(0);
     if (n.lessThan(1)) throw new Error(MINE_ERRORS$2.NO_PICKAXES);
-    const s = A.inventory.Gold || new Decimal(0);
-    return l(c({}, A), {
-        inventory: l(c({}, A.inventory), {
+    const s = e.inventory.Gold || new Decimal(0);
+    return l(c({}, e), {
+        inventory: l(c({}, e.inventory), {
             "Iron Pickaxe": n.sub(1),
             Gold: s.add(a.amount)
         }),
-        gold: l(c({}, A.gold), {
-            [e.index]: {
+        gold: l(c({}, e.gold), {
+            [A.index]: {
                 minedAt: Date.now(),
                 amount: new Decimal(2)
             }
@@ -5639,33 +5511,33 @@ function mineGold({
 }
 const STONE_RECOVERY_TIME = 4 * 60 * 60;
 var MINE_ERRORS$1;
-(function(A) {
-    A.NO_PICKAXES = "No pickaxes left", A.NO_ROCK = "No rock", A.STILL_GROWING = "Rock is still recovering"
+(function(e) {
+    e.NO_PICKAXES = "No pickaxes left", e.NO_ROCK = "No rock", e.STILL_GROWING = "Rock is still recovering"
 })(MINE_ERRORS$1 || (MINE_ERRORS$1 = {}));
 
-function canMine$1(A, e = Date.now()) {
+function canMine$1(e, A = Date.now()) {
     const t = STONE_RECOVERY_TIME;
-    return e - A.minedAt > t * 1e3
+    return A - e.minedAt > t * 1e3
 }
 
 function mineStone({
-    state: A,
-    action: e,
+    state: e,
+    action: A,
     createdAt: t = Date.now()
 }) {
-    const a = A.stones[e.index];
+    const a = e.stones[A.index];
     if (!a) throw new Error(MINE_ERRORS$1.NO_ROCK);
     if (!canMine$1(a, t)) throw new Error(MINE_ERRORS$1.STILL_GROWING);
-    const n = A.inventory.Pickaxe || new Decimal(0);
+    const n = e.inventory.Pickaxe || new Decimal(0);
     if (n.lessThan(1)) throw new Error(MINE_ERRORS$1.NO_PICKAXES);
-    const s = A.inventory.Stone || new Decimal(0);
-    return l(c({}, A), {
-        inventory: l(c({}, A.inventory), {
+    const s = e.inventory.Stone || new Decimal(0);
+    return l(c({}, e), {
+        inventory: l(c({}, e.inventory), {
             Pickaxe: n.sub(1),
             Stone: s.add(a.amount)
         }),
-        stones: l(c({}, A.stones), {
-            [e.index]: {
+        stones: l(c({}, e.stones), {
+            [A.index]: {
                 minedAt: Date.now(),
                 amount: new Decimal(2)
             }
@@ -5674,33 +5546,33 @@ function mineStone({
 }
 const IRON_RECOVERY_TIME = 12 * 60 * 60;
 var MINE_ERRORS;
-(function(A) {
-    A.NO_PICKAXES = "No pickaxes left", A.NO_ROCK = "No rock", A.STILL_GROWING = "Rock is still recovering"
+(function(e) {
+    e.NO_PICKAXES = "No pickaxes left", e.NO_ROCK = "No rock", e.STILL_GROWING = "Rock is still recovering"
 })(MINE_ERRORS || (MINE_ERRORS = {}));
 
-function canMine(A, e = Date.now()) {
+function canMine(e, A = Date.now()) {
     const t = IRON_RECOVERY_TIME;
-    return e - A.minedAt > t * 1e3
+    return A - e.minedAt > t * 1e3
 }
 
 function mineIron({
-    state: A,
-    action: e,
+    state: e,
+    action: A,
     createdAt: t = Date.now()
 }) {
-    const a = A.iron[e.index];
+    const a = e.iron[A.index];
     if (!a) throw new Error(MINE_ERRORS.NO_ROCK);
     if (!canMine(a, t)) throw new Error(MINE_ERRORS.STILL_GROWING);
-    const n = A.inventory["Stone Pickaxe"] || new Decimal(0);
+    const n = e.inventory["Stone Pickaxe"] || new Decimal(0);
     if (n.lessThan(1)) throw new Error(MINE_ERRORS.NO_PICKAXES);
-    const s = A.inventory.Iron || new Decimal(0);
-    return l(c({}, A), {
-        inventory: l(c({}, A.inventory), {
+    const s = e.inventory.Iron || new Decimal(0);
+    return l(c({}, e), {
+        inventory: l(c({}, e.inventory), {
             "Stone Pickaxe": n.sub(1),
             Iron: s.add(a.amount)
         }),
-        iron: l(c({}, A.iron), {
-            [e.index]: {
+        iron: l(c({}, e.iron), {
+            [A.index]: {
                 minedAt: Date.now(),
                 amount: new Decimal(2)
             }
@@ -5708,50 +5580,50 @@ function mineIron({
     })
 }
 var CHOP_ERRORS;
-(function(A) {
-    A.MISSING_AXE = "No axe", A.NO_AXES = "No axes left", A.NO_TREE = "No tree", A.STILL_GROWING = "Tree is still growing"
+(function(e) {
+    e.MISSING_AXE = "No axe", e.NO_AXES = "No axes left", e.NO_TREE = "No tree", e.STILL_GROWING = "Tree is still growing"
 })(CHOP_ERRORS || (CHOP_ERRORS = {}));
 const TREE_RECOVERY_SECONDS = 2 * 60 * 60;
 
-function canChop(A, e = Date.now()) {
-    return e - A.choppedAt > TREE_RECOVERY_SECONDS * 1e3
+function canChop(e, A = Date.now()) {
+    return A - e.choppedAt > TREE_RECOVERY_SECONDS * 1e3
 }
 
 function getChoppedAt({
-    inventory: A,
-    createdAt: e
+    inventory: e,
+    createdAt: A
 }) {
     var t, a;
-    return ((t = A["Apprentice Beaver"]) == null ? void 0 : t.gte(1)) || ((a = A["Foreman Beaver"]) == null ? void 0 : a.gte(1)) ? e - TREE_RECOVERY_SECONDS / 2 * 1e3 : e
+    return ((t = e["Apprentice Beaver"]) == null ? void 0 : t.gte(1)) || ((a = e["Foreman Beaver"]) == null ? void 0 : a.gte(1)) ? A - TREE_RECOVERY_SECONDS / 2 * 1e3 : A
 }
 
-function getRequiredAxeAmount(A) {
-    return A["Foreman Beaver"] ? new Decimal(0) : A.Logger ? new Decimal(.5) : new Decimal(1)
+function getRequiredAxeAmount(e) {
+    return e["Foreman Beaver"] ? new Decimal(0) : e.Logger ? new Decimal(.5) : new Decimal(1)
 }
 
 function chop({
-    state: A,
-    action: e,
+    state: e,
+    action: A,
     createdAt: t = Date.now()
 }) {
-    const a = getRequiredAxeAmount(A.inventory);
-    if (e.item !== "Axe" && a.gt(0)) throw new Error(CHOP_ERRORS.MISSING_AXE);
-    const n = A.inventory.Axe || new Decimal(0);
+    const a = getRequiredAxeAmount(e.inventory);
+    if (A.item !== "Axe" && a.gt(0)) throw new Error(CHOP_ERRORS.MISSING_AXE);
+    const n = e.inventory.Axe || new Decimal(0);
     if (n.lessThan(a)) throw new Error(CHOP_ERRORS.NO_AXES);
-    const s = A.trees[e.index];
+    const s = e.trees[A.index];
     if (!s) throw new Error(CHOP_ERRORS.NO_TREE);
     if (!canChop(s, t)) throw new Error(CHOP_ERRORS.STILL_GROWING);
-    const r = A.inventory.Wood || new Decimal(0);
-    return l(c({}, A), {
-        inventory: l(c({}, A.inventory), {
+    const r = e.inventory.Wood || new Decimal(0);
+    return l(c({}, e), {
+        inventory: l(c({}, e.inventory), {
             Axe: n.sub(a),
             Wood: r.add(s.wood)
         }),
-        trees: l(c({}, A.trees), {
-            [e.index]: {
+        trees: l(c({}, e.trees), {
+            [A.index]: {
                 choppedAt: getChoppedAt({
                     createdAt: t,
-                    inventory: A.inventory
+                    inventory: e.inventory
                 }),
                 wood: new Decimal(3)
             }
@@ -5760,19 +5632,19 @@ function chop({
 }
 
 function openReward({
-    state: A,
-    action: e,
+    state: e,
+    action: A,
     createdAt: t = Date.now()
 }) {
-    const a = A.fields[e.fieldIndex];
+    const a = e.fields[A.fieldIndex];
     if (!a) throw new Error("Field does not exist");
     if (!a.reward) throw new Error("Field does not have a reward");
     const n = CROPS()[a.name];
     if (t - a.plantedAt < n.harvestSeconds * 1e3) throw new Error("Not ready");
     const s = a.reward.items[0],
-        r = c({}, A.inventory),
+        r = c({}, e.inventory),
         i = r[s.name] || new Decimal(0);
-    return r[s.name] = i.add(s.amount), delete A.fields[e.fieldIndex].reward, l(c({}, A), {
+    return r[s.name] = i.add(s.amount), delete e.fields[A.fieldIndex].reward, l(c({}, e), {
         inventory: r
     })
 }
@@ -5788,12 +5660,12 @@ const EVENTS = {
     "reward.opened": openReward
 };
 
-function processEvent(A, e) {
-    const t = EVENTS[e.type];
-    if (!t) throw new Error(`Unknown event type: ${e}`);
+function processEvent(e, A) {
+    const t = EVENTS[A.type];
+    if (!t) throw new Error(`Unknown event type: ${A}`);
     return t({
-        state: A,
-        action: e
+        state: e,
+        action: A
     })
 }
 async function sanitizeHTTPResponse(response) {
@@ -5805,106 +5677,106 @@ async function sanitizeHTTPResponse(response) {
     return data
 }
 
-function makeGame(A) {
+function makeGame(e) {
     return {
-        inventory: Object.keys(A.inventory).reduce((e, t) => l(c({}, e), {
-            [t]: new Decimal(A.inventory[t])
+        inventory: Object.keys(e.inventory).reduce((A, t) => l(c({}, A), {
+            [t]: new Decimal(e.inventory[t])
         }), {}),
-        stock: Object.keys(A.stock).reduce((e, t) => l(c({}, e), {
-            [t]: new Decimal(A.stock[t])
+        stock: Object.keys(e.stock).reduce((A, t) => l(c({}, A), {
+            [t]: new Decimal(e.stock[t])
         }), {}),
-        trees: Object.keys(A.trees).reduce((e, t) => l(c({}, e), {
-            [t]: l(c({}, A.trees[t]), {
-                wood: new Decimal(A.trees[t].wood)
+        trees: Object.keys(e.trees).reduce((A, t) => l(c({}, A), {
+            [t]: l(c({}, e.trees[t]), {
+                wood: new Decimal(e.trees[t].wood)
             })
         }), {}),
-        stones: Object.keys(A.stones).reduce((e, t) => l(c({}, e), {
-            [t]: l(c({}, A.stones[t]), {
-                amount: new Decimal(A.stones[t].amount)
+        stones: Object.keys(e.stones).reduce((A, t) => l(c({}, A), {
+            [t]: l(c({}, e.stones[t]), {
+                amount: new Decimal(e.stones[t].amount)
             })
         }), {}),
-        iron: Object.keys(A.iron).reduce((e, t) => l(c({}, e), {
-            [t]: l(c({}, A.iron[t]), {
-                amount: new Decimal(A.iron[t].amount)
+        iron: Object.keys(e.iron).reduce((A, t) => l(c({}, A), {
+            [t]: l(c({}, e.iron[t]), {
+                amount: new Decimal(e.iron[t].amount)
             })
         }), {}),
-        gold: Object.keys(A.gold).reduce((e, t) => l(c({}, e), {
-            [t]: l(c({}, A.gold[t]), {
-                amount: new Decimal(A.gold[t].amount)
+        gold: Object.keys(e.gold).reduce((A, t) => l(c({}, A), {
+            [t]: l(c({}, e.gold[t]), {
+                amount: new Decimal(e.gold[t].amount)
             })
         }), {}),
         skills: {
-            farming: new Decimal(A.skills.farming),
-            gathering: new Decimal(A.skills.gathering)
+            farming: new Decimal(e.skills.farming),
+            gathering: new Decimal(e.skills.gathering)
         },
-        balance: new Decimal(A.balance),
-        fields: A.fields,
-        id: A.id
+        balance: new Decimal(e.balance),
+        fields: e.fields,
+        id: e.id
     }
 }
 
-function updateRocks(A, e) {
-    return Object.keys(A).reduce((t, a) => {
+function updateRocks(e, A) {
+    return Object.keys(e).reduce((t, a) => {
         const n = Number(a),
-            s = A[n];
+            s = e[n];
         return l(c({}, t), {
             [n]: l(c({}, s), {
-                amount: e[n].amount
+                amount: A[n].amount
             })
         })
     }, {})
 }
 
-function updateGame(A, e) {
-    if (!A) return e;
+function updateGame(e, A) {
+    if (!e) return A;
     try {
-        return l(c({}, e), {
-            fields: Object.keys(e.fields).reduce((t, a) => {
+        return l(c({}, A), {
+            fields: Object.keys(A.fields).reduce((t, a) => {
                 const n = Number(a),
-                    s = e.fields[n];
+                    s = A.fields[n];
                 return l(c({}, t), {
                     [n]: l(c({}, s), {
-                        reward: A.fields[n].reward
+                        reward: e.fields[n].reward
                     })
                 })
             }, {}),
-            trees: Object.keys(e.trees).reduce((t, a) => {
+            trees: Object.keys(A.trees).reduce((t, a) => {
                 const n = Number(a),
-                    s = e.trees[n];
+                    s = A.trees[n];
                 return l(c({}, t), {
                     [n]: l(c({}, s), {
-                        wood: A.trees[n].wood
+                        wood: e.trees[n].wood
                     })
                 })
             }, {}),
-            stones: updateRocks(e.stones, A.stones),
-            iron: updateRocks(e.iron, A.iron),
-            gold: updateRocks(e.gold, A.gold),
-            skills: A.skills
+            stones: updateRocks(A.stones, e.stones),
+            iron: updateRocks(A.iron, e.iron),
+            gold: updateRocks(A.gold, e.gold),
+            skills: e.skills
         })
     } catch (t) {
         return console.log({
             e: t
-        }), e
+        }), A
     }
 }
 const API_URL$7 = CONFIG.API_URL;
-async function loadSession(A) {
+async function loadSession(e) {
     try {
-        const e = await window.fetch(`${API_URL$7}/session/${A.farmId}`, {
+        const A = await window.fetch(`${API_URL$7}/session/${e.farmId}`, {
             method: "POST",
             headers: {
                 "content-type": "application/json;charset=UTF-8",
-                Authorization: `Bearer ${A.token}`,
+                Authorization: `Bearer ${e.token}`,
                 accept: "application/json"
             },
             body: JSON.stringify({
-                sessionId: A.sessionId,
+                sessionId: e.sessionId,
                 clientVersion: CONFIG.CLIENT_VERSION
             })
         });
-        if (e.status === 429) throw new Error(ERRORS.TOO_MANY_REQUESTS);
-        e.status === 401 && removeSession(metamask.myAccount);
+        if (A.status === 429) throw new Error(ERRORS.TOO_MANY_REQUESTS);
+        A.status === 401 && removeSession(metamask.myAccount);
         const {
             farm: t,
             startedAt: a,
@@ -5912,7 +5784,7 @@ async function loadSession(A) {
             whitelistedAt: s,
             itemsMintedAt: r,
             blacklistStatus: i
-        } = await sanitizeHTTPResponse(e), m = new Date(a);
+        } = await sanitizeHTTPResponse(A), m = new Date(a);
         let d = 0;
         return Math.abs(m.getTime() - Date.now()) > 1e3 * 30 && (console.log("Not in sync!", m.getTime() - Date.now()), d = m.getTime() - Date.now()), {
             offset: d,
@@ -5922,9 +5794,9 @@ async function loadSession(A) {
             itemsMintedAt: r,
             blacklistStatus: i
         }
-    } catch (e) {
+    } catch (A) {
         throw console.error({
-            e
+            e: A
         }), new Error(ERRORS.TOO_MANY_REQUESTS)
     }
 }
@@ -6072,45 +5944,45 @@ const GRID_WIDTH_PX = 42,
     },
     API_URL$6 = CONFIG.API_URL;
 
-function squashEvents(A) {
-    return A.reduce((e, t, a) => {
+function squashEvents(e) {
+    return e.reduce((A, t, a) => {
         if (a > 0) {
-            const n = e[e.length - 1];
-            if ((t.type === "item.crafted" && n.type === "item.crafted" || t.type === "item.sell" && n.type === "item.sell") && t.item === n.item) return [...e.slice(0, -1), l(c({}, t), {
+            const n = A[A.length - 1];
+            if ((t.type === "item.crafted" && n.type === "item.crafted" || t.type === "item.sell" && n.type === "item.sell") && t.item === n.item) return [...A.slice(0, -1), l(c({}, t), {
                 amount: n.amount + t.amount
             })]
         }
-        return [...e, t]
+        return [...A, t]
     }, [])
 }
 
-function serialize(A, e) {
-    return A.map(t => l(c({}, t), {
-        createdAt: new Date(t.createdAt.getTime() + e).toISOString()
+function serialize(e, A) {
+    return e.map(t => l(c({}, t), {
+        createdAt: new Date(t.createdAt.getTime() + A).toISOString()
     }))
 }
-async function autosaveRequest(A) {
-    const e = window["x-amz-ttl"];
-    return await window.fetch(`${API_URL$6}/autosave/${A.farmId}`, {
+async function autosaveRequest(e) {
+    const A = window["x-amz-ttl"];
+    return await window.fetch(`${API_URL$6}/autosave/${e.farmId}`, {
         method: "POST",
         headers: c({
             "content-type": "application/json;charset=UTF-8",
-            Authorization: `Bearer ${A.token}`,
-            "X-Fingerprint": A.fingerprint
-        }, e ? {
+            Authorization: `Bearer ${e.token}`,
+            "X-Fingerprint": e.fingerprint
+        }, A ? {
             "X-Amz-TTL": window["x-amz-ttl"]
         } : {}),
         body: JSON.stringify({
-            sessionId: A.sessionId,
-            actions: A.actions,
+            sessionId: e.sessionId,
+            actions: e.actions,
             clientVersion: CONFIG.CLIENT_VERSION
         })
     })
 }
-async function autosave(A) {
-    const e = squashEvents(A.actions),
-        t = serialize(e, A.offset),
-        a = await autosaveRequest(l(c({}, A), {
+async function autosave(e) {
+    const A = squashEvents(e.actions),
+        t = serialize(A, e.offset),
+        a = await autosaveRequest(l(c({}, e), {
             actions: t
         }));
     if (a.status === 401 && removeSession(metamask.myAccount), a.status === 429) throw new Error(ERRORS.TOO_MANY_REQUESTS);
@@ -6124,22 +5996,22 @@ async function autosave(A) {
     }
 }
 const API_URL$5 = CONFIG.API_URL;
-async function mint(A) {
-    const e = await window.fetch(`${API_URL$5}/mint/${A.farmId}`, {
+async function mint(e) {
+    const A = await window.fetch(`${API_URL$5}/mint/${e.farmId}`, {
         method: "POST",
         headers: {
             "content-type": "application/json;charset=UTF-8",
-            Authorization: `Bearer ${A.token}`
+            Authorization: `Bearer ${e.token}`
         },
         body: JSON.stringify({
-            sessionId: A.sessionId,
-            item: A.item,
-            captcha: A.captcha
+            sessionId: e.sessionId,
+            item: e.item,
+            captcha: e.captcha
         })
     });
-    if (e.status === 429) throw new Error(ERRORS.TOO_MANY_REQUESTS);
-    if (e.status !== 200 || !e.ok) throw new Error("Could not mint your object");
-    const t = await e.json();
+    if (A.status === 429) throw new Error(ERRORS.TOO_MANY_REQUESTS);
+    if (A.status !== 200 || !A.ok) throw new Error("Could not mint your object");
+    const t = await A.json();
     return {
         sessionId: await metamask.getSessionManager().sync(t),
         verified: !0
@@ -6147,19 +6019,19 @@ async function mint(A) {
 }
 const API_URL$4 = CONFIG.API_URL;
 async function sync({
-    farmId: A,
-    sessionId: e,
+    farmId: e,
+    sessionId: A,
     token: t,
     captcha: a
 }) {
-    const n = await window.fetch(`${API_URL$4}/sync/${A}`, {
+    const n = await window.fetch(`${API_URL$4}/sync/${e}`, {
         method: "POST",
         headers: {
             "content-type": "application/json;charset=UTF-8",
             Authorization: `Bearer ${t}`
         },
         body: JSON.stringify({
-            sessionId: e,
+            sessionId: A,
             captcha: a
         })
     });
@@ -6174,22 +6046,22 @@ async function sync({
 }
 const API_URL$3 = CONFIG.API_URL;
 async function withdraw({
-    farmId: A,
-    sessionId: e,
+    farmId: e,
+    sessionId: A,
     sfl: t,
     ids: a,
     amounts: n,
     token: s,
     captcha: r
 }) {
-    const i = await window.fetch(`${API_URL$3}/withdraw/${A}`, {
+    const i = await window.fetch(`${API_URL$3}/withdraw/${e}`, {
         method: "POST",
         headers: {
             "content-type": "application/json;charset=UTF-8",
             Authorization: `Bearer ${s}`
         },
         body: JSON.stringify({
-            sessionId: e,
+            sessionId: A,
             sfl: t,
             ids: a,
             amounts: n,
@@ -6225,36 +6097,36 @@ const RESOURCES = {
     }
 };
 
-function getItemUnit(A) {
-    return A in CROPS() || A in RESOURCES || A in SEEDS() || A in TOOLS ? "ether" : "wei"
+function getItemUnit(e) {
+    return e in CROPS() || e in RESOURCES || e in SEEDS() || e in TOOLS ? "ether" : "wei"
 }
 
-function balancesToInventory(A) {
-    const e = Object.keys(KNOWN_IDS);
-    return A.reduce((a, n, s) => {
-        const r = getItemUnit(e[s]),
+function balancesToInventory(e) {
+    const A = Object.keys(KNOWN_IDS);
+    return e.reduce((a, n, s) => {
+        const r = getItemUnit(A[s]),
             i = new Decimal(lib.fromWei(n, r));
         return i.equals(0) ? a : l(c({}, a), {
-            [e[s]]: i
+            [A[s]]: i
         })
     }, {})
 }
 
-function populateFields(A) {
-    const e = {
+function populateFields(e) {
+    const A = {
             name: "Sunflower",
             plantedAt: 0
         },
         t = {},
         a = [];
-    A["Pumpkin Soup"] && a.push(5, 6, 7, 8, 9), A.Sauerkraut && a.push(10, 11, 12, 13, 14, 15), A["Roasted Cauliflower"] && a.push(16, 17, 18, 19, 20, 21);
-    for (let n = 0; n < 22; n += 1)(n >= 0 && n <= 4 || a.includes(n)) && (t[n] = e);
+    e["Pumpkin Soup"] && a.push(5, 6, 7, 8, 9), e.Sauerkraut && a.push(10, 11, 12, 13, 14, 15), e["Roasted Cauliflower"] && a.push(16, 17, 18, 19, 20, 21);
+    for (let n = 0; n < 22; n += 1)(n >= 0 && n <= 4 || a.includes(n)) && (t[n] = A);
     return t
 }
 const API_URL$2 = CONFIG.API_URL;
-async function loadMetadata(A) {
-    const e = `${API_URL$2}/nfts/farm/${A}`;
-    return await (await window.fetch(e, {
+async function loadMetadata(e) {
+    const A = `${API_URL$2}/nfts/farm/${e}`;
+    return await (await window.fetch(A, {
         method: "GET",
         headers: {
             "content-type": "application/json;charset=UTF-8"
@@ -6262,18 +6134,18 @@ async function loadMetadata(A) {
     })).json()
 }
 async function getOnChainState({
-    id: A,
-    farmAddress: e
+    id: e,
+    farmAddress: A
 }) {
-    const t = await metamask.getToken().balanceOf(e),
-        a = await metamask.getInventory().getBalances(e),
+    const t = await metamask.getToken().balanceOf(A),
+        a = await metamask.getInventory().getBalances(A),
         n = balancesToInventory(a),
         s = populateFields(n),
-        i = (await loadMetadata(A)).image.includes("blacklisted");
+        i = (await loadMetadata(e)).image.includes("blacklisted");
     return {
         game: l(c({}, EMPTY), {
             balance: new Decimal(lib.fromWei(t)),
-            farmAddress: e,
+            farmAddress: A,
             fields: s,
             inventory: n
         }),
@@ -6281,39 +6153,39 @@ async function getOnChainState({
     }
 }
 async function getFingerPrint() {
-    let A = "0x123";
+    let e = "0x123";
     try {
-        A = await new Promise((e, t) => {
-            window.botdPromise.then(a => a.detect()).then(a => e(a.requestId)).catch(t)
+        e = await new Promise((A, t) => {
+            window.botdPromise.then(a => a.detect()).then(a => A(a.requestId)).catch(t)
         })
     } catch {}
-    return A
+    return e
 }
-async function levelUp(A) {
-    const e = await autosaveRequest(l(c({}, A), {
+async function levelUp(e) {
+    const A = await autosaveRequest(l(c({}, e), {
             actions: [{
                 type: "skill.learned",
-                skill: A.skill
+                skill: e.skill
             }]
         })),
-        t = await sanitizeHTTPResponse(e);
+        t = await sanitizeHTTPResponse(A);
     return {
         farm: makeGame(t.farm)
     }
 }
 const API_URL$1 = CONFIG.API_URL;
-async function reset(A) {
-    return await (await window.fetch(`${API_URL$1}/reset/${A.farmId}`, {
+async function reset(e) {
+    return await (await window.fetch(`${API_URL$1}/reset/${e.farmId}`, {
         method: "POST",
         headers: {
             "content-type": "application/json;charset=UTF-8",
-            Authorization: `Bearer ${A.token}`,
-            "X-Fingerprint": A.fingerprint
+            Authorization: `Bearer ${e.token}`,
+            "X-Fingerprint": e.fingerprint
         }
     })).json()
 }
-const GAME_EVENT_HANDLERS = Object.keys(EVENTS).reduce((A, e) => l(c({}, A), {
-    [e]: {
+const GAME_EVENT_HANDLERS = Object.keys(EVENTS).reduce((e, A) => l(c({}, e), {
+    [A]: {
         actions: assign((t, a) => ({
             state: processEvent(t.state, a),
             actions: [...t.actions, l(c({}, a), {
@@ -6323,15 +6195,15 @@ const GAME_EVENT_HANDLERS = Object.keys(EVENTS).reduce((A, e) => l(c({}, A), {
     }
 }), {});
 
-function startGame(A) {
-    const e = () => A.sessionId || !A.address ? "playing" : "readonly";
+function startGame(e) {
+    const A = () => e.sessionId || !e.address ? "playing" : "readonly";
     return createMachine({
         id: "gameMachine",
         initial: "loading",
         context: {
             actions: [],
             state: EMPTY,
-            sessionId: A.sessionId,
+            sessionId: e.sessionId,
             offset: 0
         },
         states: {
@@ -6341,9 +6213,9 @@ function startGame(A) {
                         if (t.sessionId) {
                             const a = await getFingerPrint(),
                                 n = await loadSession({
-                                    farmId: Number(A.farmId),
+                                    farmId: Number(e.farmId),
                                     sessionId: t.sessionId,
-                                    token: A.rawToken
+                                    token: e.rawToken
                                 });
                             if (!n) throw new Error("NO_FARM");
                             const {
@@ -6354,9 +6226,9 @@ function startGame(A) {
                                 itemsMintedAt: d,
                                 blacklistStatus: E
                             } = n;
-                            return s.farmAddress = A.address, {
+                            return s.farmAddress = e.address, {
                                 state: l(c({}, s), {
-                                    id: Number(A.farmId)
+                                    id: Number(e.farmId)
                                 }),
                                 offset: r,
                                 isBlacklisted: i,
@@ -6366,15 +6238,15 @@ function startGame(A) {
                                 blacklistStatus: E
                             }
                         }
-                        if (A.address) {
+                        if (e.address) {
                             const {
                                 game: a,
                                 isBlacklisted: n
                             } = await getOnChainState({
-                                farmAddress: A.address,
-                                id: Number(A.farmId)
+                                farmAddress: e.address,
+                                id: Number(e.farmId)
                             });
-                            return a.id = A.farmId, {
+                            return a.id = e.farmId, {
                                 state: a,
                                 isBlacklisted: n
                             }
@@ -6395,7 +6267,7 @@ function startGame(A) {
                             itemsMintedAt: (t, a) => a.data.itemsMintedAt
                         })
                     }, {
-                        target: e(),
+                        target: A(),
                         actions: assign({
                             state: (t, a) => a.data.state,
                             offset: (t, a) => a.data.offset,
@@ -6414,7 +6286,7 @@ function startGame(A) {
                     src: t => a => {
                         const n = setInterval(async () => {
                             var r;
-                            await ((r = metamask.getSessionManager()) == null ? void 0 : r.getSessionId(A == null ? void 0 : A.farmId)) !== t.sessionId && a("EXPIRED")
+                            await ((r = metamask.getSessionManager()) == null ? void 0 : r.getSessionId(e == null ? void 0 : e.farmId)) !== t.sessionId && a("EXPIRED")
                         }, 1e3 * 20);
                         return () => {
                             clearInterval(n)
@@ -6467,10 +6339,10 @@ function startGame(A) {
                             verified: s,
                             farm: r
                         } = await autosave({
-                            farmId: Number(A.farmId),
+                            farmId: Number(e.farmId),
                             sessionId: t.sessionId,
                             actions: t.actions,
-                            token: A.rawToken,
+                            token: e.rawToken,
                             offset: t.offset,
                             fingerprint: t.fingerprint
                         });
@@ -6497,10 +6369,10 @@ function startGame(A) {
                 invoke: {
                     src: async (t, a) => {
                         t.actions.length > 0 && await autosave({
-                            farmId: Number(A.farmId),
+                            farmId: Number(e.farmId),
                             sessionId: t.sessionId,
                             actions: t.actions,
-                            token: A.rawToken,
+                            token: e.rawToken,
                             offset: t.offset,
                             fingerprint: t.fingerprint
                         });
@@ -6510,9 +6382,9 @@ function startGame(A) {
                         } = a, {
                             sessionId: r
                         } = await mint({
-                            farmId: Number(A.farmId),
+                            farmId: Number(e.farmId),
                             sessionId: t.sessionId,
-                            token: A.rawToken,
+                            token: e.rawToken,
                             item: n,
                             captcha: s
                         });
@@ -6537,19 +6409,19 @@ function startGame(A) {
                 invoke: {
                     src: async (t, a) => {
                         t.actions.length > 0 && await autosave({
-                            farmId: Number(A.farmId),
+                            farmId: Number(e.farmId),
                             sessionId: t.sessionId,
                             actions: t.actions,
-                            token: A.rawToken,
+                            token: e.rawToken,
                             offset: t.offset,
                             fingerprint: t.fingerprint
                         });
                         const {
                             sessionId: n
                         } = await sync({
-                            farmId: Number(A.farmId),
+                            farmId: Number(e.farmId),
                             sessionId: t.sessionId,
-                            token: A.rawToken,
+                            token: e.rawToken,
                             captcha: a.captcha
                         });
                         return {
@@ -6586,9 +6458,9 @@ function startGame(A) {
                         } = a, {
                             sessionId: m
                         } = await withdraw({
-                            farmId: Number(A.farmId),
+                            farmId: Number(e.farmId),
                             sessionId: t.sessionId,
-                            token: A.rawToken,
+                            token: e.rawToken,
                             amounts: n,
                             ids: s,
                             sfl: r,
@@ -6617,19 +6489,19 @@ function startGame(A) {
                 invoke: {
                     src: async (t, a) => {
                         t.actions.length > 0 && await autosave({
-                            farmId: Number(A.farmId),
+                            farmId: Number(e.farmId),
                             sessionId: t.sessionId,
                             actions: t.actions,
-                            token: A.rawToken,
+                            token: e.rawToken,
                             offset: t.offset,
                             fingerprint: t.fingerprint
                         });
                         const {
                             farm: n
                         } = await levelUp({
-                            farmId: Number(A.farmId),
+                            farmId: Number(e.farmId),
                             sessionId: t.sessionId,
-                            token: A.rawToken,
+                            token: e.rawToken,
                             fingerprint: t.fingerprint,
                             skill: a.skill
                         });
@@ -6656,8 +6528,8 @@ function startGame(A) {
                         const {
                             success: n
                         } = await reset({
-                            farmId: Number(A.farmId),
-                            token: A.rawToken,
+                            farmId: Number(e.farmId),
+                            token: e.rawToken,
                             fingerprint: t.fingerprint
                         });
                         return {
@@ -6681,7 +6553,7 @@ function startGame(A) {
             },
             blacklisted: {
                 on: {
-                    CONTINUE: e()
+                    CONTINUE: A()
                 }
             },
             synced: {
@@ -6710,11 +6582,11 @@ function startGame(A) {
 }
 const Context = React.createContext({}),
     GameProvider = ({
-        children: A
+        children: e
     }) => {
         const {
-            authService: e
-        } = react.exports.useContext(Context$1), [t] = useActor(e), [a] = react.exports.useState(startGame(l(c({}, t.context), {
+            authService: A
+        } = react.exports.useContext(Context$1), [t] = useActor(A), [a] = react.exports.useState(startGame(l(c({}, t.context), {
             isNoob: !1
         }))), n = useInterpret(a), [s, r] = react.exports.useState(getShortcuts()), i = react.exports.useCallback(d => {
             if (n.state.matches("readonly")) return;
@@ -6727,12 +6599,12 @@ const Context = React.createContext({}),
                 selectedItem: m,
                 gameService: n
             }
-        }, A)
+        }, e)
     },
     Balance = () => {
         const {
-            gameService: A
-        } = react.exports.useContext(Context), [e] = useActor(A), [t, a] = react.exports.useState(!1);
+            gameService: e
+        } = react.exports.useContext(Context), [A] = useActor(e), [t, a] = react.exports.useState(!1);
         return React.createElement(InnerPanel, {
             className: "fixed top-2 right-2 z-50 flex items-center shadow-lg cursor-pointer"
         }, React.createElement("img", {
@@ -6742,16 +6614,16 @@ const Context = React.createContext({}),
             className: "text-white text-sm text-shadow ml-2",
             onMouseEnter: () => a(!0),
             onMouseLeave: () => a(!1)
-        }, t === !1 ? e.context.state.balance.toDecimalPlaces(3, Decimal.ROUND_DOWN).toString() : React.createElement("small", null, e.context.state.balance.toString())))
+        }, t === !1 ? A.context.state.balance.toDecimalPlaces(3, Decimal.ROUND_DOWN).toString() : React.createElement("small", null, A.context.state.balance.toString())))
     };
 var basket = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMBAMAAACkW0HUAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAA9nV6oiYz5DtE13ZDdD85vkovGBQl2WxtxwAAAAF0Uk5TAEDm2GYAAABOSURBVAjXY2BgLy8vYGBgKHFxcQdSZeXl6QwM7MKF5sIFDMVGSkrK5iApkGRZGhCkM5SHAkE5Q1lqWlhqOkNZGJBOZygFctLCQWYBTQMATTUW2/GKHakAAAAASUVORK5CYII=",
     button = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAATBAMAAABvvEDBAAAABGdBTUEAALGPC/xhBQAAABJQTFRFAAAAJitEWmmIi5u0////wMvcOcop7gAAAAF0Uk5TAEDm2GYAAABmSURBVAjXjc7RDYAwCATQqxOUdIGG6AANcQFDF9B2/1UE7ADy9XIJcADAzIhhVQ1uw9Sr6dA5p94eddOwcPPIwoq9h8b1W2XtNpR1ryGd8ePJSBJ/JQNFTNKsQRKf7LXIQF9VIscLpnkjRCFtFEoAAAAASUVORK5CYII=",
     border = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJAgMAAACd/+6DAAAABGdBTUEAALGPC/xhBQAAAAlQTFRFAAAA////JitESMfBwwAAAAF0Uk5TAEDm2GYAAAAZSURBVAjXY+BawcCgGsbAMIGxAQODxIHyAIsgB7CF1qipAAAAAElFTkSuQmCC";
 const Label = ({
-    children: A,
-    className: e
+    children: e,
+    className: A
 }) => React.createElement("div", {
-    className: classNames("bg-silver-300 text-white text-shadow text-xs object-contain justify-center items-center flex", e),
+    className: classNames("bg-silver-300 text-white text-shadow text-xs object-contain justify-center items-center flex", A),
     style: {
         borderStyle: "solid",
         borderWidth: "5px",
@@ -6761,19 +6633,19 @@ const Label = ({
         borderImageRepeat: "repeat",
         borderRadius: "15px"
     }
-}, A);
+}, e);
 var selectBox = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeAgMAAABGXkYxAAAABGdBTUEAALGPC/xhBQAAAAxQTFRFAAAAuG9Q6tSqJitEPjZUHQAAAAF0Uk5TAEDm2GYAAABhSURBVBjTY+D/z8DAACKsVgMZfKsOMLyCMDYwvAoHMnijkBl/gAzmXxsYrh4AMhhMCxAMexDNwA/m0g3ALX0FttdqAxID7C+gU+HeuQVhAN0M9k5oAYMphHGAgR/sr/8MAKPEKneqHAQSAAAAAElFTkSuQmCC",
     cancel = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAALBAMAAABbgmoVAAAABGdBTUEAALGPC/xhBQAAABJQTFRFAAAA/5mc////5DtEJitE9nV62ycwCgAAAAF0Uk5TAEDm2GYAAABBSURBVAjXHYzBCcBACAT3YQupRP3LmVSg238r0YOBZWBYyIsB54kByWbNOKkBMbYB+MgAhMVeUR/NMt1SI7e8Lz8UXQ3kGudprwAAAABJRU5ErkJggg==";
-const shortenCount = A => {
-        if (!A) return "";
-        if (A.lessThan(1)) return A.toDecimalPlaces(2, Decimal.ROUND_FLOOR).toString();
-        if (A.lessThan(1e3)) return A.toDecimalPlaces(0, Decimal.ROUND_FLOOR).toString();
-        const e = A.lessThan(1e6);
-        return `${A.div(e?1e3:1e6).toDecimalPlaces(1,Decimal.ROUND_FLOOR).toString()}${e?"k":"m"}`
+const shortenCount = e => {
+        if (!e) return "";
+        if (e.lessThan(1)) return e.toDecimalPlaces(2, Decimal.ROUND_FLOOR).toString();
+        if (e.lessThan(1e3)) return e.toDecimalPlaces(0, Decimal.ROUND_FLOOR).toString();
+        const A = e.lessThan(1e6);
+        return `${e.div(A?1e3:1e6).toDecimalPlaces(1,Decimal.ROUND_FLOOR).toString()}${A?"k":"m"}`
     },
     Box = ({
-        image: A,
-        secondaryImage: e,
+        image: e,
+        secondaryImage: A,
         isSelected: t,
         count: a,
         onClick: n,
@@ -6804,18 +6676,18 @@ const shortenCount = A => {
                 borderImageRepeat: "repeat",
                 borderRadius: "20px"
             }
-        }, e ? React.createElement("div", {
+        }, A ? React.createElement("div", {
             className: "w-full flex"
         }, React.createElement("img", {
-            src: A,
+            src: e,
             className: "w-4/5 object-contain",
             alt: "item"
         }), React.createElement("img", {
-            src: e,
+            src: A,
             className: "absolute right-0 bottom-1 w-1/2 h-1/2 object-contain",
             alt: "crop"
-        })) : A && React.createElement("img", {
-            src: A,
+        })) : e && React.createElement("img", {
+            src: e,
             className: "h-full w-full object-contain",
             alt: "item"
         }), r && React.createElement("img", {
@@ -6835,12 +6707,12 @@ var seeds$1 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAKBAMAAACQ3rm
     close = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAALAgMAAADUwp+1AAAABGdBTUEAALGPC/xhBQAAAAxQTFRFAAAAi5u0GBQl////mo6iugAAAAF0Uk5TAEDm2GYAAAA1SURBVAjXY9BiWsCwv/sHw/z3Nxim/49gUPuXwMD9v4FB//4Dhv3hPxjmpt5gmNoZwQBUBwCl3RKJRykUxQAAAABJRU5ErkJggg==",
     tabBorder = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJAgMAAACd/+6DAAAABGdBTUEAALGPC/xhBQAAAAlQTFRFAAAA6tSqGBQlHYAABgAAAAF0Uk5TAEDm2GYAAAAWSURBVAjXY+BawcCgGsbAMIGxARcGAI9TCKVuFeTIAAAAAElFTkSuQmCC";
 const Tab = ({
-    children: A,
-    className: e,
+    children: e,
+    className: A,
     isActive: t,
     onClick: a
 }) => t ? React.createElement("div", {
-    className: classNames("bg-brown-300 px-1 py-2 mr-2 flex items-center", e),
+    className: classNames("bg-brown-300 px-1 py-2 mr-2 flex items-center", A),
     style: {
         borderStyle: "solid",
         borderWidth: "6px",
@@ -6850,10 +6722,10 @@ const Tab = ({
         borderImageRepeat: "repeat",
         borderRadius: "20px 20px 0 0"
     }
-}, A) : React.createElement("div", {
-    className: classNames("px-1 py-2 mr-2 flex items-center cursor-pointer", e),
+}, e) : React.createElement("div", {
+    className: classNames("px-1 py-2 mr-2 flex items-center cursor-pointer", A),
     onClick: a
-}, A);
+}, e);
 var seed$1 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAQklEQVQImWP8//8/w35vg/8MCMDIVGJvBRZQi3EGYwYGhv9MIFJSR4Th1pK9cLVgQXQJFpAZc058g5rJxeDN840RAGMLE5KOSgWkAAAAAElFTkSuQmCC",
     tool$1 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANBAMAAACAxflPAAAABGdBTUEAALGPC/xhBQAAABVQTFRFAAAAwMvcvkovi5u0WmmIcz45GBQlmbZdhwAAAAF0Uk5TAEDm2GYAAABDSURBVAjXY2BgYEhgAAM2MTYwK8UwKQzMdxYD00ABsDibi7MYiE4KSTEGCrCphrG5gbihCQwQLlgxiAsCqWFQUyFcADzlCyeFMcRDAAAAAElFTkSuQmCC",
     gnome$1 = "data:image/gif;base64,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",
@@ -6976,8 +6848,8 @@ var seed$1 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbybl
     easterBasket = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8BAMAAADI0sRBAAAABGdBTUEAALGPC/xhBQAAAB5QTFRFAAAAAAAAu2wHqmABiVlEpVwA0YgskFUJr2ABzHIAIdPi6QAAAAJ0Uk5TOABhDHHDAAAAu0lEQVQ4y82UMQpCMQyG4+RqQRFHe4UOzkIXR9EMrg7BUXEIXuBZRxHF3NY2PnyvXqD9hn/I1yGEpGB+0Je9tV0NKtATxK5o7bwajbg2GTORSrTIvUo99h5x6zNWIt4vC2vEnUReRBpEhxB0JUNoiIpqkXeI3ETaiGhNo6hmvqTOn4j9h03q/MpcVBszZdbJtuN9OKfBfNJ1KKkjzGfnEDcpIs4tmHtHVFIDDDnjCFCJNmYEGYO/D7uE/gAoWuavl8o/8QAAAABJRU5ErkJggg==",
     easterBunny$1 = "./assets/easter_bunny.587dfdcd.gif",
     REQUIRED_XP;
-(function(A) {
-    A[A.LEVEL_1 = 0] = "LEVEL_1", A[A.LEVEL_2 = 50] = "LEVEL_2", A[A.LEVEL_3 = 150] = "LEVEL_3", A[A.LEVEL_4 = 350] = "LEVEL_4", A[A.LEVEL_5 = 700] = "LEVEL_5", A[A.LEVEL_6 = 1100] = "LEVEL_6", A[A.LEVEL_7 = 1400] = "LEVEL_7", A[A.LEVEL_8 = 2e3] = "LEVEL_8", A[A.LEVEL_9 = 3e3] = "LEVEL_9", A[A.LEVEL_10 = 5e3] = "LEVEL_10"
+(function(e) {
+    e[e.LEVEL_1 = 0] = "LEVEL_1", e[e.LEVEL_2 = 50] = "LEVEL_2", e[e.LEVEL_3 = 150] = "LEVEL_3", e[e.LEVEL_4 = 350] = "LEVEL_4", e[e.LEVEL_5 = 700] = "LEVEL_5", e[e.LEVEL_6 = 1100] = "LEVEL_6", e[e.LEVEL_7 = 1400] = "LEVEL_7", e[e.LEVEL_8 = 2e3] = "LEVEL_8", e[e.LEVEL_9 = 3e3] = "LEVEL_9", e[e.LEVEL_10 = 5e3] = "LEVEL_10"
 })(REQUIRED_XP || (REQUIRED_XP = {}));
 const SKILL_TREE = {
     "Green Thumb": {
@@ -7034,26 +6906,26 @@ const SKILL_TREE = {
     }
 };
 
-function getLevel(A) {
-    return A.gte(5e3) ? 10 : A.gte(3e3) ? 9 : A.gte(2e3) ? 8 : A.gte(1400) ? 7 : A.gte(1100) ? 6 : A.gte(700) ? 5 : A.gte(350) ? 4 : A.gte(150) ? 3 : A.gte(50) ? 2 : 1
+function getLevel(e) {
+    return e.gte(5e3) ? 10 : e.gte(3e3) ? 9 : e.gte(2e3) ? 8 : e.gte(1400) ? 7 : e.gte(1100) ? 6 : e.gte(700) ? 5 : e.gte(350) ? 4 : e.gte(150) ? 3 : e.gte(50) ? 2 : 1
 }
 
-function getAvailableUpgrades(A) {
-    const e = getLevel(A.skills.farming);
-    if (e >= 5 && !A.inventory["Green Thumb"] && !A.inventory["Barn Manager"]) return ["Green Thumb", "Barn Manager"];
-    if (e >= 10 && !A.inventory["Seed Specialist"] && !A.inventory.Wrangler) return A.inventory["Green Thumb"] ? ["Seed Specialist"] : ["Wrangler"];
-    const t = getLevel(A.skills.gathering);
-    return t >= 5 && !A.inventory.Lumberjack && !A.inventory.Prospector ? ["Lumberjack", "Prospector"] : t >= 10 && !A.inventory.Logger && !A.inventory["Gold Rush"] ? A.inventory.Prospector ? ["Gold Rush"] : ["Logger"] : []
+function getAvailableUpgrades(e) {
+    const A = getLevel(e.skills.farming);
+    if (A >= 5 && !e.inventory["Green Thumb"] && !e.inventory["Barn Manager"]) return ["Green Thumb", "Barn Manager"];
+    if (A >= 10 && !e.inventory["Seed Specialist"] && !e.inventory.Wrangler) return e.inventory["Green Thumb"] ? ["Seed Specialist"] : ["Wrangler"];
+    const t = getLevel(e.skills.gathering);
+    return t >= 5 && !e.inventory.Lumberjack && !e.inventory.Prospector ? ["Lumberjack", "Prospector"] : t >= 10 && !e.inventory.Logger && !e.inventory["Gold Rush"] ? e.inventory.Prospector ? ["Gold Rush"] : ["Logger"] : []
 }
 
-function upgradeAvailable(A) {
-    return getAvailableUpgrades(A).length > 0
+function upgradeAvailable(e) {
+    return getAvailableUpgrades(e).length > 0
 }
 
-function getRequiredXpToLevelUp(A) {
-    if (A === 10) return;
-    const e = A + 1;
-    return REQUIRED_XP[`LEVEL_${e}`]
+function getRequiredXpToLevelUp(e) {
+    if (e === 10) return;
+    const A = e + 1;
+    return REQUIRED_XP[`LEVEL_${A}`]
 }
 const crops = CROPS(),
     seeds = SEEDS(),
@@ -7457,49 +7329,49 @@ const ONE_SEC = 1,
     ONE_HR = ONE_MIN * 60,
     ONE_DAY = ONE_HR * 24;
 
-function timeToStr(A, e) {
-    const t = A === 1 ? e : `${e}s`;
-    return `${A}${t}`
+function timeToStr(e, A) {
+    const t = e === 1 ? A : `${A}s`;
+    return `${e}${t}`
 }
 
-function getTimeUnits(A) {
-    const e = Math.ceil(A % ONE_MIN),
-        t = Math.floor(A / ONE_MIN % ONE_MIN),
-        a = Math.floor(A / ONE_HR % 24),
-        n = Math.floor(A / ONE_DAY);
-    return [n && timeToStr(n, "day"), a && timeToStr(a, "hr"), t && timeToStr(t, "min"), e && timeToStr(e, "sec")].filter(Boolean)
+function getTimeUnits(e) {
+    const A = Math.ceil(e % ONE_MIN),
+        t = Math.floor(e / ONE_MIN % ONE_MIN),
+        a = Math.floor(e / ONE_HR % 24),
+        n = Math.floor(e / ONE_DAY);
+    return [n && timeToStr(n, "day"), a && timeToStr(a, "hr"), t && timeToStr(t, "min"), A && timeToStr(A, "sec")].filter(Boolean)
 }
 
-function secondsToString(A) {
-    const e = Math.ceil(A);
-    if (e < ONE_MIN) return timeToStr(e, "sec");
-    if (A < ONE_HR) {
-        const a = Math.ceil(A / ONE_MIN);
+function secondsToString(e) {
+    const A = Math.ceil(e);
+    if (A < ONE_MIN) return timeToStr(A, "sec");
+    if (e < ONE_HR) {
+        const a = Math.ceil(e / ONE_MIN);
         return timeToStr(a, "min")
     }
-    if (A < ONE_DAY) {
-        const a = Math.ceil(A / ONE_HR);
+    if (e < ONE_DAY) {
+        const a = Math.ceil(e / ONE_HR);
         return timeToStr(a, "hr")
     }
-    const t = Math.ceil(A / ONE_DAY);
+    const t = Math.ceil(e / ONE_DAY);
     return timeToStr(t, "day")
 }
 
-function secondsToMidString(A) {
-    return getTimeUnits(A).slice(0, 2).join(" ")
+function secondsToMidString(e) {
+    return getTimeUnits(e).slice(0, 2).join(" ")
 }
 
-function secondsToLongString(A) {
-    return getTimeUnits(A).join(" ")
+function secondsToLongString(e) {
+    return getTimeUnits(e).join(" ")
 }
 
-function getTimeLeft(A, e) {
-    const t = Date.now() - A;
-    return t > e * 1e3 ? 0 : e - t / 1e3
+function getTimeLeft(e, A) {
+    const t = Date.now() - e;
+    return t > A * 1e3 ? 0 : A - t / 1e3
 }
 
-function formatDateTime(A) {
-    return new Date(A).toLocaleString("en-US", {
+function formatDateTime(e) {
+    return new Date(e).toLocaleString("en-US", {
         month: "short",
         day: "2-digit",
         hour: "2-digit",
@@ -7507,23 +7379,23 @@ function formatDateTime(A) {
         hour12: !0
     })
 }
-const useShowScrollbar = A => {
-        const [e, t] = react.exports.useState(!1), a = react.exports.useRef(null);
+const useShowScrollbar = e => {
+        const [A, t] = react.exports.useState(!1), a = react.exports.useRef(null);
         return react.exports.useEffect(() => {
             var s;
             const n = (s = a.current) == null ? void 0 : s.scrollHeight;
-            n && n > A && t(!0)
+            n && n > e && t(!0)
         }, [a.current]), {
             ref: a,
-            showScrollbar: e
+            showScrollbar: A
         }
     },
     ITEM_CARD_MIN_HEIGHT = "148px",
     TAB_CONTENT_HEIGHT$1 = 384,
-    isSeed = A => A in SEEDS(),
+    isSeed = e => e in SEEDS(),
     InventoryTabContent = ({
-        tabItems: A,
-        selectedItem: e,
+        tabItems: e,
+        selectedItem: A,
         setDefaultSelectedItem: t,
         inventory: a,
         inventoryItems: n,
@@ -7532,56 +7404,56 @@ const useShowScrollbar = A => {
         const {
             ref: r,
             showScrollbar: i
-        } = useShowScrollbar(TAB_CONTENT_HEIGHT$1), [m] = useScrollIntoView(), d = Object.keys(A), [E, u] = react.exports.useState(!1);
+        } = useShowScrollbar(TAB_CONTENT_HEIGHT$1), [m] = useScrollIntoView(), d = Object.keys(e), [E, u] = react.exports.useState(!1);
         react.exports.useEffect(() => {
-            const w = d.find(S => {
+            const h = d.find(S => {
                     var y;
-                    return !!((y = h[S]) == null ? void 0 : y.length)
+                    return !!((y = w[S]) == null ? void 0 : y.length)
                 }),
-                f = getShortcuts()[0] || w && h[w][0];
+                f = getShortcuts()[0] || h && w[h][0];
             f && t(f)
         }, []), react.exports.useEffect(() => u(hasBoost({
-            item: e,
+            item: A,
             inventory: a
-        })), [a, e]);
-        const h = n.reduce((w, f) => {
-                const S = d.find(y => f in A[y].items);
+        })), [a, A]);
+        const w = n.reduce((h, f) => {
+                const S = d.find(y => f in e[y].items);
                 if (S) {
-                    const y = w[S] || [];
-                    w[S] = [...y, f]
+                    const y = h[S] || [];
+                    h[S] = [...y, f]
                 }
-                return w
+                return h
             }, {}),
-            B = w => (console.log({
-                category: w,
-                inventoryMapping: h
-            }), Object.keys(h).includes(w)),
-            g = (w = "") => {
-                const f = w.split(" ")[0];
+            B = h => (console.log({
+                category: h,
+                inventoryMapping: w
+            }), Object.keys(w).includes(h)),
+            g = (h = "") => {
+                const f = h.split(" ")[0];
                 return secondsToMidString(getCropTime(f, a))
             },
-            C = w => {
-                s(w), w && ITEM_DETAILS[w].section && m(ITEM_DETAILS[w].section)
+            C = h => {
+                s(h), h && ITEM_DETAILS[h].section && m(ITEM_DETAILS[h].section)
             },
-            Q = Object.values(h).every(w => w.length === 0);
+            Q = Object.values(w).every(h => h.length === 0);
         return React.createElement("div", {
             className: "flex flex-col"
         }, !Q && React.createElement(OuterPanel, {
             className: "flex-1 mb-3"
-        }, e && React.createElement("div", {
+        }, A && React.createElement("div", {
             style: {
                 minHeight: ITEM_CARD_MIN_HEIGHT
             },
             className: "flex flex-col justify-evenly items-center p-2"
         }, React.createElement("span", {
             className: "text-center text-shadow"
-        }, e), React.createElement("img", {
-            src: ITEM_DETAILS[e].image,
+        }, A), React.createElement("img", {
+            src: ITEM_DETAILS[A].image,
             className: "h-12",
-            alt: e
+            alt: A
         }), React.createElement("span", {
             className: "text-xs text-shadow text-center mt-2 w-80"
-        }, ITEM_DETAILS[e].description), isSeed(e) && React.createElement("div", {
+        }, ITEM_DETAILS[A].description), isSeed(A) && React.createElement("div", {
             className: "w-full pt-1"
         }, React.createElement("div", {
             className: "flex justify-center items-end"
@@ -7593,7 +7465,7 @@ const useShowScrollbar = A => {
             className: "h-6 me-2"
         }), React.createElement("span", {
             className: "text-xs text-shadow text-center mt-2 "
-        }, g(e)))))), React.createElement("div", {
+        }, g(A)))))), React.createElement("div", {
             ref: r,
             style: {
                 maxHeight: TAB_CONTENT_HEIGHT$1
@@ -7601,22 +7473,22 @@ const useShowScrollbar = A => {
             className: classNames("overflow-y-auto", {
                 scrollable: i
             })
-        }, d.map(w => React.createElement("div", {
+        }, d.map(h => React.createElement("div", {
             className: "flex flex-col pl-2",
-            key: w
+            key: h
         }, React.createElement("p", {
             className: "mb-2 underline"
-        }, w), B(w) ? React.createElement("div", {
+        }, h), B(h) ? React.createElement("div", {
             className: "flex mb-2 flex-wrap pl-1.5"
-        }, h[w].map(f => React.createElement(Box, {
+        }, w[h].map(f => React.createElement(Box, {
             count: a[f],
-            isSelected: e === f,
+            isSelected: A === f,
             key: f,
             onClick: () => C(f),
             image: ITEM_DETAILS[f].image
         }))) : React.createElement("p", {
             className: "text-white text-xs text-shadow mb-2 pl-2.5"
-        }, `No ${w} in inventory`)))))
+        }, `No ${h} in inventory`)))))
     },
     BASKET_CATEGORIES = {
         Seeds: {
@@ -7658,20 +7530,20 @@ const useShowScrollbar = A => {
             }
         }
     },
-    makeInventoryItems = A => Object.keys(A).filter(t => {
+    makeInventoryItems = e => Object.keys(e).filter(t => {
         var a;
-        return !!A[t] && !((a = A[t]) == null ? void 0 : a.equals(0))
+        return !!e[t] && !((a = e[t]) == null ? void 0 : a.equals(0))
     }),
     InventoryItems = ({
-        onClose: A
+        onClose: e
     }) => {
         const {
-            gameService: e,
+            gameService: A,
             shortcutItem: t
-        } = react.exports.useContext(Context), [a] = useActor(e), n = a.context.state.inventory, [s, r] = react.exports.useState("basket"), [i] = react.exports.useState(makeInventoryItems(n)), [m, d] = react.exports.useState(), E = h => {
-            r(h)
-        }, u = h => {
-            t(h), d(h)
+        } = react.exports.useContext(Context), [a] = useActor(A), n = a.context.state.inventory, [s, r] = react.exports.useState("basket"), [i] = react.exports.useState(makeInventoryItems(n)), [m, d] = react.exports.useState(), E = w => {
+            r(w)
+        }, u = w => {
+            t(w), d(w)
         };
         return React.createElement(Panel, {
             className: "pt-5 relative"
@@ -7700,7 +7572,7 @@ const useShowScrollbar = A => {
         }, "Collectibles"))), React.createElement("img", {
             src: close,
             className: "h-6 cursor-pointer mr-2 mb-1",
-            onClick: A
+            onClick: e
         })), s === "basket" && React.createElement(InventoryTabContent, {
             tabItems: BASKET_CATEGORIES,
             selectedItem: m,
@@ -7718,11 +7590,11 @@ const useShowScrollbar = A => {
         }))
     },
     Inventory = () => {
-        const [A, e] = react.exports.useState(!1), {
+        const [e, A] = react.exports.useState(!1), {
             shortcutItem: t,
             gameService: a
         } = react.exports.useContext(Context), [n] = useActor(a), s = n.context.state.inventory, r = getShortcuts(), i = () => {
-            e(!0)
+            A(!0)
         };
         return React.createElement("div", {
             className: "flex flex-col items-end mr-2 sm:block fixed top-16 right-0 z-50"
@@ -7742,10 +7614,10 @@ const useShowScrollbar = A => {
         }, "Items")), React.createElement(Modal, {
             centered: !0,
             scrollable: !0,
-            show: A,
-            onHide: () => e(!1)
+            show: e,
+            onHide: () => A(!1)
         }, React.createElement(InventoryItems, {
-            onClose: () => e(!1)
+            onClose: () => A(!1)
         })), !n.matches("readonly") && React.createElement("div", {
             className: "flex flex-col items-center sm:mt-8"
         }, r.map((m, d) => {
@@ -7761,8 +7633,8 @@ const useShowScrollbar = A => {
         })))
     },
     Button = ({
-        children: A,
-        onClick: e,
+        children: e,
+        onClick: A,
         disabled: t,
         className: a,
         type: n
@@ -7770,7 +7642,7 @@ const useShowScrollbar = A => {
         className: classNames("bg-brown-200 w-full p-1 shadow-sm text-white text-shadow object-contain justify-center items-center hover:bg-brown-300 cursor-pointer flex disabled:opacity-50 ", a),
         type: n,
         disabled: t,
-        onClick: e,
+        onClick: A,
         style: {
             borderStyle: "solid",
             borderWidth: "5px",
@@ -7780,7 +7652,7 @@ const useShowScrollbar = A => {
             borderImageRepeat: "repeat",
             borderRadius: "15px"
         }
-    }, A);
+    }, e);
 var farm = "./assets/nft.7f8d8538.png";
 const CopySvg = () => React.createElement("svg", {
         className: "fill-white hover:fill-brown-300",
@@ -7798,12 +7670,12 @@ const CopySvg = () => React.createElement("svg", {
         d: "M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"
     })),
     CopyField = ({
-        text: A = "",
-        copyFieldMessage: e
+        text: e = "",
+        copyFieldMessage: A
     }) => {
-        const [t, a] = react.exports.useState(e), [n, s] = react.exports.useState(!1), r = () => {
-            navigator.clipboard.writeText(A), a("Copied!"), setTimeout(() => {
-                a(e)
+        const [t, a] = react.exports.useState(A), [n, s] = react.exports.useState(!1), r = () => {
+            navigator.clipboard.writeText(e), a("Copied!"), setTimeout(() => {
+                a(A)
             }, 2e3)
         }, i = () => {
             s(!0)
@@ -7818,7 +7690,7 @@ const CopySvg = () => React.createElement("svg", {
             className: "flex justify-content-between p-2 gap-x-2 align-items-center"
         }, React.createElement("span", {
             className: "text-[0.55rem] sm:text-xs m-auto break-all select-text"
-        }, A), React.createElement("span", {
+        }, e), React.createElement("span", {
             className: "cursor-pointer scale-[1.5]",
             onMouseEnter: i,
             onMouseLeave: m,
@@ -7828,16 +7700,16 @@ const CopySvg = () => React.createElement("svg", {
         }, React.createElement(Label, null, t)))
     },
     Share = ({
-        farmURL: A,
-        isOpen: e,
+        farmURL: e,
+        isOpen: A,
         onClose: t
     }) => {
         const a = () => {
             window.open(encodeURI(`https://twitter.com/intent/tweet?text=Visit My Sunflower Land Farm \u{1F447}
-${A}&ref_src=https://sunflower-land.com`), "_blank")
+${e}&ref_src=https://sunflower-land.com`), "_blank")
         };
         return React.createElement(Modal, {
-            show: e,
+            show: A,
             onHide: t,
             centered: !0
         }, React.createElement(Panel, null, React.createElement(Modal.Header, {
@@ -7861,7 +7733,7 @@ ${A}&ref_src=https://sunflower-land.com`), "_blank")
             className: "w-64 md-mt-2",
             alt: "Sunflower-Land Farm NFT Image"
         }))), React.createElement(CopyField, {
-            text: A,
+            text: e,
             copyFieldMessage: "Copy farm URL"
         })), React.createElement(Modal.Footer, {
             className: "justify-content-center"
@@ -7870,7 +7742,7 @@ ${A}&ref_src=https://sunflower-land.com`), "_blank")
             onClick: a
         }, "Tweet"), React.createElement(Button, {
             className: "text-s w-1/4 px-1",
-            onClick: () => window.open(A, "_blank")
+            onClick: () => window.open(e, "_blank")
         }, "Visit"))))
     };
 var sunflowerPlant = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAaBAMAAABMRsE0AAAABGdBTUEAALGPC/xhBQAAACpQTFRFAAAA/+s2Y8dN93Yi+6ogJlxCPolI/94fcz45uG9Q//lO5KZyvkovwoVpgyPvXAAAAAF0Uk5TAEDm2GYAAACZSURBVAjXY2DABnjOQOlTqyCs41arzA+ABMpLRMprQAxzjw53GyDj1JKOjpZVQLlTCzs6GsEMmAhcDVwX3BywyWogRlrOGbVUIM2mpJqaBmJcTVNNDY1lYOCdmpaWuvvmBYabd0NDU2fvnctw8/bOq7kQxu65d3cDGbxzdwMBUA1ICCQA1Db37l2QAFBo5sy5YMfz3r0LFAAAbXtNAJ9cW54AAAAASUVORK5CYII=",
@@ -7881,15 +7753,15 @@ var sunflowerPlant = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAaBAMA
 
 function useIsNewFarm() {
     const {
-        authService: A
+        authService: e
     } = react.exports.useContext(Context$1), [{
-        history: e
-    }] = useActor(A);
-    return (e == null ? void 0 : e.event.type) === "CREATE_FARM"
+        history: A
+    }] = useActor(e);
+    return (A == null ? void 0 : A.event.type) === "CREATE_FARM"
 }
 const HowToModalHeader = ({
-        onClose: A,
-        onBack: e,
+        onClose: e,
+        onBack: A,
         title: t
     }) => {
         const a = !useIsNewFarm();
@@ -7897,24 +7769,24 @@ const HowToModalHeader = ({
             className: "justify-start"
         }, React.createElement("div", {
             className: "flex w-full"
-        }, e && React.createElement("img", {
+        }, A && React.createElement("img", {
             className: "h-6 mr-3 cursor-pointer",
             src: arrowLeft,
             alt: "back",
-            onClick: e
+            onClick: A
         }), React.createElement("span", {
             className: "text-base ml-2 grow"
         }, t), a && React.createElement("img", {
             src: close,
             className: "h-6 cursor-pointer",
-            onClick: A
+            onClick: e
         })))
     },
     HowToFarm = ({
-        onClose: A
+        onClose: e
     }) => React.createElement(React.Fragment, null, React.createElement(HowToModalHeader, {
         title: "How to Farm?",
-        onClose: A
+        onClose: e
     }), React.createElement(Modal.Body, null, React.createElement("div", {
         className: "flex items-center"
     }, React.createElement("p", {
@@ -7974,12 +7846,12 @@ var goblin$1 = "data:image/gif;base64,R0lGODdhYABAAHcAACH/C05FVFNDQVBFMi4wAwEAAA
     bakery = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC4AAAArCAMAAAAwqkq2AAAABGdBTUEAALGPC/xhBQAAAFpQTFRFAAAAlJWki5m0GDw5i31zEGGLGDxi9nV7WjApOYlKKYmcxcreSqFqvW1SOURi////WmmLpCQx5jhBpPr/7tasGG3VvUgpIChB5qVzxYVqczw5AJneEEyLKer2kEoJ7wAAAAF0Uk5TAEDm2GYAAAGOSURBVDjLpZWLcoIwEEVTbauADUUg2+bx/7/ZfQRIiJjOeGZcGTxO9mYlKrWhF9QTLCJ23wm9PvbsFwIe0Z0GAt+9P9OdtAJ5Vtm+79/AIYnunKc7aQX0eqvMNE3vn2EcR92B0OmxIHj0JhP1j7Zt9Sn2ftKhwBU6fC8AGz6pdd3NW31Jn0TX0daVZiZPeusXwnFU2vfeu1DBedl3+4v4MFYInryog68CqT4jceIzXxc100mULZv5S2UtdInrDsh03mHO5Is9lwqvRI2prkS8zpPnvUueKz1h9uoeJC+j5voueR41pmI9XufJ4dWpzs9mW07VPZtt1Pn3Dsn4DmYLyeMByQwPZrvo/LOvR+XHyEjv1tgKxiZRramS6z8VFl3JWnU9HuzUiDV4GMt5Sgc47MBbhrVVx4WijmsOBKxlwFubjktxM6LTysNwv1zoxWUYuBnSDvQ7kpSHumzw/3QKI3uEufY6R810CiM6Rd3pHHXfzMZA1vkeSxb19kCHJgNW/YZ+QdPkf8BNs3yi/gCNHqnyd9SY6gAAAABJRU5ErkJggg==",
     carrotPlant = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAaBAMAAABMRsE0AAAABGdBTUEAALGPC/xhBQAAACRQTFRFAAAAJlxC/udhPolITadvY8dN5KZyvkov93Yi/q40uG9QwoVp4IqbiQAAAAF0Uk5TAEDm2GYAAACCSURBVAjXY2CgPmBxYHEAM1yDTUPADOfQUBMwg9E0WADM4BQ2nABmTCoU1wTRHJrTKyc1ABnbOydpzqhmYOBe3jFJs6NqA8Ou3RWdM9p3r2bYtQ3EyAYxtnfOqAYyuFdn7969bdcGBqBQWhpQAKht9e7dIAGg0KpVq8FWcO/eDRQAAJb4LY/vkRWWAAAAAElFTkSuQmCC";
 const HowToUpgrade = ({
-        onClose: A,
-        onBack: e
+        onClose: e,
+        onBack: A
     }) => React.createElement(React.Fragment, null, React.createElement(HowToModalHeader, {
         title: "How to upgrade?",
-        onClose: A,
-        onBack: e
+        onClose: e,
+        onBack: A
     }), React.createElement(Modal.Body, null, React.createElement("div", {
         className: "flex items-center"
     }, React.createElement("p", {
@@ -8030,12 +7902,12 @@ const HowToUpgrade = ({
         className: "w-14 relative"
     }))))),
     HowToSync = ({
-        onClose: A,
-        onBack: e
+        onClose: e,
+        onBack: A
     }) => React.createElement(React.Fragment, null, React.createElement(HowToModalHeader, {
         title: "How to sync?",
-        onClose: A,
-        onBack: e
+        onClose: e,
+        onBack: A
     }), React.createElement(Modal.Body, null, React.createElement("p", {
         className: "text-xs p-2 sm:text-sm text-center"
     }, "All of your progress is saved on our game server. You will need to sync on chain when you want to move your tokens, NFTs and resources onto Polygon."), React.createElement("div", {
@@ -8053,12 +7925,12 @@ const HowToUpgrade = ({
         className: "w-4"
     }))))),
     LetsGo = ({
-        onClose: A,
-        onBack: e
+        onClose: e,
+        onBack: A
     }) => React.createElement(React.Fragment, null, React.createElement(HowToModalHeader, {
         title: "Time to play!",
-        onClose: A,
-        onBack: e
+        onClose: e,
+        onBack: A
     }), React.createElement(Modal.Body, null, React.createElement("p", {
         className: "text-xs p-2 sm:text-sm text-center"
     }, "Thanks for playing beta! We are still working on the game and appreciate your support during the early stages!"), React.createElement("p", {
@@ -8070,17 +7942,17 @@ const HowToUpgrade = ({
         rel: "noreferrer"
     }, "official docs."))));
 var Steps;
-(function(A) {
-    A[A.HowToFarm = 1] = "HowToFarm", A[A.HowToUpgrade = 2] = "HowToUpgrade", A[A.HowToSync = 3] = "HowToSync", A[A.LetsGo = 4] = "LetsGo"
+(function(e) {
+    e[e.HowToFarm = 1] = "HowToFarm", e[e.HowToUpgrade = 2] = "HowToUpgrade", e[e.HowToSync = 3] = "HowToSync", e[e.LetsGo = 4] = "LetsGo"
 })(Steps || (Steps = {}));
 const HowToPlay = ({
-    isOpen: A,
-    onClose: e
+    isOpen: e,
+    onClose: A
 }) => {
     const [t, a] = React.useState(1);
     react.exports.useEffect(() => {
-        A && a(1)
-    }, [A]);
+        e && a(1)
+    }, [e]);
     const n = () => {
             a(t - 1)
         },
@@ -8088,23 +7960,23 @@ const HowToPlay = ({
             a(t + 1)
         },
         r = () => {
-            e()
+            A()
         },
         i = !useIsNewFarm();
     return React.createElement(Modal, {
-        show: A,
-        onHide: i ? e : void 0,
+        show: e,
+        onHide: i ? A : void 0,
         centered: !0
     }, React.createElement(Panel, null, t === 1 && React.createElement(HowToFarm, {
-        onClose: e
+        onClose: A
     }), t === 2 && React.createElement(HowToUpgrade, {
-        onClose: e,
+        onClose: A,
         onBack: n
     }), t === 3 && React.createElement(HowToSync, {
-        onClose: e,
+        onClose: A,
         onBack: n
     }), t === 4 && React.createElement(LetsGo, {
-        onClose: e,
+        onClose: A,
         onBack: n
     }), React.createElement(Modal.Footer, {
         className: "justify-content-center"
@@ -8118,22 +7990,20 @@ const HowToPlay = ({
 };
 var alert = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAJCAYAAAAVb42gAAAANElEQVQImWNU03b5z4AEmEDEjeYPDDev7AYLgwVA4P+LJFQBhuOX0QSgALehIEyEFgYGBgAYUBH4km+gIQAAAABJRU5ErkJggg==";
 const Settings = ({
-    isOpen: A,
-    onClose: e
+    isOpen: e,
+    onClose: A
 }) => {
     const {
         authService: t
     } = react.exports.useContext(Context$1), {
         gameService: a
     } = react.exports.useContext(Context), [n, s] = react.exports.useState(!1), r = () => {
-        e(), t.send("LOGOUT")
+        A(), t.send("LOGOUT")
     }, i = () => {
         s(!0)
     }, m = () => {
-        e(), a.send("RESET")
-    }, d = () => {
-        t.send("AIRDROP")
-    }, E = () => n ? React.createElement("div", {
+        A(), a.send("RESET")
+    }, d = () => n ? React.createElement("div", {
         className: "p-4 "
     }, React.createElement("div", {
         className: "flex items-center border-2 rounded-md border-black p-2 mt-2 mb-2 bg-[#e43b44]"
@@ -8159,37 +8029,34 @@ const Settings = ({
     }, "Logout"), React.createElement(Button, {
         className: "col  p-1 mt-2",
         onClick: i
-    }, "Reset Session"), React.createElement(Button, {
-        className: "col  p-1 mt-2",
-        onClick: d
-    }, "Airdrop V1 Farm"));
+    }, "Reset Session"));
     return React.createElement(Modal, {
-        show: A,
-        onHide: e,
+        show: e,
+        onHide: A,
         centered: !0
     }, React.createElement(Panel, {
         className: "p-0"
-    }, E()))
+    }, d()))
 };
 var mobileMenu = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABICAMAAABWSoJpAAAABGdBTUEAALGPC/xhBQAAAEVQTFRFBAMDBAMDBAMDBAMDBAMDBAMDBAMDBAMDBAMDBAMDBAMDBAMDAAAA3NvbDAsLExIS397e3t3dFBMT29ragoGBBAMD////pcoZXQAAAA10Uk5T2+vurLAwNN3e2s9PAPFaF7cAAACmSURBVFjD7ZZLFsIgEATRfIygRo2d+x9VVtE9FUXTvWNTj+ExNRNOcMI6wBRVmqHtX8AkIvt+AUYEqHYB5sNcmmuuum7gTToY+O/Adf8h3nq4HHB9/YCxDTTwO4P+2HT0oN91tG0a1IdTrnpjwLMUXPKmvg3eergccH15phho4Kc2B8VEbw5K7/p6FOeiiAp2vkuVA8fqb+g3ZIF4p+C9jNvGI6AoTyLQhxn4Y1rXAAAAAElFTkSuQmCC",
     radish = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAPBAMAAAAizzN6AAAABGdBTUEAALGPC/xhBQAAAB5QTFRFAAAA9nV6cz45GTw+Y8dNPicxJlxCPolI5DtEoiYzZKA5OwAAAAF0Uk5TAEDm2GYAAABiSURBVAjXY2BLSwAihnQXtxSXMob0EvcSdyBV7uJSXsbAZl5eXpzAwMBsXmzAwMAwo72ik4GBs6OjQ2ICmGqcwMA6s6NjZgCQAoIABobImTOnAlWyRk4FcoA0mGRgUmBgAAAo8RtuZzoP8wAAAABJRU5ErkJggg==",
     town = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAsCAMAAAAUyMtVAAAABGdBTUEAALGPC/xhBQAAAFFQTFRFAAAAMSg5lJWki5m0GDw5i31zgzBBYig5xcreWjApi1BavW1S////OURiWmmLIChB7tas/5mcvUgppCQxxYVq5qVzAAAAczw5OSQx5jhB9nV77TL5RwAAAAF0Uk5TAEDm2GYAAAGeSURBVEjHrZbZcoMwDEVp0wWoXcBqvfD/H1pL8g7EmUnvg4YQnZGvZSsZhkI6arinnKK1ZJ0SMU9r48WfpBhRQuozcd6gzZeXRUkRKghp7Ru9KiPmGQSEEK8vzkuOARilcxbflNH6PIGAWtf1/XPftk2OC2uU20E7+LxVJeBjnmd5G1k3uR/kToDlO2qhHFvERwAHOT4NrASADPkSektaAYEZovZ7prEPAtzekYPYB/PjBfvW0Q6YlwD7gGoAV06hjhMqPNcAnhZwbZzwhJqJD9QROOoO0O57iASE52dNVy7LuxD3oPVQuaQ1cL/THpybLgFuftqA1nTlknobYtwD+3+drr3meNnp2muKCaD7UHa69ppNVxeo7HTtNccE0MXoe6aLpqIHo0xHylSmjeqqBX47yoDmin0gjHtfAuspP8p5EuP4Xxr5V4rS8JcmAL5cAHCIoJYUcGCUgC9IS2IA6wPOKZpV9AC0JEy7BNKJ4HAB8IY/CqAt3i/vsAXIdAOgLQbQdAOQ6eOSsgDztAvh0nRW+xNdA2c6+xPAX/wBrpmkHTwXChcAAAAASUVORK5CYII=",
     water = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAJCAYAAAD+WDajAAAAYklEQVQYlWNU03ZhQAL/GRgYGGF8JmSJm1d2wxSgSP5n27uRQfflNwZkBcg6MQBI8v+tvOkoEjDdGDpBRmM46MrGZxgKYF5BMVptUiZYjlFCRBUswCcuD/fCp5cPGRkYGBgAVzgjn6D8dXEAAAAASUVORK5CYII=",
     MENU_LEVELS;
-(function(A) {
-    A.ROOT = "root", A.MAP = "map", A.VIEW = "view"
+(function(e) {
+    e.ROOT = "root", e.MAP = "map", e.VIEW = "view"
 })(MENU_LEVELS || (MENU_LEVELS = {}));
 const Menu = () => {
     const {
-        authService: A
+        authService: e
     } = react.exports.useContext(Context$1), {
-        gameService: e
-    } = react.exports.useContext(Context), [t] = useActor(A), [a] = useActor(e), [n, s] = react.exports.useState(!1), [r] = useScrollIntoView(), [i, m] = react.exports.useState(!1), [d, E] = react.exports.useState(!1), [u, h] = react.exports.useState(useIsNewFarm()), [B, g] = react.exports.useState(!1), [C, Q] = react.exports.useState(""), [w, f] = react.exports.useState(MENU_LEVELS.ROOT), S = react.exports.useRef(null), y = () => {
+        gameService: A
+    } = react.exports.useContext(Context), [t] = useActor(e), [a] = useActor(A), [n, s] = react.exports.useState(!1), [r] = useScrollIntoView(), [i, m] = react.exports.useState(!1), [d, E] = react.exports.useState(!1), [u, w] = react.exports.useState(useIsNewFarm()), [B, g] = react.exports.useState(!1), [C, Q] = react.exports.useState(""), [h, f] = react.exports.useState(MENU_LEVELS.ROOT), S = react.exports.useRef(null), y = () => {
         s(!n)
     }, I = b => {
         r(b), s(!1)
     }, D = () => {
-        h(!0), s(!1)
+        w(!0), s(!1)
     }, F = () => {
         m(!0), s(!1)
     }, T = () => {
@@ -8200,15 +8067,15 @@ const Menu = () => {
     }, U = async () => {
         g(!0)
     }, v = async b => {
-        await new Promise(G => setTimeout(G, 1e3)), e.send("SYNC", {
+        await new Promise(G => setTimeout(G, 1e3)), A.send("SYNC", {
             captcha: b
         }), s(!1), g(!1)
     }, P = async () => {
-        e.send("SAVE")
+        A.send("SAVE")
     }, L = () => {
-        A.send("RETURN")
+        e.send("RETURN")
     }, J = () => {
-        A.send("EXPLORE")
+        e.send("EXPLORE")
     };
     return react.exports.useEffect(() => (document.addEventListener("mousedown", N), document.addEventListener("touchstart", N), () => {
         document.removeEventListener("mousedown", N), document.removeEventListener("touchstart", N)
@@ -8242,7 +8109,7 @@ const Menu = () => {
         className: `transition-all ease duration-200 ${n?"max-h-100":"max-h-0"}`
     }, React.createElement("ul", {
         className: `list-none pt-1 transition-all ease duration-200 origin-top ${n?"scale-y-1":"scale-y-0"}`
-    }, w === MENU_LEVELS.ROOT && React.createElement(React.Fragment, null, !a.matches("readonly") && React.createElement("li", {
+    }, h === MENU_LEVELS.ROOT && React.createElement(React.Fragment, null, !a.matches("readonly") && React.createElement("li", {
         className: "p-1"
     }, React.createElement(Button, {
         onClick: U
@@ -8279,7 +8146,7 @@ const Menu = () => {
         onClick: T
     }, React.createElement("span", {
         className: "sm:text-sm flex-1"
-    }, "Settings")))), w !== MENU_LEVELS.ROOT && React.createElement("li", {
+    }, "Settings")))), h !== MENU_LEVELS.ROOT && React.createElement("li", {
         className: "p-1"
     }, React.createElement(Button, {
         onClick: () => f(MENU_LEVELS.ROOT)
@@ -8287,7 +8154,7 @@ const Menu = () => {
         src: arrowLeft,
         className: "w-4 mr-2",
         alt: "left"
-    }))), w === MENU_LEVELS.MAP && React.createElement(React.Fragment, null, React.createElement("li", {
+    }))), h === MENU_LEVELS.MAP && React.createElement(React.Fragment, null, React.createElement("li", {
         className: "p-1"
     }, React.createElement(Button, {
         className: "flex justify-between",
@@ -8331,7 +8198,7 @@ const Menu = () => {
         src: wood,
         className: "w-4 ml-2",
         alt: "wood"
-    })))), w === MENU_LEVELS.VIEW && React.createElement(React.Fragment, null, React.createElement("li", {
+    })))), h === MENU_LEVELS.VIEW && React.createElement(React.Fragment, null, React.createElement("li", {
         className: "p-1"
     }, React.createElement(Button, {
         onClick: F
@@ -8349,7 +8216,7 @@ const Menu = () => {
         farmURL: C
     }), React.createElement(HowToPlay, {
         isOpen: u,
-        onClose: () => h(!1)
+        onClose: () => w(!1)
     }), React.createElement(Settings, {
         isOpen: d,
         onClose: () => E(!1)
@@ -8387,28 +8254,28 @@ const song_list = [{
         name: "Willow Tree",
         path: willow_tree
     }],
-    getSong = A => song_list[A],
+    getSong = e => song_list[e],
     getSongCount = () => song_list.length,
-    useStepper = A => {
-        const [e, t] = react.exports.useState(Math.min(Math.max(A.initial, A.min), A.max));
+    useStepper = e => {
+        const [A, t] = react.exports.useState(Math.min(Math.max(e.initial, e.min), e.max));
         return {
             decrease: () => {
-                t(Math.max(e - A.step, A.min))
+                t(Math.max(A - e.step, e.min))
             },
             increase: () => {
-                t(Math.min(e + A.step, A.max))
+                t(Math.min(A + e.step, e.max))
             },
-            value: e
+            value: A
         }
     },
     AudioPlayer = () => {
-        const A = useStepper({
+        const e = useStepper({
                 initial: .1,
                 step: .1,
                 max: 1,
                 min: 0
             }),
-            [e, t] = react.exports.useState(!1),
+            [A, t] = react.exports.useState(!1),
             [a, n] = react.exports.useState(!1),
             [s, r] = react.exports.useState(!0),
             [i, m] = react.exports.useState(0),
@@ -8419,17 +8286,17 @@ const song_list = [{
             u = () => {
                 getSongCount() === i + 1 ? m(0) : m(i + 1)
             },
-            h = getSong(i);
+            w = getSong(i);
         return react.exports.useEffect(() => {
             howler.Howler.mute(a)
         }, [a]), react.exports.useEffect(() => {
-            d.current.volume = A.value
-        }, [A.value]), react.exports.useEffect(() => {
+            d.current.volume = e.value
+        }, [e.value]), react.exports.useEffect(() => {
             navigator.userAgent.match(/chrome|chromium|crios/i) && (r(!1), d.current.pause())
         }, []), React.createElement("div", {
-            className: `position-fixed ${e?"-right-6 sm:right-10":"right-2"} sm:right-2 bottom-4 z-50 md:w-56 w-48 h-fit  sm:-translate-x-50 transition-all duration-500 ease-in-out`,
+            className: `position-fixed ${A?"-right-6 sm:right-10":"right-2"} sm:right-2 bottom-4 z-50 md:w-56 w-48 h-fit  sm:-translate-x-50 transition-all duration-500 ease-in-out`,
             style: {
-                transform: `translateX(${e?0:"calc(100% + 8px)"})`
+                transform: `translateX(${A?0:"calc(100% + 8px)"})`
             }
         }, React.createElement(Panel, {
             className: "pointer-events-auto w-40 sm:w-56"
@@ -8438,7 +8305,7 @@ const song_list = [{
             onEnded: u,
             onPause: () => r(!d.current.paused),
             onPlay: () => r(!d.current.paused),
-            src: h.path,
+            src: w.path,
             className: "d-none",
             autoPlay: !0,
             controls: !0
@@ -8453,7 +8320,7 @@ const song_list = [{
                 whiteSpace: "nowrap",
                 animationPlayState: s ? "running" : "paused"
             }
-        }, h.name, " - ", h.artist)), React.createElement("div", {
+        }, w.name, " - ", w.artist)), React.createElement("div", {
             className: "flex space-x-2 justify-content-between "
         }, React.createElement(Button, {
             onClick: E,
@@ -8468,13 +8335,13 @@ const song_list = [{
             src: skip_forward,
             alt: "next song button"
         })), React.createElement(Button, {
-            onClick: A.decrease,
+            onClick: e.decrease,
             className: "w-10 h-8 hidden sm:flex"
         }, React.createElement("img", {
             src: volume_down,
             alt: "next song button"
         })), React.createElement(Button, {
-            onClick: A.increase,
+            onClick: e.increase,
             className: "w-10 h-8 hidden sm:flex"
         }, React.createElement("img", {
             src: volume_up,
@@ -8484,10 +8351,10 @@ const song_list = [{
         }, React.createElement("div", {
             className: "bg-white h-1.5 transition-all duration-200 rounded-sm",
             style: {
-                height: `${A.value*100}%`
+                height: `${e.value*100}%`
             }
         }))))), React.createElement("div", {
-            className: `position-absolute ${e?"translate-x-1.5":""} -left-20 sm:-left-24 bottom-0 transition-all -z-10 duration-500 ease-in-out w-fit z-50 flex gap-2 align-items-center overflow-hidden`
+            className: `position-absolute ${A?"translate-x-1.5":""} -left-20 sm:-left-24 bottom-0 transition-all -z-10 duration-500 ease-in-out w-fit z-50 flex gap-2 align-items-center overflow-hidden`
         }, React.createElement(Button, {
             onClick: () => n(!a)
         }, React.createElement("img", {
@@ -8495,24 +8362,24 @@ const song_list = [{
             alt: "mute/unmute ingame audio",
             className: "w-4 h-4 sm:w-6 sm:h-5"
         })), React.createElement(Button, {
-            onClick: () => t(!e)
+            onClick: () => t(!A)
         }, React.createElement("img", {
-            src: e ? chevron_right : music_note,
+            src: A ? chevron_right : music_note,
             alt: "show/hide music player",
             className: "w-4 h-4 sm:w-6 sm:h-5"
         }))))
     },
     VisitBanner = () => {
         const {
-            gameService: A
-        } = react.exports.useContext(Context), [e] = useActor(A);
-        return e.context.state.id ? React.createElement("div", {
+            gameService: e
+        } = react.exports.useContext(Context), [A] = useActor(e);
+        return A.context.state.id ? React.createElement("div", {
             className: "fixed bottom-2 left-2 z-50 shadow-lg"
         }, React.createElement(OuterPanel, null, React.createElement("div", {
             className: "flex justify-center p-1"
         }, React.createElement("span", {
             className: "text-sm"
-        }, `Farm #${e.context.state.id}`)))) : null
+        }, `Farm #${A.context.state.id}`)))) : null
     },
     Hud = () => React.createElement("div", {
         "data-html2canvas-ignore": "true",
@@ -8525,17 +8392,17 @@ var soil = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAaBAMAAABMRsE0AA
     progressAlmost$1 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAHCAYAAADXhRcnAAAAUklEQVQYlWP8//8/g7qO638G0gEjg5q2y39yAEgfC8y+lBN+eK3eVvoRzn52+CCYZiLDuXAAt3mOxSb8Kg/j0NwzZytZNjOqabuAaNJDm4GBEQCHH0dV01wIwwAAAABJRU5ErkJggg==",
     progressFull = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAHCAYAAADXhRcnAAAASUlEQVQYlWP8//8/g7qO638G0gEjg5q2y39yAEgfC8y+lBN+RFs9x2ITmGYiw7lwALcZZhrJmnvmbCXLZkY1bRcQTXpoMzAwAgARO0OSW6pY7wAAAABJRU5ErkJggg==";
 const Bar = ({
-        percentage: A
-    }) => A >= 100 ? React.createElement("img", {
+        percentage: e
+    }) => e >= 100 ? React.createElement("img", {
         src: progressFull,
         className: "w-10"
-    }) : A >= 75 ? React.createElement("img", {
+    }) : e >= 75 ? React.createElement("img", {
         src: progressAlmost$1,
         className: "w-10"
-    }) : A >= 50 ? React.createElement("img", {
+    }) : e >= 50 ? React.createElement("img", {
         src: progressHalf$1,
         className: "w-10"
-    }) : A >= 25 ? React.createElement("img", {
+    }) : e >= 25 ? React.createElement("img", {
         src: progressQuarter,
         className: "w-10"
     }) : React.createElement("img", {
@@ -8543,15 +8410,15 @@ const Bar = ({
         className: "w-10"
     }),
     ProgressBar = ({
-        percentage: A,
-        seconds: e
+        percentage: e,
+        seconds: A
     }) => React.createElement("div", {
         className: "flex flex-col items-center justify-center"
-    }, e > 0 && React.createElement("span", {
+    }, A > 0 && React.createElement("span", {
         className: "text-shadow text-xxs text-white -mb-0.5"
-    }, secondsToString(e)), React.createElement(Bar, {
-        percentage: A,
-        seconds: e
+    }, secondsToString(A)), React.createElement(Bar, {
+        percentage: e,
+        seconds: A
     })),
     p2 = .99,
     p3 = .99,
@@ -8561,17 +8428,17 @@ const Bar = ({
     RandomID = function() {
         return "_" + Math.random().toString(36).substr(2, 9)
     };
-async function addNoise(A, e = .4) {
+async function addNoise(e, A = .4) {
     await new Promise(i => setTimeout(i, 100));
     const t = document.createElement("canvas"),
         a = t == null ? void 0 : t.getContext("2d"),
-        n = document.getElementById(A);
+        n = document.getElementById(e);
     t.width = n.naturalWidth, t.height = n.naturalHeight, a.drawImage(n, 0, 0);
     const s = a.getImageData(0, 0, n.naturalWidth, n.naturalHeight);
     for (let i = 0, m = s.data.length; i < m; i += 4) {
-        const d = .93 + Math.random() * e,
-            E = .93 + Math.random() * e,
-            u = .93 + Math.random() * e;
+        const d = .93 + Math.random() * A,
+            E = .93 + Math.random() * A,
+            u = .93 + Math.random() * A;
         s.data[i] = s.data[i] * p2 * d + er, s.data[i + 1] = s.data[i + 1] * p2 * E + eg, s.data[i + 2] = s.data[i + 2] * p3 * u + eb
     }
     a.putImageData(s, 0, 0);
@@ -8658,39 +8525,39 @@ const LIFECYCLE = {
         }
     },
     Ready = ({
-        image: A,
-        className: e
+        image: e,
+        className: A
     }) => {
         const t = react.exports.useRef(RandomID());
         return react.exports.useEffect(() => {
             Math.random() > .8 && addNoise(t.current, .15)
         }, []), React.createElement("img", {
             id: t.current,
-            src: A,
-            className: classNames("w-full", e)
+            src: e,
+            className: classNames("w-full", A)
         })
     },
     Soil = ({
-        field: A,
-        className: e,
+        field: e,
+        className: A,
         showCropDetails: t
     }) => {
         const [a, n] = React.useState(0), s = React.useCallback(() => {
             n(d => d + 1)
         }, []);
         if (React.useEffect(() => {
-                if (A) {
+                if (e) {
                     s();
                     const d = window.setInterval(s, 1e3);
                     return () => window.clearInterval(d)
                 }
-            }, [A, s]), !A) return React.createElement("img", {
+            }, [e, s]), !e) return React.createElement("img", {
             src: soil,
-            className: classNames("w-full", e)
+            className: classNames("w-full", A)
         });
-        const r = CROPS()[A.name],
-            i = LIFECYCLE[A.name],
-            m = getTimeLeft(A.plantedAt, r.harvestSeconds);
+        const r = CROPS()[e.name],
+            i = LIFECYCLE[e.name],
+            m = getTimeLeft(e.plantedAt, r.harvestSeconds);
         if (m > 0) {
             const d = 100 - m / r.harvestSeconds * 100,
                 E = d >= 50;
@@ -8698,7 +8565,7 @@ const LIFECYCLE = {
                 className: "relative w-full h-full"
             }, React.createElement("img", {
                 src: E ? i.almost : i.seedling,
-                className: classNames("w-full", e)
+                className: classNames("w-full", A)
             }), React.createElement("div", {
                 className: "absolute w-full -bottom-4 z-10"
             }, React.createElement(ProgressBar, {
@@ -8716,12 +8583,12 @@ const LIFECYCLE = {
             }, React.createElement("img", {
                 src: i.ready,
                 className: "w-4 mr-1"
-            }), React.createElement("span", null, A.name)), React.createElement("span", {
+            }), React.createElement("span", null, e.name)), React.createElement("span", {
                 className: "flex-1"
             }, secondsToMidString(m)))))
         }
         return React.createElement(Ready, {
-            className: e,
+            className: A,
             image: i.ready
         })
     };
@@ -8824,11 +8691,11 @@ var progressEmpty = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAHCAYAA
     progressAlmost = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAHCAYAAADXhRcnAAAAVElEQVQYlWP8//8/g7qO638G0gEjg5q2y39yAEgfC8w+xll3wDTvtEkEnfDpAkQNExnOhQO4zf/TVCCMNMI2wwBYc8+crWTZzKim7QK2mGSdDAyMANOHRo3ACyXwAAAAAElFTkSuQmCC",
     progressHalf = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAHCAYAAADXhRcnAAAAVUlEQVQYlWP8//8/g7qO638G0gEjg5q2y39yAEgfC8w+xll3sFrNO20ShtinCxAxJjKcCwdwm/+nqWBXkYZpMwyANffM2UqWzYxq2i5gi0nWycDACACwt0aNkffcOAAAAABJRU5ErkJggg==";
 const HealthBar = ({
-    percentage: A
-}) => A >= 50 ? React.createElement("img", {
+    percentage: e
+}) => e >= 50 ? React.createElement("img", {
     src: progressHalf,
     className: "w-10"
-}) : A >= 25 ? React.createElement("img", {
+}) : e >= 25 ? React.createElement("img", {
     src: progressAlmost,
     className: "w-10"
 }) : React.createElement("img", {
@@ -8838,27 +8705,27 @@ const HealthBar = ({
 var secure = "./assets/synced.b9cc64dc.gif",
     idle = "data:image/gif;base64,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";
 
-function randomIntFromInterval(A, e) {
-    return Math.floor(Math.random() * (e - A + 1) + A)
+function randomIntFromInterval(e, A) {
+    return Math.floor(Math.random() * (A - e + 1) + e)
 }
 const CropReward = ({
-        reward: A,
-        onCollected: e,
+        reward: e,
+        onCollected: A,
         fieldIndex: t
     }) => {
         const {
             gameService: a
         } = react.exports.useContext(Context), [n, s] = react.exports.useState(!1), r = react.exports.useRef(randomIntFromInterval(30, 100)), i = react.exports.useRef(RandomID());
         if (react.exports.useEffect(() => {
-                A && addNoise(i.current)
-            }, [A]), !A) return null;
+                e && addNoise(i.current)
+            }, [e]), !e) return null;
         const m = () => {
                 s(!0), a.send("reward.opened", {
                     fieldIndex: t
                 })
             },
             d = () => {
-                e(), s(!1)
+                A(), s(!1)
             };
         return React.createElement(Modal, {
             centered: !0,
@@ -8867,7 +8734,7 @@ const CropReward = ({
             className: "flex flex-col items-center justify-between h-52"
         }, React.createElement("span", {
             className: "text-center mb-2"
-        }, "Woohoo! You found a reward"), n ? React.createElement(React.Fragment, null, A.items.map(E => React.createElement("div", {
+        }, "Woohoo! You found a reward"), n ? React.createElement(React.Fragment, null, e.items.map(E => React.createElement("div", {
             key: E.name,
             className: "flex items-center"
         }, React.createElement("img", {
@@ -8897,15 +8764,15 @@ const CropReward = ({
         }, "Tap the chest to open it")))))
     },
     POPOVER_TIME_MS$4 = 1e3,
-    isCropReady = (A, e, t) => A - e > t * 1e3,
+    isCropReady = (e, A, t) => e - A > t * 1e3,
     Field = ({
-        selectedItem: A,
-        className: e,
+        selectedItem: e,
+        className: A,
         fieldIndex: t
     }) => {
         const [a, n] = react.exports.useState(!0), [s, r] = react.exports.useState(), {
             gameService: i
-        } = react.exports.useContext(Context), [m, d] = react.exports.useState(0), [E, u] = react.exports.useState(null), [h] = useActor(i), B = react.exports.useRef(0), g = h.context.state.fields[t], [C, Q] = react.exports.useState(!1), w = async F => {
+        } = react.exports.useContext(Context), [m, d] = react.exports.useState(0), [E, u] = react.exports.useState(null), [w] = useActor(i), B = react.exports.useRef(0), g = w.context.state.fields[t], [C, Q] = react.exports.useState(!1), h = async F => {
             r(F), n(!0), await new Promise(T => setTimeout(T, POPOVER_TIME_MS$4)), n(!1)
         }, f = () => {
             u(null), d(0), i.send("item.harvested", {
@@ -8936,15 +8803,15 @@ const CropReward = ({
                     try {
                         i.send("item.planted", {
                             index: t,
-                            item: A
-                        }), plantAudio.play(), w(React.createElement("div", {
+                            item: e
+                        }), plantAudio.play(), h(React.createElement("div", {
                             className: "flex items-center justify-center text-xs text-white text-shadow overflow-visible"
                         }, React.createElement("img", {
-                            src: ITEM_DETAILS[A].image,
+                            src: ITEM_DETAILS[e].image,
                             className: "w-4 mr-1"
                         }), React.createElement("span", null, "-1")))
                     } catch {
-                        w(React.createElement("img", {
+                        h(React.createElement("img", {
                             className: "w-5",
                             src: cancel
                         }))
@@ -8954,25 +8821,25 @@ const CropReward = ({
                 try {
                     i.send("item.harvested", {
                         index: t
-                    }), harvestAudio.play(), w(React.createElement("div", {
+                    }), harvestAudio.play(), h(React.createElement("div", {
                         className: "flex items-center justify-center text-xs text-white text-shadow overflow-visible"
                     }, React.createElement("img", {
                         src: ITEM_DETAILS[g.name].image,
                         className: "w-4 mr-1"
                     }), React.createElement("span", null, `+${g.multiplier||1}`)))
                 } catch {
-                    w(React.createElement("img", {
+                    h(React.createElement("img", {
                         className: "w-5",
                         src: cancel
                     }))
                 }
                 d(0)
             }
-        }, D = h.matches("playing") || h.matches("autosaving");
+        }, D = w.matches("playing") || w.matches("autosaving");
         return React.createElement("div", {
             onMouseEnter: S,
             onMouseLeave: y,
-            className: classNames("relative group", e),
+            className: classNames("relative group", A),
             style: {
                 width: `${GRID_WIDTH_PX}px`,
                 height: `${GRID_WIDTH_PX}px`
@@ -9008,7 +8875,7 @@ const CropReward = ({
     },
     CropZoneOne = () => {
         const {
-            selectedItem: A
+            selectedItem: e
         } = react.exports.useContext(Context);
         return React.createElement("div", {
             className: "absolute flex justify-center flex-col ",
@@ -9021,30 +8888,30 @@ const CropReward = ({
         }, React.createElement("div", {
             className: "flex justify-between"
         }, React.createElement(Field, {
-            selectedItem: A,
+            selectedItem: e,
             fieldIndex: 0
         }), React.createElement(Field, {
-            selectedItem: A,
+            selectedItem: e,
             fieldIndex: 1
         })), React.createElement("div", {
             className: "flex justify-center"
         }, React.createElement(Field, {
-            selectedItem: A,
+            selectedItem: e,
             fieldIndex: 2
         })), React.createElement("div", {
             className: "flex justify-between"
         }, React.createElement(Field, {
-            selectedItem: A,
+            selectedItem: e,
             fieldIndex: 3
         }), React.createElement(Field, {
-            selectedItem: A,
+            selectedItem: e,
             fieldIndex: 4
         })))
     };
 var goblinHead = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAYAAABvEu28AAAAAXNSR0IArs4c6QAAAPJJREFUOE9jZMABBHjk/+OS+/DlISO6HIYASAHIEJ06dbBadTs2uJ6bh36B2VeabjKgGwY2CN12mCHoBoH4yIbBbAAZyggyJHiPLlwBNu8guwpmGMhVggGKDE45PAxrXS4zgA0CuWDXG1OwGW4ip3EFDYo4yCCYy0FssEEgk6X12MCGkWIQTB/YIFgYgQRhAGQoMkC2/WrTTQbtOnVwgIP0vN9wHxzw8FhDDnDkwAYZCNMMZjffYtCuVQMbBAKw2MOIfuSoxxdY6EmAKIMOl+5kELayBZv79thhBttud4y0hNUgkAZYQGJzFc4EiU0xqVkEAMqLdbuJ513PAAAAAElFTkSuQmCC",
     heart = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAIBAMAAADZ48iGAAAABGdBTUEAALGPC/xhBQAAAA9QTFRFAAAA////9nV6JitE5DtEW1VdTgAAAAF0Uk5TAEDm2GYAAAAuSURBVAjXY2AwZjZgYGBWMVJmYDAScXIxYDBxcYGTzC4uzgwMQA5QDQOzMQMDAJEWBev0tPusAAAAAElFTkSuQmCC";
 const CropZoneTwo = () => {
-    const [A, e] = react.exports.useState(!1), {
+    const [e, A] = react.exports.useState(!1), {
         gameService: t,
         selectedItem: a
     } = react.exports.useContext(Context), [{
@@ -9052,7 +8919,7 @@ const CropZoneTwo = () => {
             state: n
         }
     }] = useActor(t), [s] = useScrollIntoView(), r = () => {
-        e(!1), s(Section.Town)
+        A(!1), s(Section.Town)
     }, i = n.inventory["Pumpkin Soup"];
     return React.createElement(React.Fragment, null, i ? React.createElement(React.Fragment, null, React.createElement("img", {
         src: heart,
@@ -9089,7 +8956,7 @@ const CropZoneTwo = () => {
     }), React.createElement("img", {
         src: goblin$1,
         className: "absolute z-10 hover:img-highlight cursor-pointer",
-        onClick: () => e(!0),
+        onClick: () => A(!0),
         style: {
             width: `${GRID_WIDTH_PX*5}px`,
             left: `${GRID_WIDTH_PX*1}px`,
@@ -9097,7 +8964,7 @@ const CropZoneTwo = () => {
         }
     })), React.createElement("div", {
         className: "absolute flex justify-center flex-col",
-        onClick: i ? void 0 : () => e(!0),
+        onClick: i ? void 0 : () => A(!0),
         style: {
             width: `${GRID_WIDTH_PX*3}px`,
             height: `${GRID_WIDTH_PX*3}px`,
@@ -9127,12 +8994,12 @@ const CropZoneTwo = () => {
         fieldIndex: 9
     }))), React.createElement(Modal, {
         centered: !0,
-        show: A,
-        onHide: () => e(!1)
+        show: e,
+        onHide: () => A(!1)
     }, React.createElement(Panel, null, React.createElement("img", {
         src: close,
         className: "h-6 top-4 right-4 absolute cursor-pointer",
-        onClick: () => e(!1)
+        onClick: () => A(!1)
     }), React.createElement("div", {
         className: "flex items-start"
     }, React.createElement("img", {
@@ -9155,7 +9022,7 @@ const CropZoneTwo = () => {
 var goblinWatering = "data:image/gif;base64,R0lGODdhYABAAHcAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQJBwAAACwAAAAAYABAAIQAAAAXFCQ+iUhjx00mXEL2dXoYFCQYFSUZPD7+rjQAlem+Si/YdkQSTol0Pzks6PV1PToAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAF8CAgjmRpnmiqrmzrvnAsz3Rt33iu73zv/8CgcEgsGo/IpHLJbDqf0Kh0Sq1ar9isdsvter/gsFgZKJsD41pAIBi42eh0bM12vwVx+erMrtvxZXopAQN9hocBBAN5giRrBQWHiHCNJokCkZJ9l4yVIokEBIZ0BngEnZ6fZYalAgeAqYNwdJsAgbGWdAhnZQkBCsC4JKUECAnHAQsBvsDNwrYGy8e+ygwBDdjOuAEOAQzH1mXW2NnBsdzeDOprp2gP7+/mnhC8aNEi8Pnvzyv6D/z94AEcSLCgwYMIEypcyLChw4cQI0qcSLGixYsYM84IAQAh+QQJBwAAACwnABcAHgATAIQAAAAXFCQ+iUhjx00mXEL2dXoYFCQYFSUZPD7+rjQAlem+Si/YdkQSTol0Pzks6PV1PToAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFmiAgjkFpBmOqrmkgCEP8omzdvnA8zDZ74jmZqUfaAY8zwoDWcxUKSKBLwLQFCAJoNEkliq4ELG5qoBKqRBOwLDhQ0V7AtHREleKtKeJUSgQUgAp4ZQQICYcBCwF+gYFeAQaLh36KDAENjYBpDgEMh5Yllg2jCg8Pgk2cDKuWAmc0DaayDzYQfCiRpiOxp7J4Kboio5ilv8bHvyEAIfkECQcAAAAsJwAXACAAEwCEAAAAFxQkPolIY8dNJlxC9nV6GBQkGBUlGTw+/q40AJXpvkovLOj12HZEEk6JdD85dT06AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABZ0gII5BaQZjqq5rIAhD/KJs3b5wPMy2feI5mamnCuyAyBlhQCMCXIVCEugSNIkBgkA6VVqdJIKY+jJYCVewCWgWHKxpsKhaQqJK8mIVcSolAgqBeSJmBAgJiAELAX+BgQwMcgEGjIh/iw0BDpsKkJIPAQ2ImSWZm5yCkJE1AaANr5kCaCinDo4AqjUQfSiUKae3gz2oCsIpnsZEq3IhACH5BAkHAAAALCcAFwAhABMAhAAAABcUJD6JSGPHTSZcQvZ1ehgUJBgVJRk8Pv6uNACV6b5KLxJOiSzo9dh2RHQ/OXU9OgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWdICCOQWkGY6qubCAIQ/yibN2+cDzMdn/iOZmptwrsgMgZYUAjilyFQhLoEjSdAYJAOlVanaksQYurGqyEKxhgAp4FB6t6/ZxVy+z5uvRCnEoJAQqDCnQiZwQICYsBCwGBDIQNDXQBBo+LgY4OAQyehJUPAQ6LnCWcAJ6RhXuiDq+cAmk0n4MqkywQfyiXKrW3lIbAkcJOk8HFRLg1IQAh+QQJBwAAACwnABcAIQASAIQAAAAXFCQ+iUhjx00mXEL2dXoYFCQYFSUZPD7+rjQAlem+Si8STonYdkR0Pzl1PTos6PUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFmyAgjkFpBmOqrmwgCEP8omzdvnA8zHZ/4jmZqbcK7IDIGWFAI4pchUIS6BI0nQGCQDpVWp2pLEGLqxqshCsYYAKeBQerev2cVcvs+br0QpxKCQEKg3QjZwQICYoBCwGBDIMKhWwGjoqBjQ0BDJCEdAEOAQ2KmiWanJ2Se6ENrZoCaSionmAPfyiVKQwQELSTNby9qim8vyMQPRAhADs=",
     cabbageSoup = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAKCAMAAACg0N8BAAAABGdBTUEAALGPC/xhBQAAAFFQTFRFAAAA////V1ZW+P7//fz8//3+/v/+4OTtpKetAQMH4uXwUSxUAgID4uXv6LeW3uPspqmvV1dY/v78/v//QCcf4OTuaDhsuG9Q9nV6cz45tVCIi0pAGAAAAAF0Uk5TAEDm2GYAAAA+SURBVAjXDchHDsAwDMRApvdqW5H3/w+N5kKAkGvNwBciNUDTpTG9tC75Qy93XQzS6YXJ4hbmzcxu2I914QeFYQPOPloLeQAAAABJRU5ErkJggg==";
 const CropZoneThree = () => {
-    const [A, e] = react.exports.useState(!1), {
+    const [e, A] = react.exports.useState(!1), {
         gameService: t,
         selectedItem: a
     } = react.exports.useContext(Context), [{
@@ -9182,7 +9049,7 @@ const CropZoneThree = () => {
     })) : React.createElement(React.Fragment, null, React.createElement("img", {
         src: goblinWatering,
         className: "absolute z-20 hover:img-highlight cursor-pointer",
-        onClick: () => e(!0),
+        onClick: () => A(!0),
         style: {
             width: `${GRID_WIDTH_PX*5}px`,
             left: `${GRID_WIDTH_PX*.2}px`,
@@ -9190,7 +9057,7 @@ const CropZoneThree = () => {
         }
     })), React.createElement("div", {
         className: "absolute flex justify-between flex-col",
-        onClick: s ? void 0 : () => e(!0),
+        onClick: s ? void 0 : () => A(!0),
         style: {
             width: `${GRID_WIDTH_PX*4}px`,
             height: `${GRID_WIDTH_PX*2.3}px`,
@@ -9221,8 +9088,8 @@ const CropZoneThree = () => {
         fieldIndex: 15
     }))), React.createElement(Modal, {
         centered: !0,
-        show: A,
-        onHide: () => e(!1)
+        show: e,
+        onHide: () => A(!1)
     }, React.createElement(Panel, null, React.createElement("div", {
         className: "flex items-start"
     }, React.createElement("img", {
@@ -9240,7 +9107,7 @@ const CropZoneThree = () => {
 var jumpingGoblin = "data:image/gif;base64,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",
     goblinDig = "data:image/gif;base64,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";
 const CropZoneFour = () => {
-    const [A, e] = react.exports.useState(!1), {
+    const [e, A] = react.exports.useState(!1), {
         gameService: t,
         selectedItem: a
     } = react.exports.useContext(Context), [{
@@ -9267,7 +9134,7 @@ const CropZoneFour = () => {
     })) : React.createElement(React.Fragment, null, React.createElement("img", {
         src: goblinDig,
         className: "absolute z-20 hover:img-highlight cursor-pointer -scale-x-100",
-        onClick: () => e(!0),
+        onClick: () => A(!0),
         style: {
             width: `${GRID_WIDTH_PX*5}px`,
             left: `${GRID_WIDTH_PX*4.8}px`,
@@ -9275,7 +9142,7 @@ const CropZoneFour = () => {
         }
     })), React.createElement("div", {
         className: "absolute flex justify-between flex-col",
-        onClick: s ? void 0 : () => e(!0),
+        onClick: s ? void 0 : () => A(!0),
         style: {
             width: `${GRID_WIDTH_PX*4}px`,
             height: `${GRID_WIDTH_PX*2.3}px`,
@@ -9306,12 +9173,12 @@ const CropZoneFour = () => {
         fieldIndex: 21
     }))), React.createElement(Modal, {
         centered: !0,
-        show: A,
-        onHide: () => e(!1)
+        show: e,
+        onHide: () => A(!1)
     }, React.createElement(Panel, null, React.createElement("img", {
         src: close,
         className: "h-6 top-4 right-4 absolute cursor-pointer",
-        onClick: () => e(!1)
+        onClick: () => A(!1)
     }), React.createElement("div", {
         className: "flex items-start"
     }, React.createElement("img", {
@@ -9328,7 +9195,7 @@ const CropZoneFour = () => {
 };
 var goblin = "data:image/gif;base64,R0lGODdhEgAQAMQAAAAAABcUJD6JSGPHTSZcQvZ1ehgUJBgVJf///xk8Pj8oMnQ/OQAAAHU9Ovd2Iv/eH//5TgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQJBwAAACwAAAAAEgAQAAAFaSAgjkFpBmNKCsLgsqgqBmzrDnB61vZrAgEcbwgjDEqCQoHIowlKhOTQaXhGUQGCllcVHKwxIJL5DK9qiETC8TDrolMHRGYiKLSKkgzISggWLAs0bgBVBAkLiYlZhIUliwp5jSMEJ1kqIQAh+QQJBwAAACwAAAAAEgAQAAAFaSAgjkFpBmNKCsLgsmh6sq07wCUQ3EJA168AYVASFAq/ZA9HMCp/wp6O0HzCCDFdlOYTGHrZFe0rOEhVOusZvUUkEo4HWkZQUBUoB4QtrN9zbCwJAgssCz5hIl8ECQuOjkKJigENJ5RhIQAh+QQJBwAAACwAAAAAEgAQAAAFaSAgjkFpBmNKCsLgsqgqBmzrDnB61vZrAgEcbwgjDEqCQoHIowlKhCSzFoiiqoQolWV4EmJAZK0rODzBqylap0UkEo6HjK3IKlAOiAxKqPdLc04JAgssCzRrAF0ECQuOjlWJigENJ5RoIQAh+QQJBwAAACwAAAEAEgAPAAAFaCAgjkFpBmNKCsLgsqgqBmzrDnB61vZrAgEcbwgjDEqCQoHIowlKhCSzFoiiqoQolWV4EmJAZK0rODzBqylap0UkEo6HLJwlKLKKkgOiYyWiCywLTmhdBAkBC4qKNF8qBigNJwENkCMhACH5BAkHAAAALAAAAQASAA8AAAVoICCOQWkGY0oKwuCyqCoGbOsOsFzW9luSNJ5QECCgArjCkEcb7ArKJYxALAoI1FrQQKQeTTyu4FCNraRmlVWASCQcDxmghCUosIqSA5IKJqgLLAtBaVwECQELioo0RioGKA0nAQ2QIyEAIfkECQcAAAAsAAABABIADwAABWQgII5BaQZjSgrC4LKoKgZs6w5wetb2awIBHG8IIwxKgkKByKMJSoQksxaIoqqEKJVleBJiQGStKzg8waspWqdFJBKOh2yGVWQVJQdE5UwIFiwLNGsAXQQJC4mJVYSFAQ0nj2ghACH5BAkHAAAALAAAAQASAA8AAAVkICCOQWkGY0oKwuCyqCoGbOsOcHrW9msCARxvCCMMSoJCgcijCUqEJLMWiKKqhCiVZXgSYkBkrSs4PMGrKVqnRSQSjodsVhUsWIuSA6JyJhaAgDRrAF0Ef3kKClWEhQENJ49oIQAh+QQJBwAAACwAAAAAEgAQAAAFZSAgjmRpjkGqBicqCEP8smfwwvEwk+uNyypAQOcrzgiDlKBQMPpsghRh6bwFpqwrYWp9GaIEmlB5+woOUbGrquZxEYmE49GSChavRcoBKUETC4GBNm0AXwSAegoKV4WGAQ0rkGohACH5BAkHAAAALAAAAAASABAAAAVqICCOQWkGY0oKwuCyqCoGbOsOsFzW9luSNJ5QECCgArjCkEcb7ArKJYxALAoI1FrQQKQeTTyu4FCNraRmlVWASCQcD9msRFBgFSUHRM1KCBYsCzRpIlwECQuJiUWEhSWLCniNKQ0nAQ0qIQA7";
 const WheatGoblin = () => {
-        const [A, e] = react.exports.useState(!1), {
+        const [e, A] = react.exports.useState(!1), {
             gameService: t
         } = react.exports.useContext(Context), [{
             context: {
@@ -9366,19 +9233,19 @@ const WheatGoblin = () => {
         }), React.createElement("img", {
             src: goblin,
             className: "z-10 w-full hover:img-highlight cursor-pointer",
-            onClick: () => e(!0),
+            onClick: () => A(!0),
             style: {
                 width: `${GRID_WIDTH_PX*1}px`,
                 transform: "scaleX(-1)"
             }
         }))), React.createElement(Modal, {
             centered: !0,
-            show: A,
-            onHide: () => e(!1)
+            show: e,
+            onHide: () => A(!1)
         }, React.createElement(Panel, null, React.createElement("img", {
             src: close,
             className: "h-6 top-4 right-4 absolute cursor-pointer",
-            onClick: () => e(!1)
+            onClick: () => A(!1)
         }), React.createElement("div", {
             className: "flex items-start"
         }, React.createElement("img", {
@@ -9411,19 +9278,19 @@ var chick = "data:image/gif;base64,R0lGODlhCgAMAKIAAP2xADQ0NMiVM7y8vP/wPopXBf///
     dragonfly = "data:image/gif;base64,R0lGODdhUABQAHcAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQJCgAAACwAAAAAUABQAIIAAAAAAABdpStjsS5qvjDL2/wAAAAAAAADsgi63P4wykmrvTjrzbv/YCiOZGmeaKqubOu+cCzPdG3feK7vfO//wKBwSCwaj8ikMlZoOpuo51NAFZCkzii2ULWOtgUttnvdiqXkFfgJWTvTMjf0IedWafW2HM6U6918OAGDAQSGBISFh4tEiYuOi4eNhI+UkYaTg5WalwRIA6ChoIFHoqKkRqahqEWqo3dLsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DRuQkAIfkECQoAAAAsAAAAAFAAUACCAAAAAAAAXaUrY7Euar4wy9v8AAAAAAAAA7MIutz+MMpJq7046827/2AojmRpnmiqrmzrvnAsz3Rt33iu73zv/8CgcEgsGo/IpHKpITgJgqiAyXhCpdSFVTrNArbYIzjq/T655XE3q6YV3vB3YB6w0gPxPBynl9PtdH15fH13gHOCcYR6hk93iXsvghQDlZaVaA+TJ5sSl5eZDp0loxCflqENpSOrDqeYYaJ9ZbS1tre4ubq7vL2+v8DBwsPExcbHyMnKy8zNzs/Q0dLPCQA7",
     sharkRight = "./assets/shark-right.b5992259.gif",
     sharkLeft = "./assets/shark-left.fe30309c.gif";
-const randomBetweenMaxInclusive = (A, e) => Math.floor(Math.random() * (e - A + 1) + A),
+const randomBetweenMaxInclusive = (e, A) => Math.floor(Math.random() * (A - e + 1) + e),
     blankPng = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
     imageSources = [sharkLeft, blankPng, sharkRight, blankPng],
     getSharkPosition = () => {
-        const A = randomBetweenMaxInclusive(0, 73);
+        const e = randomBetweenMaxInclusive(0, 73);
         return {
             top: randomBetweenMaxInclusive(0, 90),
-            left: A
+            left: e
         }
     },
     Shark = () => {
-        const A = react.exports.useRef(null),
-            [e, t] = react.exports.useState(getSharkPosition()),
+        const e = react.exports.useRef(null),
+            [A, t] = react.exports.useState(getSharkPosition()),
             [a, n] = react.exports.useState(1),
             s = () => {
                 t(getSharkPosition())
@@ -9435,10 +9302,10 @@ const randomBetweenMaxInclusive = (A, e) => Math.floor(Math.random() * (e - A + 
             };
         return react.exports.useEffect(() => {
             r()
-        }, [e]), react.exports.useEffect(() => (A.current = setInterval(s, randomBetweenMaxInclusive(6e4, 9e4)), () => clearInterval(A.current)), []), React.createElement("div", {
-            className: "absolute top-1/2 -translate-y-40 w-full",
+        }, [A]), react.exports.useEffect(() => (e.current = setInterval(s, randomBetweenMaxInclusive(6e4, 9e4)), () => clearInterval(e.current)), []), React.createElement("div", {
+            className: "absolute top-1/2 -translate-y-20 w-full",
             style: {
-                height: "360px",
+                height: "280px",
                 left: "-200px",
                 width: "calc(100% + 180px)"
             }
@@ -9447,8 +9314,8 @@ const randomBetweenMaxInclusive = (A, e) => Math.floor(Math.random() * (e - A + 
             src: imageSources[a],
             alt: "shark",
             style: {
-                top: `${e.top}%`,
-                left: `${e.left}%`
+                top: `${A.top}%`,
+                left: `${A.left}%`
             }
         }))
     };
@@ -9458,8 +9325,8 @@ var goblinSwimming = "./assets/goblin_swimming.70b3a6c1.gif",
     waterBoat = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAD4AAAAcCAYAAAA5pQx5AAADN0lEQVRYhdWY30uTURjHv6/MgS0pbwJFJlvMxB9b4I0DGZpB0C7WXTfrLjCGXgwvhP6AwCB2oYwGQkS7kd20C4MiM4Y1I0KTFquhQxMvhaASzXi72M6797znvHt/beo+N9v7nOec83zPr/c8rwCdTAX8YvD8H73uhln8dQ4A8CiTFZT9mm1T2ZYc1QJlx9PxqK7O8ull3YEBQE9oVPo/E4kx5Xr7VULaUhNfVfhUwC+Sjo82Vk0FYBS7d4h6Ntuv3TuEmUhMVbiNZ5TPMq/jt5++mQpGDxfW16nnn/9aDLcxMnhFc8AY4dVmmQhe+7hvOBjzHBiuMTKo7UMJnwr4xdCNq6qzTAR7vF1MeWFjG9PxKF49eQqgNDhW/JR1HJ3NlO337l+uTS+ScCLa7aKXlnyW5QH2trcxwQHA7UAPFjJ5ro8RP2WdifsTaNv8AABYyOSxtrvPtSlxTubEndk+Zp/biGjefubNslaQjYLtzU2f2P+wInqreAC3q0USXW/B9bwbEHizTu1xIhqAquj0S/rUrQbPlyfUSJtmUYrnvs6AUoA2jmDXwEWuf29xj7E5Optxqc1BG4uscK6fRttWURVO0BLcSMhnnRLudrVQy/343Xu4BjpOIURtrJ4NTeTPVrF0USCiu8Njlho+iUPLCk3XXnwWZiIx9IRGJfGE7vAYeot7ddljp40NKGcwEYjT8aiUXTEzn1zCV5f2sieXkmqQW5sR5h7MUc8dHJsW8lOdyX3JPT2fXmZucd+TS4Y6qickf+cRvecHAMQeZ5HyzUt21ddZyjcPRO4CqOTB8tuc1X2vB2VaqoxBisViP8zrLOWbx63tO1IiL18BZpF/bCCopY1HG6uwe4ek35qTKIgY9wiU8J3ZPsE5mROfdz1D+EcQAJgBqBXVRJFBIeLND0BWtYT7dcI5mRMBILwSlGyHre2M3/D1yyYDOhlWXm+yezxREAGe8HKB88sRAFq8Et5gnCXkogFgp99e+jPuEfjf3AyIP6sctrZXFd7EqQOMewS5Y3J4sY4hngKJgqj5eRmo7PlGR3upc2hk8ZJgQFrNmmkpt3IjUhZM0D3jNaV8eDIogqsn/wGvgXPLQWoqFAAAAABJRU5ErkJggg==",
     frog = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAPCAMAAAAI/bVFAAAABGdBTUEAALGPC/xhBQAAAGxQTFRFAAAAVnk6OFYxruJnotReqd1jhKpMsuVtwfCAZoQ5t+h0qeNUd7QyicZTotowquAum9dOpNZfs6JX5GOKlsJYt+l0reJmaopAs+ZuS3UxFBIdxvl07//4gMI2zfWVe55HeLo4j9AyS2kvJ0Etti8CcgAAAAF0Uk5TAEDm2GYAAAB8SURBVAjXPc3XDsQgDERRb6/pCSUQMMz//+PStFeahyNZMlEKbSUwyiqMZbA1lbA7f3i3f4UQmmCWOXzDvNRTcMgxZIK84sjhtkp6TdBDb/pBY4oUHUZ9nA494k4U/QZ05w5Qzme6ZAjxfiZlistjU8rH8j/ZubUhsUT0A+nGDzWH2AQIAAAAAElFTkSuQmCC";
 const Frog = () => {
-        const [A, e] = react.exports.useState(!1), t = () => {
-            e(!0), frogAudio.play()
+        const [e, A] = react.exports.useState(!1), t = () => {
+            A(!0), frogAudio.play()
         };
         return React.createElement(React.Fragment, null, React.createElement("img", {
             src: frog,
@@ -9472,12 +9339,12 @@ const Frog = () => {
             }
         }), React.createElement(Modal, {
             centered: !0,
-            show: A,
-            onHide: () => e(!1)
+            show: e,
+            onHide: () => A(!1)
         }, React.createElement(Panel, null, React.createElement("img", {
             src: close,
             className: "h-6 top-4 right-4 absolute cursor-pointer",
-            onClick: () => e(!1)
+            onClick: () => A(!1)
         }), React.createElement("div", {
             className: "flex items-start"
         }, React.createElement("img", {
@@ -9553,15 +9420,15 @@ var humanDeath$1 = "./assets/suspicious_goblin.ea6c0c3a.gif";
 const NoFarm = () => {
     var s, r;
     const {
-        authService: A
-    } = react.exports.useContext(Context$1), [e] = useActor(A), t = () => {
-        A.send("EXPLORE")
+        authService: e
+    } = react.exports.useContext(Context$1), [A] = useActor(e), t = () => {
+        e.send("EXPLORE")
     }, a = () => {
-        A.send("CREATE_FARM")
+        e.send("CREATE_FARM")
     }, n = () => {
-        A.send("CONNECT_TO_DISCORD")
+        e.send("CONNECT_TO_DISCORD")
     };
-    return React.createElement(React.Fragment, null, !!((s = e.context.token) == null ? void 0 : s.userAccess.createFarm) || !!((r = e.context.token) == null ? void 0 : r.discordId) ? React.createElement(Button, {
+    return React.createElement(React.Fragment, null, !!((s = A.context.token) == null ? void 0 : s.userAccess.createFarm) || !!((r = A.context.token) == null ? void 0 : r.discordId) ? React.createElement(Button, {
         onClick: a,
         className: "overflow-hidden mb-2"
     }, "Create Farm") : React.createElement("div", {
@@ -9615,9 +9482,9 @@ var upArrow = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAANBAMAAABiGeI
     humanDeath = "./assets/human_death.4768086b.gif";
 const Blocked = () => {
         const {
-            authService: A
-        } = react.exports.useContext(Context$1), e = () => {
-            removeSession(metamask.myAccount), A.send("REFRESH")
+            authService: e
+        } = react.exports.useContext(Context$1), A = () => {
+            removeSession(metamask.myAccount), e.send("REFRESH")
         };
         return React.createElement("div", {
             className: "flex flex-col text-center text-shadow items-center p-1"
@@ -9639,14 +9506,14 @@ const Blocked = () => {
             target: "_blank",
             rel: "noreferrer"
         }, "Sunflower Land Discord server,"), ' go to the #verify channel and have the "farmer" role.'), React.createElement(Button, {
-            onClick: e,
+            onClick: A,
             className: "overflow-hidden mb-2"
         }, React.createElement("span", null, "Try again")))
     },
-    roundToOneDecimal = A => Math.round(A * 10) / 10;
+    roundToOneDecimal = e => Math.round(e * 10) / 10;
 var CharityAddress;
-(function(A) {
-    A.TheWaterProject = "0xBCf9bf2F0544252761BCA9c76Fe2aA18733C48db", A.PCF = "0x8c6A1870D922279dB6F91CB6798592c7A7133BBD"
+(function(e) {
+    e.TheWaterProject = "0xBCf9bf2F0544252761BCA9c76Fe2aA18733C48db", e.PCF = "0x8c6A1870D922279dB6F91CB6798592c7A7133BBD"
 })(CharityAddress || (CharityAddress = {}));
 const CHARITIES = lodash_shuffle([{
         name: "The Water Project",
@@ -9660,8 +9527,8 @@ const CHARITIES = lodash_shuffle([{
         address: CharityAddress.PCF
     }]),
     CharityDetail = ({
-        url: A,
-        name: e,
+        url: e,
+        name: A,
         info: t,
         address: a,
         onDonateAndPlayClick: n
@@ -9675,14 +9542,14 @@ const CHARITIES = lodash_shuffle([{
             className: "flex flex-col items-center mb-3 whitespace-normal"
         }, React.createElement("h5", {
             className: "text-sm text-shadow underline mb-3 text-center"
-        }, e), React.createElement("p", {
+        }, A), React.createElement("p", {
             className: "text-xs text-center text-shadow mb-2 px-5 two-line-ellipsis"
         }, t)), React.createElement("div", {
             className: "flex w-full z-10"
         }, React.createElement(Button, {
             className: "w-full mr-1",
             onClick: r => {
-                s(A), r.preventDefault()
+                s(e), r.preventDefault()
             }
         }, React.createElement("span", {
             className: "text-xs mr-1"
@@ -9699,28 +9566,28 @@ const CHARITIES = lodash_shuffle([{
     },
     CreateFarm = () => {
         var Q;
-        const [A, e] = react.exports.useState(1), [t, a] = react.exports.useState(), [n, s] = react.exports.useState(0), {
+        const [e, A] = react.exports.useState(1), [t, a] = react.exports.useState(), [n, s] = react.exports.useState(0), {
             authService: r
-        } = react.exports.useContext(Context$1), [i] = useActor(r), [m, d] = react.exports.useState(!1), E = async w => {
+        } = react.exports.useContext(Context$1), [i] = useActor(r), [m, d] = react.exports.useState(!1), E = async h => {
             await new Promise(f => setTimeout(f, 1e3)), r.send("CREATE_FARM", {
                 charityAddress: t,
-                donation: A,
-                captcha: w
+                donation: e,
+                captcha: h
             })
-        }, u = w => {
-            e(roundToOneDecimal(Number(w.target.value)))
-        }, h = () => {
-            e(w => roundToOneDecimal(w + .1))
+        }, u = h => {
+            A(roundToOneDecimal(Number(h.target.value)))
+        }, w = () => {
+            A(h => roundToOneDecimal(h + .1))
         }, B = () => {
-            e(A === 1 ? 1 : w => roundToOneDecimal(w - .1))
-        }, g = w => {
-            a(w), d(!0)
-        }, C = w => {
-            if (w < 0 && s(0), w > CHARITIES.length - 1) {
+            A(e === 1 ? 1 : h => roundToOneDecimal(h - .1))
+        }, g = h => {
+            a(h), d(!0)
+        }, C = h => {
+            if (h < 0 && s(0), h > CHARITIES.length - 1) {
                 s(CHARITIES.length - 1);
                 return
             }
-            s(w)
+            s(h)
         };
         return ((Q = i.context.token) == null ? void 0 : Q.userAccess.createFarm) ? m ? React.createElement(RecaptchaWrapper, {
             sitekey: "6Lfqm6MeAAAAAFS5a0vwAfTGUwnlNoHziyIlOl1s",
@@ -9746,17 +9613,17 @@ const CHARITIES = lodash_shuffle([{
             className: "text-shadow shadow-inner shadow-black bg-brown-200 w-24 p-1 text-center",
             step: "0.1",
             min: 1,
-            value: A,
+            value: e,
             required: !0,
             onChange: u,
             onBlur: () => {
-                A < 1 && e(1)
+                e < 1 && A(1)
             }
         }), React.createElement("img", {
             src: upArrow,
             alt: "increment donation value",
             className: "cursor-pointer absolute -right-4 top-0",
-            onClick: h
+            onClick: w
         }), React.createElement("img", {
             src: downArrow,
             alt: "decrement donation value",
@@ -9764,7 +9631,7 @@ const CHARITIES = lodash_shuffle([{
             onClick: B
         })), React.createElement("span", {
             className: "text-[10px] text-shadow mt-2"
-        }, "Minumum of 1 MATIC")), React.createElement("p", {
+        }, "Minimum of 1 MATIC")), React.createElement("p", {
             className: "text-center mb-3 mt-10"
         }, "Select a charity"), React.createElement(Carousel, {
             activeIndex: n,
@@ -9781,17 +9648,17 @@ const CHARITIES = lodash_shuffle([{
                 className: "h-5 cursor-pointer absolute right-2 sm:right-4",
                 onClick: () => C(n + 1)
             })
-        }, CHARITIES.map(w => React.createElement(CarouselItem, {
-            key: w.url
-        }, React.createElement(CharityDetail, l(c({}, w), {
+        }, CHARITIES.map(h => React.createElement(CarouselItem, {
+            key: h.url
+        }, React.createElement(CharityDetail, l(c({}, h), {
             onDonateAndPlayClick: g
         })))))) : React.createElement(Blocked, null)
     },
     Loading = ({
-        text: A
+        text: e
     }) => React.createElement("span", {
         className: "text-shadow loading"
-    }, A || "Loading");
+    }, e || "Loading");
 var logo = "data:image/png;base64,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",
     clouds = "./assets/clouds.684ed59f.png",
     sunflowers = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAdoAAACQBAMAAABdfrciAAAABGdBTUEAALGPC/xhBQAAACFQTFRFAAAAY8dN/+s2JlxCPolI93Yi+6og/94fcz45//lOvkovWiADuAAAAAF0Uk5TAEDm2GYAAAOaSURBVHja7Zi/b9NAFMcjlSlbJKaMHlDZQI4YmEC5KSuKEBlBckvXCiJlpAhVGUEgNVOHIIT/St7ZTu7e3Tvb9d0QpO9niNqL38v7vNwPO6MRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwEkyLon7JKl0phK2/7mtHHTqtlT13ztiJwqHqxdsaUBnujthYdh22spBp29b/lkv3+kSfy7Xm3LU87uSbMfl+tOyun75dm2G061keTY9KDlsO23FoJS2YlC0LVVIfC6yrLjQf9nJAtWHbGmMKN5nTwr9Rz3cupJbDj7fQphND04O205bOSidrRiUxpZMistb4ltBctX7dWPF6ttsfy9pTGe6peHlqmydHW0Hn2Thz6YByWHbw1YISmYrByWxpbFfdYW6yI/V+4fG+tW32I51VD1WDVcZgv1qO/gkC2E2DUkO2y7bUghKZysGpbP9nh0Kz55S3U1jd0L192HbukfZeTP4JQv1qz4YWg6+gK03m4Ykh20fWxaU1lZaQOls7a/JNPZKqD5kq1u0ErojrOTjwSCdYUFbaTYNSQ7bPrbssxPajsUFlMrWWRCmsdv+u1TTIu9LGbv9Oh4M4hkWtK013J1iQHLYhmzNI6cblNrW3doT2lq79YYZetUHbesLvYNyzPu1Mx8lVR+y1Rbd67ZXctiKtuyR0zm+k9vyBZTQ9vXEuoPesMay6sO2TYu+qsnUfXjhs2NlZkT/XaqxuOq6l+qVHLaC7YZ5KD8o1nZnfjJzg+JtTfKZUgtzD2I1llW/6rLNzm9ypZQ1A+g//jjDiti61Ydtqwu3Hc+3PZPD1rN1dtvcD4qy3bCfzPiHbWJtWXIqXKn8pbbfq8nENNauvtu2uKyuV/O8aiR9+wRfyexg2PJ9LmjbWPDZVD3hPxqSHLa+Lb+rylnQNNaWeez9oChbFjY6ywl6peqfTyaPTWM/2NW32R5bpDO9uKA357lWpSv4SraWFqu+y5YsnNm0V+rV2YDksPVt3VvXH05QjO2O77bXflCErZO8uaOqCs/pxW6srv7ZKJ8tOm3tfaWybb59vpKn5mCwqu+2JQt3NtGHzgckh61oK/wedwyKtGU3Pm94ULQtS27bkplwP9TDlu0rlW2zHRz6Va/khWm0XX2r7cHiRqcqrg+zSV8xIDlsRVvh18cmaBZn6z2MukExtk7yf4awnWALcUa7AAAAAElFTkSuQmCC";
@@ -9847,44 +9714,44 @@ var minting = "./assets/minting.8df1c1f8.gif",
     syncingAnimation = "./assets/syncing.2364d1a3.gif";
 const IMAGE_LIST = [goblinDonation, humanDeath, humanDeath, minting, richBegger, syncingAnimation, background];
 
-function preloadImage(A) {
-    return new Promise((e, t) => {
+function preloadImage(e) {
+    return new Promise((A, t) => {
         const a = new Image;
         a.onload = function() {
-            e(a)
+            A(a)
         }, a.onerror = a.onabort = function() {
-            t(A)
-        }, a.src = A
+            t(e)
+        }, a.src = e
     })
 }
 
 function useImagePreloader() {
-    const [A, e] = react.exports.useState(!1);
+    const [e, A] = react.exports.useState(!1);
     return react.exports.useEffect(() => {
         let t = !1;
         async function a() {
             if (t) return;
             const n = [];
             for (const s of IMAGE_LIST) n.push(preloadImage(s));
-            await Promise.all(n), !t && e(!0)
+            await Promise.all(n), !t && A(!0)
         }
         return a(), () => {
             t = !0
         }
     }, []), {
-        imagesPreloaded: A
+        imagesPreloaded: e
     }
 }
 const StartFarm = () => {
         const {
-            authService: A
-        } = react.exports.useContext(Context$1), [e, t] = useActor(A), {
+            authService: e
+        } = react.exports.useContext(Context$1), [A, t] = useActor(e), {
             imagesPreloaded: a
         } = useImagePreloader(), n = () => {
             t("START_GAME")
         }, s = async () => {
             t("EXPLORE")
-        }, r = e.context.farmId;
+        }, r = A.context.farmId;
         return React.createElement(React.Fragment, null, a ? React.createElement(React.Fragment, null, React.createElement("p", {
             className: "text-shadow text-small mb-2 px-1"
         }, "Farm ID: ", r), React.createElement(Button, {
@@ -9897,16 +9764,16 @@ const StartFarm = () => {
     },
     VisitFarm = () => {
         const {
-            authService: A
-        } = react.exports.useContext(Context$1), e = t => {
+            authService: e
+        } = react.exports.useContext(Context$1), A = t => {
             t.preventDefault();
             const a = parseInt(t.target.farmId.value);
-            isNaN(a) || a <= 0 || A.send("VISIT", {
+            isNaN(a) || a <= 0 || e.send("VISIT", {
                 farmId: a
             })
         };
         return React.createElement(React.Fragment, null, React.createElement("form", {
-            onSubmit: e
+            onSubmit: A
         }, React.createElement("span", {
             className: "text-shadow text-small mb-2 px-1"
         }, "Enter Farm ID:", " "), React.createElement("input", {
@@ -9918,14 +9785,14 @@ const StartFarm = () => {
         }, React.createElement(Button, {
             className: "overflow-hidden mr-1",
             type: "button",
-            onClick: () => A.send("LOAD_FARM")
+            onClick: () => e.send("LOAD_FARM")
         }, "Back"), React.createElement(Button, {
             className: "overflow-hidden ml-1",
             type: "submit"
         }, "Visit"))))
     },
     Web3Missing = () => {
-        const A = () => {
+        const e = () => {
             window.open("https://docs.sunflower-land.com/guides/getting-setup#metamask-setup", "_blank")
         };
         return React.createElement("div", {
@@ -9941,19 +9808,19 @@ const StartFarm = () => {
         }, "Web3 Not Found"), React.createElement("p", {
             className: "text-center mb-4 text-xs"
         }, "Check out this guide to help you get started."), React.createElement(Button, {
-            onClick: A,
+            onClick: e,
             className: "overflow-hidden mb-2"
         }, React.createElement("span", null, "Go to setup guide")))
     };
 var metamaskIcon = "data:image/png;base64,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";
 const WrongChain = () => {
-        const [A, e] = react.exports.useState(!1), [t] = useIsMobile(), a = () => {
+        const [e, A] = react.exports.useState(!1), [t] = useIsMobile(), a = () => {
             window.open("https://docs.sunflower-land.com/guides/getting-setup#polygon-setup", "_blank")
         };
         react.exports.useEffect(() => {
             (async () => {
                 const r = await metamask.checkDefaultNetwork();
-                e(r)
+                A(r)
             })()
         }, []);
         const n = async () => {
@@ -9974,7 +9841,7 @@ const WrongChain = () => {
         }, "Check out this guide to help you get connected."), React.createElement(Button, {
             onClick: a,
             className: "overflow-hidden mb-2"
-        }, React.createElement("span", null, "Go to guide")), (!A || !t) && React.createElement(Button, {
+        }, React.createElement("span", null, "Go to guide")), (!e || !t) && React.createElement(Button, {
             onClick: n,
             className: "overflow-hidden mb-2"
         }, React.createElement("img", {
@@ -9985,13 +9852,13 @@ const WrongChain = () => {
     },
     Chickens = () => {
         const {
-            gameService: A
+            gameService: e
         } = react.exports.useContext(Context), [{
             context: {
-                state: e
+                state: A
             }
-        }] = useActor(A);
-        return React.createElement(React.Fragment, null, e.inventory["Chicken Coop"] && React.createElement("img", {
+        }] = useActor(e);
+        return React.createElement(React.Fragment, null, A.inventory["Chicken Coop"] && React.createElement("img", {
             src: coop,
             style: {
                 width: `${GRID_WIDTH_PX*2}px`,
@@ -10005,8 +9872,8 @@ const WrongChain = () => {
 var barn = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFgAAABXCAMAAAC3HXLTAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAABFUExURQAAAL5KL3M+Of///+rUquSmcsKFaaImM2IgKuQ7RPZ1erhvUCYrRLtcP8BnTNF4UJlENNd2Qz6JSEqiaodbR5BZQgAAAD+OkBgAAAAXdFJOU/////////////////////////////8A5kDmXgAAAAlwSFlzAAAOwwAADsMBx2+oZAAABK1JREFUWEetmIt22zgMRGO1ru16X97d5v8/dTEDgAD4kORt55xQGIm6gYZ04qOPzxO6dLLTuzoB3rYvX4u+bJtd2tEheNuu1x58vR6jD8DAXq/fOuHcEXoXPMdCx+gdcGBvnc6gl+DA3u+PTvf7MXoBzljoe5KeOUJPwRX7uN0fxqQe95v0fISegDuscHuwkA/RA7gPQSL1jh92AJfgPXQHHkIQGloW3h37gQXB4ne7LuBJCAoeMgZ4P5AEnoYg4HnG6HgvkAYeu1Umy7FjueB0zB/RBu66JVPBNiYZsoF1Y/dogmdLhgENsxw7Bu3m4Nkyfgi1YInjIDS5wcuQnATSrrPkkNHb5wf+iucl080gyRkjZSzN8YA2cQEGM81Disb/AoIdKwi5W0cDq5/uYwczD46OVjAqxZKQwc1rq6bYx2ISGAdHf1MwLMCKJI5xNN+BgVAcSkW6hwjG4mm3xrCx+EnHQWNVPBcPW0MZPqTSPQN3KYiMGIrX7ZbAIGRw84uME634DPaHJtK87QotQ/7UvE6aeuDVB1ig1lvL2LZbzlju5sEQdJjZkPx1UgVY7jFwGw2sntv3eB8ruMsYPyBkcPPaqmlvH49gD8Hx1XdgRQCH8iBjZ7Ds/dixXHAaq+IDTIY362XyDNxliAayIZUDGA1mcPNjxwKSQwGHz2BhMFMtez9mrB1GWXyABYLWwGCm2YOkYGmGByDYILpTWPUBlnsM1EavSOL27fexg7wKP4D55AkMT/CYsdyOQwaHz2A+viKJb54fkzFjw6F0ZPgAC8SZxPV+0nHQWBUfYDJ8SKV7JuJSEBkxFD+AQcjg5lcZF3D4DBZGev4+87MZc9MdZAzbvILlbh4aEjivMj3AZPqgY1Qynt3HNgxgEByn58yvMpbRaOonYGHIHCKJk8F/BUpjUumpWb6ZsXuWY8dEOE2G9NvO7WMb5WyTIRpIe4/yIGPzLO01RRPvBrmAw2ewP7Q2GBlLOXtfoRzt/s2MYVHha/nsfYWC//c+jm/7Wfqt3cEehYMPMsbPHAspuoLlMAELU+ZY2+oDK19LiwKtNMXJcCbjjLXN0JTRlu7ZjCsWdVZFexQO3sl4HwtVtIIFOgF7CAKu2OdCfSDa9yRj7bUu2eWC40oVrUnrvg6wQPdD2H5r4gzVLJA+im7f9tnOwT16Bh5CQB16GlX0tFOmMZAu44r93ZaoyagiOxHquy4ZV+wfKIoy2E4lVXTquGL/hOn0tA+zqItCVdEKlrmwe1i5UaHQ9APTo8v7ijX2DDijy/sKYIcle1OOTu8rgB2X7H052t5XAPvX8hHf0UVIROv7CmS7zu4dXWQjAG3vK7AtJuCL7dylJrcQpdutgW0FQsdgmxiaghl61s3uX4ov64umYBmqflUUiJ1XTfJf0wALyQSbSsEtwC/5MPLfsEg+6K8jcD9/AX4+ZaJ8HFWvc+CXTf8qt76Wi3d5bZeX6bK9jqPo5i8X72fBy4xlYtIpcNI+WCrTObBNFq3BzDit8rmObTrnDxn//Y8KHdgiyyoL+N9dsWObzvmGAVLBLplYFsMAS/XzDUPtgu30UqfBPzrZ6aVsWpOdFn1+/gdnxC8MMokAAgAAAABJRU5ErkJggg==",
     disc = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAATBAMAAABvvEDBAAAABGdBTUEAALGPC/xhBQAAABJQTFRFAAAAJitEWmmIi5u0////wMvcOcop7gAAAAF0Uk5TAEDm2GYAAABmSURBVAjXjc7RDYAwCATQqxOUdIGG6AANcQFDF9B2/1UE7ADy9XIJcADAzIhhVQ1uw9Sr6dA5p94eddOwcPPIwoq9h8b1W2XtNpR1ryGd8ePJSBJ/JQNFTNKsQRKf7LXIQF9VIscLpnkjRCFtFEoAAAAASUVORK5CYII=";
 const Action = ({
-        text: A,
-        icon: e,
+        text: e,
+        icon: A,
         onClick: t,
         className: a
     }) => React.createElement("div", {
@@ -10019,13 +9886,13 @@ const Action = ({
         src: disc,
         className: "w-full absolute inset-0"
     }), React.createElement("img", {
-        src: e,
+        src: A,
         className: "w-2/3 z-10"
     })), React.createElement(InnerPanel, {
         className: "text-white text-shadow text-xs w-fit"
     }, React.createElement("span", {
         className: "pl-7"
-    }, A))),
+    }, e))),
     ToastContext = react.exports.createContext({
         removeToast: console.log,
         setToast: console.log,
@@ -10033,10 +9900,10 @@ const Action = ({
     }),
     MAX_TOAST = 5,
     ToastProvider = ({
-        children: A
+        children: e
     }) => {
-        const [e, t] = react.exports.useState([]), a = s => {
-            e.length > 4 && t(e.slice(0, MAX_TOAST));
+        const [A, t] = react.exports.useState([]), a = s => {
+            A.length > 4 && t(A.slice(0, MAX_TOAST));
             const r = Date.now();
             window.setTimeout(() => {
                 n(r)
@@ -10054,30 +9921,30 @@ const Action = ({
             value: {
                 removeToast: n,
                 setToast: a,
-                toastList: e
+                toastList: A
             }
-        }, A)
+        }, e)
     },
     Stock = ({
-        item: A
+        item: e
     }) => {
         const {
-            gameService: e
+            gameService: A
         } = react.exports.useContext(Context), [{
             context: {
                 state: t
             }
-        }] = useActor(e), a = t.stock[A.name] || new Decimal(0);
+        }] = useActor(A), a = t.stock[e.name] || new Decimal(0);
         return React.createElement("span", {
             className: "w-32 -mt-4 sm:mr-auto bg-blue-600 text-shadow border text-xxs p-1 rounded-md"
         }, `${a} in stock`)
     },
     CraftingItems$1 = ({
-        items: A,
-        onClose: e,
+        items: e,
+        onClose: A,
         isBulk: t = !1
     }) => {
-        const [a, n] = react.exports.useState(Object.values(A)[0]), {
+        const [a, n] = react.exports.useState(Object.values(e)[0]), {
             setToast: s
         } = react.exports.useContext(ToastContext), {
             gameService: r,
@@ -10086,7 +9953,7 @@ const Action = ({
             context: {
                 state: E
             }
-        }] = useActor(r), u = E.inventory, h = (y = 1) => a.ingredients.some(I => I.amount.mul(y).greaterThan(u[I.item] || 0)), B = (y = 1) => E.balance.lessThan(a.price.mul(y)), g = (y = 1) => {
+        }] = useActor(r), u = E.inventory, w = (y = 1) => a.ingredients.some(I => I.amount.mul(y).greaterThan(u[I.item] || 0)), B = (y = 1) => E.balance.lessThan(a.price.mul(y)), g = (y = 1) => {
             r.send("item.crafted", {
                 item: a.name,
                 amount: y
@@ -10100,7 +9967,7 @@ const Action = ({
         }, C = async y => {
             await new Promise(I => setTimeout(I, 1e3)), r.send("SYNC", {
                 captcha: y
-            }), e()
+            }), A()
         }, Q = () => {
             d(!0)
         };
@@ -10110,8 +9977,8 @@ const Action = ({
             onExpired: () => d(!1),
             className: "w-full m-4 flex items-center justify-center"
         });
-        const w = a.supply === 0,
-            f = () => w ? null : a.disabled ? React.createElement("span", {
+        const h = a.supply === 0,
+            f = () => h ? null : a.disabled ? React.createElement("span", {
                 className: "text-xs mt-1 text-shadow"
             }, "Locked") : (S == null ? void 0 : S.equals(0)) ? React.createElement("div", null, React.createElement("p", {
                 className: "text-xxs no-wrap text-center my-1 underline"
@@ -10121,11 +9988,11 @@ const Action = ({
                 className: "text-xs mt-1",
                 onClick: Q
             }, "Sync")) : React.createElement(React.Fragment, null, React.createElement(Button, {
-                disabled: B() || h() || (S == null ? void 0 : S.lessThan(1)),
+                disabled: B() || w() || (S == null ? void 0 : S.lessThan(1)),
                 className: "text-xs mt-1",
                 onClick: () => g()
             }, "Craft ", t && "1"), t && React.createElement(Button, {
-                disabled: B(10) || h(10) || (S == null ? void 0 : S.lessThan(10)),
+                disabled: B(10) || w(10) || (S == null ? void 0 : S.lessThan(10)),
                 className: "text-xs mt-1 whitespace-nowrap",
                 onClick: () => g(10)
             }, "Craft 10")),
@@ -10134,7 +10001,7 @@ const Action = ({
             className: "flex"
         }, React.createElement("div", {
             className: "w-3/5 flex flex-wrap h-fit"
-        }, Object.values(A).map(y => React.createElement(Box, {
+        }, Object.values(e).map(y => React.createElement(Box, {
             isSelected: a.name === y.name,
             key: y.name,
             onClick: () => n(y),
@@ -10183,25 +10050,25 @@ const Action = ({
     };
 
 function mintCooldown({
-    item: A,
-    itemsMintedAt: e
+    item: e,
+    itemsMintedAt: A
 }) {
-    const a = (e || {})[A];
+    const a = (A || {})[e];
     if (!a) return 0;
     const n = a + 7 * 24 * 60 * 60 * 1e3 - Date.now();
     return n < 0 ? 0 : n / 1e3
 }
 const TAB_CONTENT_HEIGHT = 360,
     Items = ({
-        items: A,
-        selected: e,
+        items: e,
+        selected: A,
         inventory: t,
         onClick: a
     }) => {
         const {
             ref: n,
             showScrollbar: s
-        } = useShowScrollbar(TAB_CONTENT_HEIGHT), r = Object.values(A);
+        } = useShowScrollbar(TAB_CONTENT_HEIGHT), r = Object.values(e);
         return React.createElement("div", {
             ref: n,
             style: {
@@ -10214,7 +10081,7 @@ const TAB_CONTENT_HEIGHT = 360,
         }, React.createElement("div", {
             className: "flex flex-wrap h-fit"
         }, r.map(i => React.createElement(Box, {
-            isSelected: e === i.name,
+            isSelected: A === i.name,
             key: i.name,
             onClick: () => a(i),
             image: ITEM_DETAILS[i.name].image,
@@ -10222,31 +10089,31 @@ const TAB_CONTENT_HEIGHT = 360,
         }))))
     },
     Rare = ({
-        onClose: A,
-        items: e,
+        onClose: e,
+        items: A,
         hasAccess: t,
         canCraft: a = !0
     }) => {
         var F;
-        const [n, s] = react.exports.useState(Object.values(e)[0]), {
+        const [n, s] = react.exports.useState(Object.values(A)[0]), {
             gameService: r
         } = react.exports.useContext(Context), [{
             context: {
                 state: i,
                 itemsMintedAt: m
             }
-        }] = useActor(r), [d, E] = react.exports.useState(!0), [u, h] = react.exports.useState(), [B, g] = react.exports.useState(!1);
+        }] = useActor(r), [d, E] = react.exports.useState(!0), [u, w] = react.exports.useState(), [B, g] = react.exports.useState(!1);
         console.log({
             itemsMintedAt: m
         }), react.exports.useEffect(() => {
             (async () => {
                 const N = await metamask.getInventory().totalSupply();
-                h(N), E(!1)
+                w(N), E(!1)
             })()
         }, []);
         const C = i.inventory,
             Q = (T = 1) => n.ingredients.some(N => N.amount.mul(T).greaterThan(C[N.item] || 0)),
-            w = (T = 1) => i.balance.lessThan(n.price.mul(T)),
+            h = (T = 1) => i.balance.lessThan(n.price.mul(T)),
             f = () => {
                 g(!0)
             },
@@ -10254,7 +10121,7 @@ const TAB_CONTENT_HEIGHT = 360,
                 await new Promise(N => setTimeout(N, 1e3)), r.send("MINT", {
                     item: n.name,
                     captcha: T
-                }), A()
+                }), e()
             };
         if (d) return React.createElement("div", {
             className: "h-60"
@@ -10292,7 +10159,7 @@ const TAB_CONTENT_HEIGHT = 360,
                     className: "text-xs text-shadow text-center mt-2"
                 }, `${n.requires}s only`));
                 if (!!a) return React.createElement(React.Fragment, null, React.createElement(Button, {
-                    disabled: w() || Q(),
+                    disabled: h() || Q(),
                     className: "text-xs mt-1",
                     onClick: f
                 }, "Craft"))
@@ -10307,7 +10174,7 @@ const TAB_CONTENT_HEIGHT = 360,
         }, "Crafting an item will sync your farm to the blockchain.")) : React.createElement("div", {
             className: "flex"
         }, React.createElement(Items, {
-            items: e,
+            items: A,
             selected: n.name,
             inventory: C,
             onClick: s
@@ -10350,7 +10217,7 @@ const TAB_CONTENT_HEIGHT = 360,
             className: "h-5 mr-1"
         }), React.createElement("span", {
             className: classNames("text-xs text-shadow text-center mt-2 ", {
-                "text-red-500": w()
+                "text-red-500": h()
             })
         }, `${n.price.toNumber()}`))), D()), React.createElement("a", {
             href: `https://opensea.io/assets/matic/0x22d5f9b75c524fec1d6619787e582644cd4d7422/${KNOWN_IDS[n.name]}`,
@@ -10360,10 +10227,10 @@ const TAB_CONTENT_HEIGHT = 360,
         }, "Open Sea")))
     },
     BarnSale = ({
-        onClose: A
+        onClose: e
     }) => {
         var s;
-        const [e, t] = react.exports.useState("animals"), {
+        const [A, t] = react.exports.useState("animals"), {
             authService: a
         } = react.exports.useContext(Context$1), [n] = useActor(a);
         return React.createElement(Panel, {
@@ -10373,7 +10240,7 @@ const TAB_CONTENT_HEIGHT = 360,
         }, React.createElement("div", {
             className: "flex"
         }, React.createElement(Tab, {
-            isActive: e === "animals",
+            isActive: A === "animals",
             onClick: () => t("animals")
         }, React.createElement("img", {
             src: chicken,
@@ -10381,7 +10248,7 @@ const TAB_CONTENT_HEIGHT = 360,
         }), React.createElement("span", {
             className: "text-sm text-shadow"
         }, "Animals")), React.createElement(Tab, {
-            isActive: e === "rare",
+            isActive: A === "rare",
             onClick: () => t("rare")
         }, React.createElement("img", {
             src: coop,
@@ -10391,24 +10258,24 @@ const TAB_CONTENT_HEIGHT = 360,
         }, "Rare"))), React.createElement("img", {
             src: close,
             className: "h-6 cursor-pointer mr-2 mb-1",
-            onClick: A
+            onClick: e
         })), React.createElement("div", {
             style: {
                 minHeight: "200px"
             }
-        }, e === "animals" && React.createElement(CraftingItems$1, {
+        }, A === "animals" && React.createElement(CraftingItems$1, {
             items: ANIMALS,
-            onClose: A
-        }), e === "rare" && React.createElement(Rare, {
+            onClose: e
+        }), A === "rare" && React.createElement(Rare, {
             items: BARN_ITEMS,
-            onClose: A,
+            onClose: e,
             hasAccess: !!((s = n.context.token) == null ? void 0 : s.userAccess.mintCollectible)
         })))
     },
     Barn = () => {
         const {
-            gameService: A
-        } = react.exports.useContext(Context), [e] = useActor(A), [t, a] = React.useState(!1), n = !e.matches("readonly"), s = () => {
+            gameService: e
+        } = react.exports.useContext(Context), [A] = useActor(e), [t, a] = React.useState(!1), n = !A.matches("readonly"), s = () => {
             a(!0), barnAudio.play()
         };
         return React.createElement("div", {
@@ -10456,25 +10323,25 @@ const TAB_CONTENT_HEIGHT = 360,
         className: "absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"
     }), React.createElement(Barn, null), React.createElement(Chickens, null)));
 
-function useInterval(A, e) {
-    const t = react.exports.useRef(A);
+function useInterval(e, A) {
+    const t = react.exports.useRef(e);
     react.exports.useLayoutEffect(() => {
-        t.current = A
-    }, [A]), react.exports.useEffect(() => {
-        if (!e && e !== 0) return;
-        const a = setInterval(t.current, e);
+        t.current = e
+    }, [e]), react.exports.useEffect(() => {
+        if (!A && A !== 0) return;
+        const a = setInterval(t.current, A);
         return () => clearInterval(a)
-    }, [e])
+    }, [A])
 }
 const ToastManager = () => {
     const {
-        toastList: A
-    } = react.exports.useContext(ToastContext), [e, t] = react.exports.useState(!1);
+        toastList: e
+    } = react.exports.useContext(ToastContext), [A, t] = react.exports.useState(!1);
     return react.exports.useEffect(() => {
-        A.length >= 1 ? t(!0) : t(!1)
-    }, [A]), React.createElement("div", null, e && React.createElement("div", {
+        e.length >= 1 ? t(!0) : t(!1)
+    }, [e]), React.createElement("div", null, A && React.createElement("div", {
         className: "text-shadow p-0.5 text-white shadow-lg flex flex-col items-end mr-2 sm:block fixed top-20 left-2 z-[99999]"
-    }, React.createElement(Panel, null, A.map(({
+    }, React.createElement(Panel, null, e.map(({
         content: a,
         id: n,
         icon: s
@@ -10492,12 +10359,12 @@ var goblinKing = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAgCAMAAABj
     easterBunny = "./assets/easter_bunny_eggs.14a07275.gif";
 const Flags = () => {
         const {
-            gameService: A
+            gameService: e
         } = react.exports.useContext(Context), [{
             context: {
-                state: e
+                state: A
             }
-        }] = useActor(A), t = Object.values(FLAGS).filter(a => a.name in e.inventory);
+        }] = useActor(e), t = Object.values(FLAGS).filter(a => a.name in A.inventory);
         return React.createElement(React.Fragment, null, React.createElement("div", {
             style: {
                 width: `${GRID_WIDTH_PX*3}px`,
@@ -10516,20 +10383,20 @@ const Flags = () => {
         }))))
     },
     Scarecrows = ({
-        inventory: A
-    }) => A.Kuebiko ? React.createElement("img", {
+        inventory: e
+    }) => e.Kuebiko ? React.createElement("img", {
         style: {
             width: `${GRID_WIDTH_PX*2}px`
         },
         src: kuebiko,
         alt: "Scarecrow"
-    }) : A.Scarecrow ? React.createElement("img", {
+    }) : e.Scarecrow ? React.createElement("img", {
         style: {
             width: `${GRID_WIDTH_PX*1.3}px`
         },
         src: scarecrow,
         alt: "Scarecrow"
-    }) : A.Nancy ? React.createElement("img", {
+    }) : e.Nancy ? React.createElement("img", {
         style: {
             width: `${GRID_WIDTH_PX*1.2}px`
         },
@@ -10537,20 +10404,20 @@ const Flags = () => {
         alt: "Scarecrow"
     }) : null,
     Beavers = ({
-        inventory: A
-    }) => A["Foreman Beaver"] ? React.createElement("img", {
+        inventory: e
+    }) => e["Foreman Beaver"] ? React.createElement("img", {
         style: {
             width: `${GRID_WIDTH_PX*1.2}px`
         },
         src: foreman,
         alt: "Foreman Beaver"
-    }) : A["Apprentice Beaver"] ? React.createElement("img", {
+    }) : e["Apprentice Beaver"] ? React.createElement("img", {
         style: {
             width: `${GRID_WIDTH_PX*1.2}px`
         },
         src: apprentice,
         alt: "Apprentice Beaver"
-    }) : A["Woody the Beaver"] ? React.createElement("img", {
+    }) : e["Woody the Beaver"] ? React.createElement("img", {
         style: {
             width: `${GRID_WIDTH_PX*1.2}px`
         },
@@ -10558,7 +10425,7 @@ const Flags = () => {
         alt: "Woddy the Beaver"
     }) : null,
     NyonStatue = () => {
-        const [A, e] = react.exports.useState(!1);
+        const [e, A] = react.exports.useState(!1);
         return React.createElement(React.Fragment, null, React.createElement("img", {
             style: {
                 width: `${GRID_WIDTH_PX*1.8}px`
@@ -10566,15 +10433,15 @@ const Flags = () => {
             className: "hover:img-highlight cursor-pointer",
             src: nyonStatue,
             alt: "Nyon Statue",
-            onClick: () => e(!0)
+            onClick: () => A(!0)
         }), React.createElement(Modal, {
             centered: !0,
-            show: A,
-            onHide: () => e(!1)
+            show: e,
+            onHide: () => A(!1)
         }, React.createElement(Panel, null, React.createElement("img", {
             src: close,
             className: "h-6 top-4 right-4 absolute cursor-pointer",
-            onClick: () => e(!1)
+            onClick: () => A(!1)
         }), React.createElement("div", {
             className: "flex flex-col items-cetner justify-content-between"
         }, React.createElement("div", {
@@ -10600,13 +10467,13 @@ const Flags = () => {
     },
     Decorations = () => {
         const {
-            gameService: A
+            gameService: e
         } = react.exports.useContext(Context), [{
             context: {
-                state: e
+                state: A
             }
-        }] = useActor(A);
-        return React.createElement(React.Fragment, null, React.createElement(Flags, null), e.inventory["Sunflower Rock"] && React.createElement("img", {
+        }] = useActor(e);
+        return React.createElement(React.Fragment, null, React.createElement(Flags, null), A.inventory["Sunflower Rock"] && React.createElement("img", {
             style: {
                 width: `${GRID_WIDTH_PX*4}px`,
                 right: `${GRID_WIDTH_PX*11.5}px`,
@@ -10616,7 +10483,7 @@ const Flags = () => {
             className: "absolute",
             src: sunflowerRock,
             alt: "Sunflower rock"
-        }), e.inventory["Christmas Tree"] && React.createElement("img", {
+        }), A.inventory["Christmas Tree"] && React.createElement("img", {
             style: {
                 width: `${GRID_WIDTH_PX*2}px`,
                 right: `${GRID_WIDTH_PX*16}px`,
@@ -10626,7 +10493,7 @@ const Flags = () => {
             className: "absolute",
             src: christmasTree,
             alt: "Christmas Tree"
-        }), e.inventory["Sunflower Statue"] && React.createElement("img", {
+        }), A.inventory["Sunflower Statue"] && React.createElement("img", {
             style: {
                 width: `${GRID_WIDTH_PX*2}px`,
                 left: `${GRID_WIDTH_PX*45.5}px`,
@@ -10636,7 +10503,7 @@ const Flags = () => {
             className: "absolute",
             src: sunflowerStatue,
             alt: "Sunflower Statue"
-        }), e.inventory["Potato Statue"] && React.createElement("img", {
+        }), A.inventory["Potato Statue"] && React.createElement("img", {
             style: {
                 width: `${GRID_WIDTH_PX*1.5}px`,
                 left: `${GRID_WIDTH_PX*52}px`,
@@ -10646,7 +10513,7 @@ const Flags = () => {
             className: "absolute",
             src: potatoStatue,
             alt: "Potato Statue"
-        }), e.inventory["Sunflower Tombstone"] && React.createElement("img", {
+        }), A.inventory["Sunflower Tombstone"] && React.createElement("img", {
             style: {
                 width: `${GRID_WIDTH_PX*1}px`,
                 left: `${GRID_WIDTH_PX*30}px`,
@@ -10656,7 +10523,7 @@ const Flags = () => {
             className: "absolute",
             src: sunflowerTombstone,
             alt: "Sunflower tombstone"
-        }), e.inventory["Farm Cat"] && React.createElement("img", {
+        }), A.inventory["Farm Cat"] && React.createElement("img", {
             style: {
                 width: `${GRID_WIDTH_PX*1.5}px`,
                 right: `${GRID_WIDTH_PX*39.55}px`,
@@ -10666,7 +10533,7 @@ const Flags = () => {
             className: "absolute z-10",
             src: cat,
             alt: "Farm cat"
-        }), e.inventory["Farm Dog"] && React.createElement("img", {
+        }), A.inventory["Farm Dog"] && React.createElement("img", {
             style: {
                 width: `${GRID_WIDTH_PX*1}px`,
                 right: `${GRID_WIDTH_PX*37.8}px`,
@@ -10676,7 +10543,7 @@ const Flags = () => {
             className: "absolute",
             src: dog,
             alt: "Farm dog"
-        }), e.inventory.Gnome && React.createElement("img", {
+        }), A.inventory.Gnome && React.createElement("img", {
             style: {
                 width: `${GRID_WIDTH_PX*1}px`,
                 right: "481px",
@@ -10695,8 +10562,8 @@ const Flags = () => {
             },
             id: Section.Scarecrow
         }, React.createElement(Scarecrows, {
-            inventory: e.inventory
-        })), e.inventory["Nyon Statue"] && React.createElement("div", {
+            inventory: A.inventory
+        })), A.inventory["Nyon Statue"] && React.createElement("div", {
             className: "flex justify-center absolute",
             style: {
                 width: `${GRID_WIDTH_PX*3}px`,
@@ -10704,7 +10571,7 @@ const Flags = () => {
                 top: `${GRID_WIDTH_PX*41}px`
             },
             id: Section["Nyon Statue"]
-        }, React.createElement(NyonStatue, null)), e.inventory.Fountain && React.createElement("img", {
+        }, React.createElement(NyonStatue, null)), A.inventory.Fountain && React.createElement("img", {
             style: {
                 width: `${GRID_WIDTH_PX*2.5}px`,
                 left: `${GRID_WIDTH_PX*35}px`,
@@ -10715,7 +10582,7 @@ const Flags = () => {
             className: "absolute hover:img-highlight cursor-pointer",
             src: fountain,
             alt: "Fountain"
-        }), e.inventory["Goblin Crown"] && React.createElement("img", {
+        }), A.inventory["Goblin Crown"] && React.createElement("img", {
             style: {
                 width: `${GRID_WIDTH_PX*3}px`,
                 right: `${GRID_WIDTH_PX*27.5}px`,
@@ -10734,8 +10601,8 @@ const Flags = () => {
             },
             id: Section.Beaver
         }, React.createElement(Beavers, {
-            inventory: e.inventory
-        })), e.inventory["Homeless Tent"] && React.createElement("img", {
+            inventory: A.inventory
+        })), A.inventory["Homeless Tent"] && React.createElement("img", {
             style: {
                 width: `${GRID_WIDTH_PX*2}px`,
                 right: `${GRID_WIDTH_PX*34.5}px`,
@@ -10769,7 +10636,7 @@ const Flags = () => {
             style: {
                 fontSize: "8px"
             }
-        }, "Farm"), e.id)), e.inventory["Farmer Bath"] && React.createElement("div", {
+        }, "Farm"), A.id)), A.inventory["Farmer Bath"] && React.createElement("div", {
             className: "flex justify-center absolute",
             style: {
                 width: `${GRID_WIDTH_PX*2}px`,
@@ -10788,7 +10655,7 @@ const Flags = () => {
                 top: `${GRID_WIDTH_PX*.5}px`,
                 left: `${GRID_WIDTH_PX*.5}px`
             }
-        })), e.inventory["Easter Bunny"] && React.createElement("img", {
+        })), A.inventory["Easter Bunny"] && React.createElement("img", {
             style: {
                 width: `${GRID_WIDTH_PX*2.5}px`,
                 right: `${GRID_WIDTH_PX*49}px`,
@@ -10812,7 +10679,7 @@ const Flags = () => {
     }, "Please be patient while our minions mint something special for you.")),
     Success = () => {
         const {
-            gameService: A
+            gameService: e
         } = react.exports.useContext(Context);
         return React.createElement("div", {
             className: "flex flex-col items-center"
@@ -10822,7 +10689,7 @@ const Flags = () => {
         }), React.createElement("span", {
             className: "text-center mb-2"
         }, "Woohoo! Your items are secured on the Blockchain!"), React.createElement(Button, {
-            onClick: () => A.send("REFRESH")
+            onClick: () => e.send("REFRESH")
         }, "Continue"))
     },
     Syncing = () => React.createElement("div", {
@@ -10842,9 +10709,9 @@ const Flags = () => {
     }, "Withdrawing"),
     Blacklisted = () => {
         const {
-            gameService: A
-        } = react.exports.useContext(Context), e = () => {
-            A.send("CONTINUE")
+            gameService: e
+        } = react.exports.useContext(Context), A = () => {
+            e.send("CONTINUE")
         };
         return React.createElement("div", {
             className: "flex flex-col items-center p-2"
@@ -10861,7 +10728,7 @@ const Flags = () => {
             target: "_blank",
             rel: "noopener noreferrer"
         }, "Share details to help us improve our system"), React.createElement(Button, {
-            onClick: e
+            onClick: A
         }, "Continue Playing"))
     };
 class SpriteSheetInstance extends React.Component {}
@@ -10869,11 +10736,11 @@ const ID = function() {
     return "_" + Math.random().toString(36).substr(2, 9)
 };
 class Spritesheet extends React.Component {
-    constructor(e) {
-        super(e);
+    constructor(A) {
+        super(A);
         x(this, "renderElements", () => {
             const {
-                image: e,
+                image: A,
                 className: t,
                 style: a,
                 widthFrame: n,
@@ -10884,12 +10751,12 @@ class Spritesheet extends React.Component {
                 backgroundPosition: d,
                 onClick: E,
                 onDoubleClick: u,
-                onMouseMove: h,
+                onMouseMove: w,
                 onMouseEnter: B,
                 onMouseLeave: g,
                 onMouseOver: C,
                 onMouseOut: Q,
-                onMouseDown: w,
+                onMouseDown: h,
                 onMouseUp: f
             } = this.props, S = {
                 position: "relative",
@@ -10906,7 +10773,7 @@ class Spritesheet extends React.Component {
                 overflow: "hidden",
                 backgroundRepeat: "no-repeat",
                 display: "table-cell",
-                backgroundImage: `url(${e})`,
+                backgroundImage: `url(${A})`,
                 width: `${n}px`,
                 height: `${s}px`,
                 transformOrigin: "0 50%"
@@ -10922,25 +10789,25 @@ class Spritesheet extends React.Component {
                 style: a,
                 onClick: () => E(this.setInstance()),
                 onDoubleClick: () => u(this.setInstance()),
-                onMouseMove: () => h(this.setInstance()),
+                onMouseMove: () => w(this.setInstance()),
                 onMouseEnter: () => B(this.setInstance()),
                 onMouseLeave: () => g(this.setInstance()),
                 onMouseOver: () => C(this.setInstance()),
                 onMouseOut: () => Q(this.setInstance()),
-                onMouseDown: () => w(this.setInstance()),
+                onMouseDown: () => h(this.setInstance()),
                 onMouseUp: () => f(this.setInstance())
             }, D)
         });
         x(this, "init", () => {
             const {
-                image: e,
+                image: A,
                 widthFrame: t,
                 heightFrame: a,
                 autoplay: n,
                 getInstance: s,
                 onInit: r
             } = this.props, i = new Image;
-            i.src = e, i.onload = () => {
+            i.src = A, i.onload = () => {
                 if (document && document.querySelector(`.${this.id}`)) {
                     this.imageSprite = i, this.cols = this.imageSprite.width === t ? 1 : this.imageSprite.width / t, this.rows = this.imageSprite.height === a ? 1 : this.imageSprite.height / a, this.spriteEl = document.querySelector(`.${this.id}`), this.spriteElContainer = this.spriteEl.querySelector(".react-responsive-spritesheet-container"), this.spriteElMove = this.spriteElContainer.querySelector(".react-responsive-spritesheet-container__move"), this.resize(!1), window.addEventListener("resize", this.resize), this.moveImage(!1), setTimeout(() => {
                         this.resize(!1)
@@ -10952,28 +10819,28 @@ class Spritesheet extends React.Component {
                 throw new Error(`Failed to load image ${i.src}`)
             }
         });
-        x(this, "resize", (e = !0) => {
+        x(this, "resize", (A = !0) => {
             const {
                 widthFrame: t,
                 onResize: a
             } = this.props;
-            this.isResponsive && (this.spriteScale = this.spriteEl.offsetWidth / t, this.spriteElContainer.style.transform = `scale(${this.spriteScale})`, this.spriteEl.style.height = `${this.getInfo("height")}px`, e && a && a(this.setInstance()))
+            this.isResponsive && (this.spriteScale = this.spriteEl.offsetWidth / t, this.spriteElContainer.style.transform = `scale(${this.spriteScale})`, this.spriteEl.style.height = `${this.getInfo("height")}px`, A && a && a(this.setInstance()))
         });
-        x(this, "play", (e = !1) => {
+        x(this, "play", (A = !1) => {
             const {
                 onPlay: t,
                 timeout: a
             } = this.props;
             this.isPlaying || setTimeout(() => {
                 t(this.setInstance()), this.setIntervalPlayFunctions(), this.isPlaying = !0
-            }, e ? a : 0)
+            }, A ? a : 0)
         });
         x(this, "setIntervalPlayFunctions", () => {
             this.intervalSprite && clearInterval(this.intervalSprite), this.intervalSprite = setInterval(() => {
                 this.isPlaying && this.moveImage()
             }, 1e3 / this.fps)
         });
-        x(this, "moveImage", (e = !0) => {
+        x(this, "moveImage", (A = !0) => {
             const {
                 onEnterFrame: t,
                 onEachFrame: a,
@@ -10982,25 +10849,25 @@ class Spritesheet extends React.Component {
             } = this.props, r = Math.floor(this.frame / this.cols), i = this.frame - this.cols * r;
             this.spriteElMove.style.backgroundPosition = `-${this.props.widthFrame*i}px -${this.props.heightFrame*r}px`, t && t.map(m => {
                 m.frame === this.frame && m.callback && m.callback()
-            }), e && (this.direction === "rewind" ? this.frame -= 1 : this.frame += 1, a && a(this.setInstance())), this.isPlaying && (this.direction === "forward" && (this.frame === this.steps || this.frame === this.endAt) || this.direction === "rewind" && (this.frame === -1 || this.frame === this.endAt)) && (n ? (s && s(this.setInstance()), this.completeLoopCicles += 1, this.frame = this.startAt ? this.startAt : this.direction === "rewind" ? this.steps - 1 : 0) : this.pause())
+            }), A && (this.direction === "rewind" ? this.frame -= 1 : this.frame += 1, a && a(this.setInstance())), this.isPlaying && (this.direction === "forward" && (this.frame === this.steps || this.frame === this.endAt) || this.direction === "rewind" && (this.frame === -1 || this.frame === this.endAt)) && (n ? (s && s(this.setInstance()), this.completeLoopCicles += 1, this.frame = this.startAt ? this.startAt : this.direction === "rewind" ? this.steps - 1 : 0) : this.pause())
         });
         x(this, "pause", () => {
             const {
-                onPause: e
+                onPause: A
             } = this.props;
-            this.isPlaying = !1, clearInterval(this.intervalSprite), e(this.setInstance())
+            this.isPlaying = !1, clearInterval(this.intervalSprite), A(this.setInstance())
         });
-        x(this, "goToAndPlay", e => {
-            this.frame = e || this.frame, this.play()
+        x(this, "goToAndPlay", A => {
+            this.frame = A || this.frame, this.play()
         });
-        x(this, "goToAndPause", e => {
-            this.pause(), this.frame = e || this.frame, this.moveImage()
+        x(this, "goToAndPause", A => {
+            this.pause(), this.frame = A || this.frame, this.moveImage()
         });
-        x(this, "setStartAt", e => (this.startAt = e ? e - 1 : 0, this.startAt));
-        x(this, "setEndAt", e => (this.endAt = e, this.endAt));
-        x(this, "setDirection", e => (this.direction = e === "rewind" ? "rewind" : "forward", this.direction));
-        x(this, "getInfo", e => {
-            switch (e) {
+        x(this, "setStartAt", A => (this.startAt = A ? A - 1 : 0, this.startAt));
+        x(this, "setEndAt", A => (this.endAt = A, this.endAt));
+        x(this, "setDirection", A => (this.direction = A === "rewind" ? "rewind" : "forward", this.direction));
+        x(this, "getInfo", A => {
+            switch (A) {
                 case "direction":
                     return this.direction;
                 case "frame":
@@ -11022,7 +10889,7 @@ class Spritesheet extends React.Component {
                 case "completeLoopCicles":
                     return this.completeLoopCicles;
                 default:
-                    throw new Error(`Invalid param \`${e}\` requested by Spritesheet.getinfo(). See the documentation on https://github.com/danilosetra/react-responsive-spritesheet`)
+                    throw new Error(`Invalid param \`${A}\` requested by Spritesheet.getinfo(). See the documentation on https://github.com/danilosetra/react-responsive-spritesheet`)
             }
         });
         const {
@@ -11032,7 +10899,7 @@ class Spritesheet extends React.Component {
             fps: s,
             steps: r,
             direction: i
-        } = e;
+        } = A;
         this.id = `react-responsive-spritesheet--${ID()}`, this.spriteEl = this.spriteElContainer = this.spriteElMove = this.imageSprite = this.cols = this.rows = null, this.intervalSprite = !1, this.isResponsive = t, this.startAt = this.setStartAt(a), this.endAt = this.setEndAt(n), this.fps = s, this.steps = r, this.completeLoopCicles = 0, this.isPlaying = !1, this.spriteScale = 1, this.direction = this.setDirection(i), this.frame = this.startAt ? this.startAt : this.direction === "rewind" ? this.steps - 1 : 0
     }
     componentDidMount() {
@@ -11041,8 +10908,8 @@ class Spritesheet extends React.Component {
     componentWillUnmount() {
         window.removeEventListener("resize", this.resize)
     }
-    setFps(e) {
-        this.fps = e, this.setIntervalPlayFunctions()
+    setFps(A) {
+        this.fps = A, this.setIntervalPlayFunctions()
     }
     setInstance() {
         return {
@@ -11134,8 +11001,8 @@ var sparkSheet$2 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAccAAABCCAMAAA
     dropSheet$2 = "data:image/png;base64,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",
     empty$2 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFsAAABCBAMAAADKwbf5AAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAAISdC6/D3PohIN0JmWmmJjJy1wczdoS7sqgAAAAF0Uk5TAEDm2GYAAACuSURBVEjH7ZQxCsJAEEUDEXshyQECWkfiDXZjbeHPtoJxtpXAZq7vxhP8FFrNqx8PdmeYojAMwzB+gIhssPeq+ub1mPVlU1znx5Y4r3/j2rL6Ttb4KZK6H9e4xBsXn3yY26PEROmj+CEkiFJ62UQdAAR9Unqd/zEBunD6oc4jzXEh9QqqUIijnnpe9ZgwdZReVkGXF+DIMfVXmYB7x67YxWccvcBln+nsphjGn/gAR5UzncGFU8gAAAAASUVORK5CYII=";
 const TimeLeftPanel = ({
-        text: A = "",
-        showTimeLeft: e = !1,
+        text: e = "",
+        showTimeLeft: A = !1,
         timeLeft: t
     }) => {
         const [a, n] = react.exports.useState(secondsToMidString(t));
@@ -11143,34 +11010,34 @@ const TimeLeftPanel = ({
             const s = Date.now(),
                 r = setInterval(() => {
                     const i = t - (Date.now() - s) / 1e3;
-                    n(secondsToMidString(i)), (i <= 0 || !e) && clearInterval(r)
+                    n(secondsToMidString(i)), (i <= 0 || !A) && clearInterval(r)
                 }, 1e3);
             return () => clearInterval(r)
-        }, [e, t]), React.createElement(InnerPanel, {
+        }, [A, t]), React.createElement(InnerPanel, {
             className: classNames("ml-10 transition-opacity absolute whitespace-nowrap sm:opacity-0 bottom-5 w-fit left-5 z-20 pointer-events-none", {
-                "opacity-100": e,
-                "opacity-0": !e
+                "opacity-100": A,
+                "opacity-0": !A
             })
         }, React.createElement("div", {
             className: "flex flex-col text-xxs text-white text-shadow ml-2 mr-2"
         }, React.createElement("span", {
             className: "flex-1"
-        }, A), React.createElement("span", {
+        }, e), React.createElement("span", {
             className: "flex-1"
         }, a)))
     },
     POPOVER_TIME_MS$3 = 1e3,
     HITS$3 = 3,
     Gold = ({
-        rockIndex: A
+        rockIndex: e
     }) => {
         const {
-            gameService: e,
+            gameService: A,
             selectedItem: t
-        } = react.exports.useContext(Context), [a] = useActor(e), [n] = useActor(e), [s, r] = react.exports.useState(!0), [i, m] = react.exports.useState(!1), [d, E] = react.exports.useState(), [u, h] = react.exports.useState(0), [B, g] = react.exports.useState(!1), C = react.exports.useRef(null), Q = react.exports.useRef(), w = react.exports.useRef(), [f, S] = react.exports.useState(!1), y = a.matches("readonly"), I = "Iron Pickaxe", D = n.context.state.gold[A], F = !canMine$2(D);
+        } = react.exports.useContext(Context), [a] = useActor(A), [n] = useActor(A), [s, r] = react.exports.useState(!0), [i, m] = react.exports.useState(!1), [d, E] = react.exports.useState(), [u, w] = react.exports.useState(0), [B, g] = react.exports.useState(!1), C = react.exports.useRef(null), Q = react.exports.useRef(), h = react.exports.useRef(), [f, S] = react.exports.useState(!1), y = a.matches("readonly"), I = "Iron Pickaxe", D = n.context.state.gold[e], F = !canMine$2(D);
         react.exports.useEffect(() => {
             const R = k => {
-                C.current && !C.current.contains(k.target) && h(0)
+                C.current && !C.current.contains(k.target) && w(0)
             };
             return document.addEventListener("click", R, !0), () => {
                 document.removeEventListener("click", R, !0)
@@ -11190,14 +11057,14 @@ const TimeLeftPanel = ({
                 return
             }
             if (!(n.context.state.inventory["Iron Pickaxe"] || new Decimal(0)).lessThanOrEqualTo(0))
-                if (t == I && !R) miningAudio.play(), (K = Q.current) == null || K.goToAndPlay(0), h(V => V + 1), u > 0 && u === HITS$3 - 1 && (P(), miningFallAudio.play(), h(0));
+                if (t == I && !R) miningAudio.play(), (K = Q.current) == null || K.goToAndPlay(0), w(V => V + 1), u > 0 && u === HITS$3 - 1 && (P(), miningFallAudio.play(), w(0));
                 else return
         }, P = async () => {
             var R;
             try {
-                e.send("gold.mined", {
-                    index: A
-                }), g(!0), (R = w.current) == null || R.goToAndPlay(0), T(React.createElement("div", {
+                A.send("gold.mined", {
+                    index: e
+                }), g(!0), (R = h.current) == null || R.goToAndPlay(0), T(React.createElement("div", {
                     className: "flex"
                 }, React.createElement("img", {
                     src: gold,
@@ -11260,7 +11127,7 @@ const TimeLeftPanel = ({
             },
             className: "pointer-events-none z-20",
             getInstance: R => {
-                w.current = R
+                h.current = R
             },
             image: dropSheet$2,
             widthFrame: 91,
@@ -11312,15 +11179,15 @@ var sparkSheet$1 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAccAAABCBAMAAA
 const POPOVER_TIME_MS$2 = 1e3,
     HITS$2 = 3,
     Stone = ({
-        rockIndex: A
+        rockIndex: e
     }) => {
         const {
-            gameService: e,
+            gameService: A,
             selectedItem: t
-        } = react.exports.useContext(Context), [a] = useActor(e), [n] = useActor(e), [s, r] = react.exports.useState(!0), [i, m] = react.exports.useState(!1), [d, E] = react.exports.useState(), [u, h] = react.exports.useState(0), [B, g] = react.exports.useState(!1), C = react.exports.useRef(null), Q = react.exports.useRef(), w = react.exports.useRef(), [f, S] = react.exports.useState(!1), y = a.matches("readonly"), I = "Pickaxe", D = n.context.state.stones[A], F = !canMine$1(D);
+        } = react.exports.useContext(Context), [a] = useActor(A), [n] = useActor(A), [s, r] = react.exports.useState(!0), [i, m] = react.exports.useState(!1), [d, E] = react.exports.useState(), [u, w] = react.exports.useState(0), [B, g] = react.exports.useState(!1), C = react.exports.useRef(null), Q = react.exports.useRef(), h = react.exports.useRef(), [f, S] = react.exports.useState(!1), y = a.matches("readonly"), I = "Pickaxe", D = n.context.state.stones[e], F = !canMine$1(D);
         react.exports.useEffect(() => {
             const R = k => {
-                C.current && !C.current.contains(k.target) && h(0)
+                C.current && !C.current.contains(k.target) && w(0)
             };
             return document.addEventListener("click", R, !0), () => {
                 document.removeEventListener("click", R, !0)
@@ -11340,15 +11207,15 @@ const POPOVER_TIME_MS$2 = 1e3,
                 return
             }
             if (!(n.context.state.inventory.Pickaxe || new Decimal(0)).lessThanOrEqualTo(0))
-                if (t == I && !R) miningAudio.play(), (K = Q.current) == null || K.goToAndPlay(0), h(V => V + 1), u > 0 && u === HITS$2 - 1 && (P(), miningFallAudio.play(), h(0));
+                if (t == I && !R) miningAudio.play(), (K = Q.current) == null || K.goToAndPlay(0), w(V => V + 1), u > 0 && u === HITS$2 - 1 && (P(), miningFallAudio.play(), w(0));
                 else return
         }, P = async () => {
             var R;
-            h(0);
+            w(0);
             try {
-                e.send("stone.mined", {
-                    index: A
-                }), g(!0), (R = w.current) == null || R.goToAndPlay(0), T(React.createElement("div", {
+                A.send("stone.mined", {
+                    index: e
+                }), g(!0), (R = h.current) == null || R.goToAndPlay(0), T(React.createElement("div", {
                     className: "flex"
                 }, React.createElement("img", {
                     src: stone,
@@ -11411,7 +11278,7 @@ const POPOVER_TIME_MS$2 = 1e3,
             },
             className: "pointer-events-none z-20",
             getInstance: R => {
-                w.current = R
+                h.current = R
             },
             image: dropSheet$1,
             widthFrame: 91,
@@ -11463,15 +11330,15 @@ var sparkSheet = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAccAAABCCAMAAAAV
 const POPOVER_TIME_MS$1 = 1e3,
     HITS$1 = 3,
     Iron = ({
-        rockIndex: A
+        rockIndex: e
     }) => {
         const {
-            gameService: e,
+            gameService: A,
             selectedItem: t
-        } = react.exports.useContext(Context), [a] = useActor(e), [n] = useActor(e), [s, r] = react.exports.useState(!0), [i, m] = react.exports.useState(!1), [d, E] = react.exports.useState(), [u, h] = react.exports.useState(0), [B, g] = react.exports.useState(!1), C = react.exports.useRef(null), Q = react.exports.useRef(), w = react.exports.useRef(), [f, S] = react.exports.useState(!1), y = a.matches("readonly"), I = "Stone Pickaxe", D = n.context.state.iron[A], F = !canMine(D);
+        } = react.exports.useContext(Context), [a] = useActor(A), [n] = useActor(A), [s, r] = react.exports.useState(!0), [i, m] = react.exports.useState(!1), [d, E] = react.exports.useState(), [u, w] = react.exports.useState(0), [B, g] = react.exports.useState(!1), C = react.exports.useRef(null), Q = react.exports.useRef(), h = react.exports.useRef(), [f, S] = react.exports.useState(!1), y = a.matches("readonly"), I = "Stone Pickaxe", D = n.context.state.iron[e], F = !canMine(D);
         react.exports.useEffect(() => {
             const R = k => {
-                C.current && !C.current.contains(k.target) && h(0)
+                C.current && !C.current.contains(k.target) && w(0)
             };
             return document.addEventListener("click", R, !0), () => {
                 document.removeEventListener("click", R, !0)
@@ -11491,15 +11358,15 @@ const POPOVER_TIME_MS$1 = 1e3,
                 return
             }
             if (!(n.context.state.inventory["Stone Pickaxe"] || new Decimal(0)).lessThanOrEqualTo(0))
-                if (t === I && !R) miningAudio.play(), (K = Q.current) == null || K.goToAndPlay(0), h(V => V + 1), u > 0 && u === HITS$1 - 1 && (P(), miningFallAudio.play(), h(0));
+                if (t === I && !R) miningAudio.play(), (K = Q.current) == null || K.goToAndPlay(0), w(V => V + 1), u > 0 && u === HITS$1 - 1 && (P(), miningFallAudio.play(), w(0));
                 else return
         }, P = async () => {
             var R;
-            h(0);
+            w(0);
             try {
-                e.send("iron.mined", {
-                    index: A
-                }), g(!0), (R = w.current) == null || R.goToAndPlay(0), T(React.createElement("div", {
+                A.send("iron.mined", {
+                    index: e
+                }), g(!0), (R = h.current) == null || R.goToAndPlay(0), T(React.createElement("div", {
                     className: "flex"
                 }, React.createElement("img", {
                     src: ironOre,
@@ -11562,7 +11429,7 @@ const POPOVER_TIME_MS$1 = 1e3,
             },
             className: "pointer-events-none z-20",
             getInstance: R => {
-                w.current = R
+                h.current = R
             },
             image: dropSheet,
             widthFrame: 91,
@@ -11684,21 +11551,21 @@ const teamDonationMachine = createMachine({
             },
             donating: {
                 invoke: {
-                    src: async (A, e) => {
+                    src: async (e, A) => {
                         const {
                             donation: t
-                        } = e;
+                        } = A;
                         await metamask.donateToTheTeam(t)
                     },
                     onDone: {
                         target: "donated",
                         actions: assign({
-                            hasDonated: (A, e) => !0
+                            hasDonated: (e, A) => !0
                         })
                     },
                     onError: [{
                         target: "idle",
-                        cond: (A, e) => e.data.message === ERRORS.REJECTED_TRANSACTION
+                        cond: (e, A) => A.data.message === ERRORS.REJECTED_TRANSACTION
                     }, {
                         target: "error"
                     }]
@@ -11721,7 +11588,7 @@ const teamDonationMachine = createMachine({
         }
     }),
     TeamDonation = () => {
-        const [A, e] = useMachine(teamDonationMachine), {
+        const [e, A] = useMachine(teamDonationMachine), {
             gameService: t
         } = react.exports.useContext(Context), [a] = useActor(t), [n, s] = react.exports.useState(1), r = E => {
             s(roundToOneDecimal(Number(E.target.value)))
@@ -11730,7 +11597,7 @@ const teamDonationMachine = createMachine({
         }, m = () => {
             n === .2 ? s(.2) : n < .2 ? s(.1) : s(E => roundToOneDecimal(E - .1))
         }, d = () => {
-            s(1), e("BEGGER_CLICK"), beggarAudio.play()
+            s(1), A("BEGGER_CLICK"), beggarAudio.play()
         };
         return React.createElement("div", {
             className: "z-5 absolute align-items-center w-[72px]",
@@ -11741,7 +11608,7 @@ const teamDonationMachine = createMachine({
                 left: `calc(50% - ${GRID_WIDTH_PX*-9.8}px)`,
                 top: `calc(50% - ${GRID_WIDTH_PX*17.2}px)`
             }
-        }, A.context.hasDonated ? React.createElement("img", {
+        }, e.context.hasDonated ? React.createElement("img", {
             id: "rich_begger",
             src: richBegger,
             className: "absolute hover:cursor-pointer hover:img-highlight z-10",
@@ -11759,9 +11626,9 @@ const teamDonationMachine = createMachine({
             onClick: d
         }), React.createElement(Modal, {
             centered: !0,
-            show: !A.matches("idle"),
-            onHide: () => e("CLOSE")
-        }, React.createElement(Panel, null, A.matches("begging") && React.createElement("div", {
+            show: !e.matches("idle"),
+            onHide: () => A("CLOSE")
+        }, React.createElement(Panel, null, e.matches("begging") && React.createElement("div", {
             className: "flex flex-col items-center mb-1"
         }, React.createElement("img", {
             src: team,
@@ -11808,17 +11675,17 @@ const teamDonationMachine = createMachine({
             className: "flex w-full"
         }, React.createElement(Button, {
             className: "w-full mr-1",
-            onClick: () => e("CLOSE")
+            onClick: () => A("CLOSE")
         }, React.createElement("span", {
             className: "text-xs whitespace-nowrap"
         }, "Close")), React.createElement(Button, {
             className: "w-full ml-1",
-            onClick: () => e("DONATE", {
+            onClick: () => A("DONATE", {
                 donation: n
             })
         }, React.createElement("span", {
             className: "text-xs whitespace-nowrap"
-        }, "Donate")))), A.matches("donating") && React.createElement("div", {
+        }, "Donate")))), e.matches("donating") && React.createElement("div", {
             className: "flex flex-col items-center"
         }, React.createElement("img", {
             id: "begger",
@@ -11826,7 +11693,7 @@ const teamDonationMachine = createMachine({
             className: "w-24"
         }), React.createElement("p", {
             className: "loading mb-4"
-        }, "Donating")), A.matches("donated") && React.createElement("div", {
+        }, "Donating")), e.matches("donated") && React.createElement("div", {
             className: "flex flex-col items-center"
         }, React.createElement("img", {
             id: "richBegger",
@@ -11834,7 +11701,7 @@ const teamDonationMachine = createMachine({
             className: "w-24"
         }), React.createElement("p", {
             className: "mb-4"
-        }, "Thank you!")), A.matches("error") && React.createElement("div", {
+        }, "Thank you!")), e.matches("error") && React.createElement("div", {
             className: "flex flex-col items-center"
         }, React.createElement("img", {
             id: "richBegger",
@@ -11850,12 +11717,12 @@ const POPOVER_TIME_MS = 1e3,
     HITS = 3,
     tool = "Axe",
     Tree = ({
-        treeIndex: A
+        treeIndex: e
     }) => {
         const {
-            gameService: e,
+            gameService: A,
             selectedItem: t
-        } = react.exports.useContext(Context), [a] = useActor(e), [n, s] = react.exports.useState(!0), [r, i] = react.exports.useState(!1), [m, d] = react.exports.useState(), [E, u] = react.exports.useState(0), [h, B] = react.exports.useState(!1), g = react.exports.useRef(null), C = react.exports.useRef(), Q = react.exports.useRef(), [w, f] = react.exports.useState(!1);
+        } = react.exports.useContext(Context), [a] = useActor(A), [n, s] = react.exports.useState(!0), [r, i] = react.exports.useState(!1), [m, d] = react.exports.useState(), [E, u] = react.exports.useState(0), [w, B] = react.exports.useState(!1), g = react.exports.useRef(null), C = react.exports.useRef(), Q = react.exports.useRef(), [h, f] = react.exports.useState(!1);
         react.exports.useEffect(() => {
             const M = R => {
                 g.current && !g.current.contains(R.target) && u(0)
@@ -11864,7 +11731,7 @@ const POPOVER_TIME_MS = 1e3,
                 document.removeEventListener("click", M, !0)
             }
         }, []);
-        const S = a.context.state.trees[A],
+        const S = a.context.state.trees[e],
             y = !canChop(S),
             I = async M => {
                 d(M), s(!0), await new Promise(R => setTimeout(R, POPOVER_TIME_MS)), s(!1)
@@ -11882,8 +11749,8 @@ const POPOVER_TIME_MS = 1e3,
                 var M;
                 u(0);
                 try {
-                    e.send("tree.chopped", {
-                        index: A,
+                    A.send("tree.chopped", {
+                        index: e,
                         item: t
                     }), B(!0), (M = Q.current) == null || M.goToAndPlay(0), I(React.createElement("div", {
                         className: "flex"
@@ -11956,7 +11823,7 @@ const POPOVER_TIME_MS = 1e3,
             style: {
                 width: `${GRID_WIDTH_PX*4}px`,
                 transform: `translateX(-${GRID_WIDTH_PX*2.5}px)`,
-                opacity: h ? 1 : 0,
+                opacity: w ? 1 : 0,
                 transition: "opacity 0.2s ease-in",
                 imageRendering: "pixelated"
             },
@@ -11993,14 +11860,14 @@ const POPOVER_TIME_MS = 1e3,
         })), React.createElement(TimeLeftPanel, {
             text: "Recovers in:",
             timeLeft: b,
-            showTimeLeft: w
+            showTimeLeft: h
         })), React.createElement("div", {
             className: classNames("transition-opacity pointer-events-none absolute top-4 left-2", {
                 "opacity-100": E > 0,
                 "opacity-0": E === 0
             })
         }, React.createElement(HealthBar, {
-            percentage: h ? 0 : 100 - E / 3 * 100
+            percentage: w ? 0 : 100 - E / 3 * 100
         })), React.createElement("div", {
             className: classNames("transition-opacity absolute -bottom-5 w-40 -left-16 z-20 pointer-events-none", {
                 "opacity-100": n,
@@ -12009,8 +11876,8 @@ const POPOVER_TIME_MS = 1e3,
         }, m))
     },
     Lumberjack = () => {
-        const [A, e] = react.exports.useState(!1), [t] = useScrollIntoView(), a = () => {
-            e(!1), t(Section.Town)
+        const [e, A] = react.exports.useState(!1), [t] = useScrollIntoView(), a = () => {
+            A(!1), t(Section.Town)
         };
         return React.createElement(React.Fragment, null, React.createElement("img", {
             src: questionMark,
@@ -12022,7 +11889,7 @@ const POPOVER_TIME_MS = 1e3,
             }
         }), React.createElement("img", {
             src: idle,
-            onClick: () => e(!0),
+            onClick: () => A(!0),
             className: "absolute cursor-pointer hover:img-highlight",
             style: {
                 width: `${GRID_WIDTH_PX*1}px`,
@@ -12031,12 +11898,12 @@ const POPOVER_TIME_MS = 1e3,
             }
         }), React.createElement(Modal, {
             centered: !0,
-            show: A,
-            onHide: () => e(!1)
+            show: e,
+            onHide: () => A(!1)
         }, React.createElement(Panel, null, React.createElement("img", {
             src: close,
             className: "h-6 top-4 right-4 absolute cursor-pointer",
-            onClick: () => e(!1)
+            onClick: () => A(!1)
         }), React.createElement("div", {
             className: "flex items-start"
         }, React.createElement("img", {
@@ -12115,18 +11982,18 @@ const POPOVER_TIME_MS = 1e3,
     })));
 var bank = "./assets/bank.af356bb9.gif",
     player = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAOBAMAAAAGUYvhAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAA/peb/cZPlFVC/q40xYFYGBQl+99rxn+FfQAAAAF0Uk5TAEDm2GYAAABZSURBVAjXY2BgS0tLYwCC9CKl8gQGBjb38vJyNwaGFCBVXpIAFC5XLwJKpLuXA2ECQwqIdklgYHMBAqA6NmMgMAPSoamhqWFItKloqChQnCE1NDQUaC7UHgAcbBnVY4PP/gAAAABJRU5ErkJggg==";
-const shortAddress$1 = A => A ? `${A.slice(0,5)}...${A.slice(-4)}` : "";
+const shortAddress$1 = e => e ? `${e.slice(0,5)}...${e.slice(-4)}` : "";
 
-function getTax(A) {
-    return A.lessThan(10) ? 300 : A.lessThan(100) ? 250 : A.lessThan(1e3) ? 200 : A.lessThan(5e3) ? 150 : 100
+function getTax(e) {
+    return e.lessThan(10) ? 300 : e.lessThan(100) ? 250 : e.lessThan(1e3) ? 200 : e.lessThan(5e3) ? 150 : 100
 }
 const WithdrawTokens = ({
-    onWithdraw: A
+    onWithdraw: e
 }) => {
     var y;
     const {
-        authService: e
-    } = react.exports.useContext(Context$1), [t] = useActor(e), {
+        authService: A
+    } = react.exports.useContext(Context$1), [t] = useActor(A), {
         gameService: a
     } = react.exports.useContext(Context), [n] = useActor(a), [s, r] = react.exports.useState(new Decimal(0)), [i, m] = react.exports.useState(new Decimal(0)), [d, E] = react.exports.useState(!0);
     react.exports.useEffect(() => {
@@ -12141,8 +12008,8 @@ const WithdrawTokens = ({
         })()
     }, []);
     const u = I => typeof I != "string" ? I : new Decimal(0),
-        h = () => {
-            s > new Decimal(0) ? A(lib.toWei(s.toString())) : r(new Decimal(0))
+        w = () => {
+            s > new Decimal(0) ? e(lib.toWei(s.toString())) : r(new Decimal(0))
         },
         B = I => {
             I.target.value === "" ? r(new Decimal(0)) : r(new Decimal(Number(I.target.value)))
@@ -12159,7 +12026,7 @@ const WithdrawTokens = ({
     if (d) return React.createElement("span", {
         className: "text-shadow loading"
     }, "Loading");
-    const w = getTax(typeof s != "string" ? s : new Decimal(0)) / 10,
+    const h = getTax(typeof s != "string" ? s : new Decimal(0)) / 10,
         f = (y = t.context.token) == null ? void 0 : y.userAccess.withdraw,
         S = u(s).gte(i) || u(s).lt(0);
     return f ? React.createElement(React.Fragment, null, React.createElement("div", {
@@ -12198,7 +12065,7 @@ const WithdrawTokens = ({
         className: "text-xs"
     }, React.createElement("span", {
         className: "text-xs"
-    }, w, "% fee"), React.createElement("a", {
+    }, h, "% fee"), React.createElement("a", {
         className: "underline ml-2",
         href: "https://docs.sunflower-land.com/fundamentals/withdrawing",
         target: "_blank",
@@ -12207,7 +12074,7 @@ const WithdrawTokens = ({
         className: "flex items-center mt-4"
     }, React.createElement("span", {
         className: ""
-    }, `You will receive: ${u(s).mul((100-w)/100).toFixed(1)}`), React.createElement("img", {
+    }, `You will receive: ${u(s).mul((100-h)/100).toFixed(1)}`), React.createElement("img", {
         src: token,
         className: "w-4 ml-2 img-highlight"
     })), React.createElement("div", {
@@ -12228,43 +12095,43 @@ const WithdrawTokens = ({
     }), React.createElement("span", {
         className: "text-xs"
     }, "ANY PROGRESS THAT HAS NOT BEEN SYNCED ON CHAIN WILL BE LOST.")), React.createElement(Button, {
-        onClick: h,
+        onClick: w,
         disabled: S
     }, "Withdraw")) : React.createElement("span", null, "Available May 9th")
 };
 
 function cropIsPlanted({
-    item: A,
-    game: e
+    item: e,
+    game: A
 }) {
-    return Object.values(e.fields).some(a => a.name === A)
+    return Object.values(A.fields).some(a => a.name === e)
 }
 
-function hasSeeds(A) {
-    return Object.keys(A).some(e => e in SEEDS())
+function hasSeeds(e) {
+    return Object.keys(e).some(A => A in SEEDS())
 }
 
 function canWithdraw({
-    item: A,
-    game: e
+    item: e,
+    game: A
 }) {
-    return isSeed$1(A) || A in SKILL_TREE || A in FOODS() ? !1 : A === "Woody the Beaver" || A === "Apprentice Beaver" || A === "Foreman Beaver" ? Object.values(e.trees).every(t => canChop(t)) : A === "Kuebiko" && hasSeeds(e.inventory) ? !1 : A === "Scarecrow" || A === "Nancy" || A === "Kuebiko" ? Object.values(e.fields).length === 0 : A === "Easter Bunny" ? !cropIsPlanted({
+    return isSeed$1(e) || e in SKILL_TREE || e in FOODS() ? !1 : e === "Woody the Beaver" || e === "Apprentice Beaver" || e === "Foreman Beaver" ? Object.values(A.trees).every(t => canChop(t)) : e === "Kuebiko" && hasSeeds(A.inventory) ? !1 : e === "Scarecrow" || e === "Nancy" || e === "Kuebiko" ? Object.values(A.fields).length === 0 : e === "Easter Bunny" ? !cropIsPlanted({
         item: "Carrot",
-        game: e
-    }) : A === "Golden Cauliflower" ? !cropIsPlanted({
+        game: A
+    }) : e === "Golden Cauliflower" ? !cropIsPlanted({
         item: "Cauliflower",
-        game: e
-    }) : A === "Mysterious Parsnip" ? !cropIsPlanted({
+        game: A
+    }) : e === "Mysterious Parsnip" ? !cropIsPlanted({
         item: "Parsnip",
-        game: e
+        game: A
     }) : !0
 }
 const WithdrawItems = ({
-        onWithdraw: A
+        onWithdraw: e
     }) => {
         const {
-            gameService: e
-        } = react.exports.useContext(Context), [t] = useActor(e), [a, n] = react.exports.useState(!0), [s, r] = react.exports.useState({}), [i, m] = react.exports.useState({});
+            gameService: A
+        } = react.exports.useContext(Context), [t] = useActor(A), [a, n] = react.exports.useState(!0), [s, r] = react.exports.useState({}), [i, m] = react.exports.useState({});
         react.exports.useEffect(() => {
             n(!0);
             const g = async () => {
@@ -12281,10 +12148,10 @@ const WithdrawItems = ({
         const d = () => {
                 const g = Object.keys(i).map(Q => KNOWN_IDS[Q]),
                     C = Object.keys(i).map(Q => {
-                        var w;
-                        return lib.toWei((w = i[Q]) == null ? void 0 : w.toString(), getItemUnit(Q))
+                        var h;
+                        return lib.toWei((h = i[Q]) == null ? void 0 : h.toString(), getItemUnit(Q))
                     });
-                A(g, C)
+                e(g, C)
             },
             E = g => {
                 m(C => l(c({}, C), {
@@ -12309,12 +12176,12 @@ const WithdrawItems = ({
         if (a) return React.createElement("span", {
             className: "text-shadow loading"
         }, "Loading");
-        const h = Object.keys(s).filter(g => {
+        const w = Object.keys(s).filter(g => {
             var C;
             return (C = s[g]) == null ? void 0 : C.gt(0)
         });
         console.log({
-            inventoryItems: h
+            inventoryItems: w
         });
         const B = Object.keys(i).filter(g => {
             var C;
@@ -12324,7 +12191,7 @@ const WithdrawItems = ({
             className: "text-shadow text-base"
         }, "Select items to withdraw"), React.createElement("div", {
             className: "flex flex-wrap h-fit"
-        }, h.map(g => React.createElement(Box, {
+        }, w.map(g => React.createElement(Box, {
             count: s[g],
             key: g,
             onClick: () => E(g),
@@ -12333,7 +12200,7 @@ const WithdrawItems = ({
                 item: g,
                 game: t.context.state
             })
-        })), h.length < 4 && new Array(4 - h.length).fill(null).map((g, C) => React.createElement(Box, {
+        })), w.length < 4 && new Array(4 - w.length).fill(null).map((g, C) => React.createElement(Box, {
             disabled: !0,
             key: C
         }))), React.createElement("div", {
@@ -12381,32 +12248,32 @@ const WithdrawItems = ({
         }, "Read more")))
     },
     Withdraw = ({
-        onClose: A
+        onClose: e
     }) => {
         const {
-            gameService: e
-        } = react.exports.useContext(Context), [t] = useActor(e), [a, n] = react.exports.useState("warning"), s = react.exports.useRef({
+            gameService: A
+        } = react.exports.useContext(Context), [t] = useActor(A), [a, n] = react.exports.useState("warning"), s = react.exports.useRef({
             ids: [],
             amounts: [],
             sfl: "0"
-        }), [r, i] = react.exports.useState(!1), m = async h => {
+        }), [r, i] = react.exports.useState(!1), m = async w => {
             console.log({
-                sfl: h
+                sfl: w
             }), s.current = {
                 ids: [],
                 amounts: [],
-                sfl: h
+                sfl: w
             }, i(!0)
-        }, d = async (h, B) => {
+        }, d = async (w, B) => {
             s.current = {
-                ids: h,
+                ids: w,
                 amounts: B,
                 sfl: "0"
             }, i(!0)
-        }, E = async h => {
-            await new Promise(B => setTimeout(B, 1e3)), e.send("WITHDRAW", l(c({}, s.current), {
-                captcha: h
-            })), A()
+        }, E = async w => {
+            await new Promise(B => setTimeout(B, 1e3)), A.send("WITHDRAW", l(c({}, s.current), {
+                captcha: w
+            })), e()
         };
         return t.context.whitelistedAt ? React.createElement("div", {
             className: "p-2 text-sm text-center"
@@ -12517,18 +12384,18 @@ const WithdrawItems = ({
     }, "4."), React.createElement("span", null, 'Once the transaction has completed successfully, open the menu inside Sunflower Land and click "Sync on Chain"'))),
     TOOL_TIP_MESSAGE = "Copy Farm Address";
 var Instructions;
-(function(A) {
-    A[A.token = 0] = "token", A[A.item = 1] = "item"
+(function(e) {
+    e[e.token = 0] = "token", e[e.item = 1] = "item"
 })(Instructions || (Instructions = {}));
 const Deposit = () => {
         var g;
         const {
-            gameService: A
-        } = react.exports.useContext(Context), [e] = useActor(A), [t, a] = react.exports.useState(!1), [n, s] = react.exports.useState(TOOL_TIP_MESSAGE), [r, i] = react.exports.useState(!1), [m, d] = react.exports.useState(null), E = (g = e.context.state) == null ? void 0 : g.farmAddress, u = () => {
+            gameService: e
+        } = react.exports.useContext(Context), [A] = useActor(e), [t, a] = react.exports.useState(!1), [n, s] = react.exports.useState(TOOL_TIP_MESSAGE), [r, i] = react.exports.useState(!1), [m, d] = react.exports.useState(null), E = (g = A.context.state) == null ? void 0 : g.farmAddress, u = () => {
             navigator.clipboard.writeText(E), s("Copied!"), setTimeout(() => {
                 s(TOOL_TIP_MESSAGE)
             }, 2e3)
-        }, h = m === 0, B = m === 1;
+        }, w = m === 0, B = m === 1;
         return React.createElement("div", null, React.createElement("div", {
             className: "h-14 w-full",
             style: {
@@ -12579,7 +12446,7 @@ const Deposit = () => {
             className: "flex mb-3"
         }, React.createElement(Button, {
             className: classNames("mr-1", {
-                "bg-brown-300": h
+                "bg-brown-300": w
             }),
             onClick: () => d(0)
         }, "SFL Token"), React.createElement(Button, {
@@ -12587,7 +12454,7 @@ const Deposit = () => {
                 "bg-brown-300": B
             }),
             onClick: () => d(1)
-        }, "SFL Items")), h && React.createElement(SFLTokenInstructions, null), B && React.createElement(SFLItemsInstructions, null), React.createElement("div", {
+        }, "SFL Items")), w && React.createElement(SFLTokenInstructions, null), B && React.createElement(SFLItemsInstructions, null), React.createElement("div", {
             className: "flex items-center border-2 rounded-md border-black p-2 bg-[#e43b44]"
         }, React.createElement("img", {
             src: alert,
@@ -12598,9 +12465,9 @@ const Deposit = () => {
         }, "DO NOT SEND MATIC OR ANY OTHER NON SFL TOKENS TO YOUR FARM ADDRESS")))
     },
     BankModal = ({
-        onClose: A
+        onClose: e
     }) => {
-        const [e, t] = react.exports.useState("deposit");
+        const [A, t] = react.exports.useState("deposit");
         return React.createElement(Panel, {
             className: "pt-5 relative max-w-5xl"
         }, React.createElement("div", {
@@ -12608,7 +12475,7 @@ const Deposit = () => {
         }, React.createElement("div", {
             className: "flex"
         }, React.createElement(Tab, {
-            isActive: e === "deposit",
+            isActive: A === "deposit",
             onClick: () => t("deposit")
         }, React.createElement("img", {
             src: token,
@@ -12616,7 +12483,7 @@ const Deposit = () => {
         }), React.createElement("span", {
             className: "text-sm text-shadow"
         }, "Deposit")), React.createElement(Tab, {
-            isActive: e === "withdraw",
+            isActive: A === "withdraw",
             onClick: () => t("withdraw")
         }, React.createElement("img", {
             src: token,
@@ -12626,19 +12493,19 @@ const Deposit = () => {
         }, "Withdraw"))), React.createElement("img", {
             src: close,
             className: "h-6 cursor-pointer mr-2 mb-1",
-            onClick: A
+            onClick: e
         })), React.createElement("div", {
             style: {
                 minHeight: "200px"
             }
-        }, e === "deposit" && React.createElement(Deposit, null), e === "withdraw" && React.createElement(Withdraw, {
-            onClose: A
+        }, A === "deposit" && React.createElement(Deposit, null), A === "withdraw" && React.createElement(Withdraw, {
+            onClose: e
         })))
     },
     Bank = () => {
         const {
-            gameService: A
-        } = react.exports.useContext(Context), [e] = useActor(A), [t, a] = React.useState(!1), n = !e.matches("readonly"), s = () => {
+            gameService: e
+        } = react.exports.useContext(Context), [A] = useActor(e), [t, a] = React.useState(!1), n = !A.matches("readonly"), s = () => {
             if (n) a(!0), bankAudio.play();
             else return
         };
@@ -12675,9 +12542,9 @@ const Deposit = () => {
 var smoke$1 = "data:image/gif;base64,R0lGODdhDwAlAHcAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQJCgAAACwAAAAADwAlAIEAAADAy9z///8AAAACNoSPqcutEdyBstqLs968X1EJUNQIJlmeiAkeJ8qKCDW9zkg3o8f3/s9jSWItRoCFWuCSypyhAAAh+QQJCgAAACwCAAEADQAkAIEAAADAy9z///8AAAACOYSPeaHtD6OctNr7RBSBvQ4JnNeIICBqx8ikHHIGJpl09ndi+s73q5hxNWTCWieVM9iWNADzZlwiCgAh+QQJCgAAACwDAAAADAAlAIEAAADAy9z///8AAAACPISPCaHtD6OctFoqoBDshe4Em7dlQHl8Y8mlnciByEeH34XneoPypXz49VywoUHFmiF/xOLtSIvKpE9AAQAh+QQJCgAAACwCAAAADQAlAIEAAADAy9z///8AAAACOYQdp8vtD6OctNopYhAZhq91zyY6icJBHGh+Z3vF8oylDre+KP6VBk/yAVzBFm60aREbRBejyQIUAAAh+QQJCgAAACwBAAkADgAcAIEAAADAy9z///8AAAACM4SPqRabAR2CQkgW6mV761tFEiSOTYem6soelSW9oZOFtUJSL07KdP2hBVuH3IlnXBhLBQAh+QQJCgAAACwBAAkADQAcAIEAAADAy9z///8AAAACN4RvgZsRwpB7Ubp6FN5GQOxd1aSNJYem6qp6X+QK4vLIjkeTcX670RTCTIS2E8I1oxWFJNPQUAAAIfkECQoAAAAsAQAHAA0AHgCBAAAAwMvc////AAAAAjeEj6mbEcKMezDOEGXeRlTmOdaUidyJpqf3KazHUPDihHNTs8oV0hcWe5h2LOBOaDwmVYihz1kAACH5BAkKAAAALAEABgAMAB8AgQAAAMDL3P///wAAAAI3hI95EYrcnIHRUTmxRkILplXbSJae0Dnoqq5pErgKhc5oXHNrLBo3JIF8LLjXgzEk9kzMDdBQAAAh+QQJCgAAACwBAAUADAAgAIEAAADAy9z///8AAAACM4SPeRGK7B6MbNL4MKi66Q+G4iiUVGkmQoAK6sqmB8wlVW3fzs3uDOpjeXI44uiI/FgABQAh+QQJCgAAACwCAAQACgAbAIEAAADAy9z///8AAAACMISPGZG3bR6MDEo7V217+g+GoUAiZECWQIqmBtsKr6BddQfcXMulMhL7OVq4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",
     soup = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAMBAMAAACdPPCPAAAABGdBTUEAALGPC/xhBQAAACFQTFRFAAAAGBUl////GTw+GBQl9nV6Y8dNJlxCFxQkGBQkPolIdrFdFAAAAAF0Uk5TAEDm2GYAAABnSURBVAjXJYy7CYBAFAQ3MPBasARTG7AJW3jINXBgZKRiZHafUFDutkr1OdGwCwMAMcYDH4Zii1qiCN+x3nbeYsOMhYofsQ9qKWO9yMzkM2o3sbDxM7Cl7w1/5exaTZuJ/MuVc64HHpD2LEjvbcW+AAAAAElFTkSuQmCC";
 const CraftingItems = ({
-        items: A
+        items: e
     }) => {
-        const [e, t] = react.exports.useState(Object.values(A)[0]), {
+        const [A, t] = react.exports.useState(Object.values(e)[0]), {
             setToast: a
         } = react.exports.useContext(ToastContext), {
             gameService: n,
@@ -12686,24 +12553,24 @@ const CraftingItems = ({
             context: {
                 state: r
             }
-        }] = useActor(n), i = r.inventory, m = (B = 1) => e.ingredients.some(g => g.amount.mul(B).greaterThan(i[g.item] || 0)), d = (B = 1) => r.balance.lessThan(e.price.mul(B)), E = Object.keys(i).includes(e.name), u = !(d() || m()), h = (B = 1) => {
+        }] = useActor(n), i = r.inventory, m = (B = 1) => A.ingredients.some(g => g.amount.mul(B).greaterThan(i[g.item] || 0)), d = (B = 1) => r.balance.lessThan(A.price.mul(B)), E = Object.keys(i).includes(A.name), u = !(d() || m()), w = (B = 1) => {
             n.send("item.crafted", {
-                item: e.name,
+                item: A.name,
                 amount: B
             }), a({
-                content: "SFL -$" + e.price.mul(B)
-            }), e.ingredients.map(g => {
+                content: "SFL -$" + A.price.mul(B)
+            }), A.ingredients.map(g => {
                 a({
                     content: g.item + " -" + g.amount.mul(B)
                 })
-            }), s(e.name)
+            }), s(A.name)
         };
         return React.createElement("div", {
             className: "flex"
         }, React.createElement("div", {
             className: "w-3/5 flex flex-wrap h-fit"
-        }, Object.values(A).map(B => React.createElement(Box, {
-            isSelected: e.name === B.name,
+        }, Object.values(e).map(B => React.createElement(Box, {
+            isSelected: A.name === B.name,
             key: B.name,
             onClick: () => t(B),
             image: ITEM_DETAILS[B.name].image,
@@ -12714,15 +12581,15 @@ const CraftingItems = ({
             className: "flex flex-col justify-center items-center p-2 relative"
         }, React.createElement("span", {
             className: "text-shadow text-center"
-        }, e.name), React.createElement("img", {
-            src: ITEM_DETAILS[e.name].image,
+        }, A.name), React.createElement("img", {
+            src: ITEM_DETAILS[A.name].image,
             className: "h-16 img-highlight mt-1",
-            alt: e.name
+            alt: A.name
         }), React.createElement("span", {
             className: "text-shadow text-center mt-2 sm:text-sm"
-        }, e.description), !E && React.createElement("div", {
+        }, A.description), !E && React.createElement("div", {
             className: "border-t border-white w-full mt-2 pt-1"
-        }, e.ingredients.map((B, g) => {
+        }, A.ingredients.map((B, g) => {
             const C = ITEM_DETAILS[B.item],
                 Q = new Decimal(i[B.item] || 0).lessThan(B.amount);
             return React.createElement("div", {
@@ -12745,16 +12612,16 @@ const CraftingItems = ({
             className: classNames("text-xs text-shadow text-center mt-2 ", {
                 "text-red-500": d()
             })
-        }, `$${e.price.toNumber()}`))), React.createElement(Button, {
+        }, `$${A.price.toNumber()}`))), React.createElement(Button, {
             disabled: E || !u,
             className: `${E?"pe-none":""} text-xs mt-1`,
-            onClick: () => h()
+            onClick: () => w()
         }, E ? "Already crafted" : "Craft"))))
     },
     Crafting$1 = ({
-        onClose: A
+        onClose: e
     }) => {
-        const [e, t] = react.exports.useState("foods");
+        const [A, t] = react.exports.useState("foods");
         return React.createElement(Panel, {
             className: "pt-5 relative"
         }, React.createElement("div", {
@@ -12762,7 +12629,7 @@ const CraftingItems = ({
         }, React.createElement("div", {
             className: "flex"
         }, React.createElement(Tab, {
-            isActive: e === "foods",
+            isActive: A === "foods",
             onClick: () => t("foods")
         }, React.createElement("img", {
             src: food,
@@ -12772,19 +12639,19 @@ const CraftingItems = ({
         }, "Food"))), React.createElement("img", {
             src: close,
             className: "h-6 cursor-pointer mr-2 mb-1",
-            onClick: A
+            onClick: e
         })), React.createElement("div", {
             style: {
                 minHeight: "200px"
             }
-        }, e === "foods" && React.createElement(CraftingItems, {
+        }, A === "foods" && React.createElement(CraftingItems, {
             items: FOODS()
         })))
     },
     Bakery = () => {
         const {
-            gameService: A
-        } = react.exports.useContext(Context), [e] = useActor(A), [t, a] = React.useState(!1), n = !e.matches("readonly"), s = () => {
+            gameService: e
+        } = react.exports.useContext(Context), [A] = useActor(e), [t, a] = React.useState(!1), n = !A.matches("readonly"), s = () => {
             a(!0), bakeryAudio.play()
         }, r = () => {
             a(!1)
@@ -12832,10 +12699,10 @@ const CraftingItems = ({
 var blacksmith = "./assets/blacksmith_building.df51adb3.gif",
     hammer = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANBAMAAACAxflPAAAABGdBTUEAALGPC/xhBQAAABVQTFRFAAAAwMvcvkovi5u0WmmIcz45GBQlmbZdhwAAAAF0Uk5TAEDm2GYAAABDSURBVAjXY2BgYEhgAAM2MTYwK8UwKQzMdxYD00ABsDibi7MYiE4KSTEGCrCphrG5gbihCQwQLlgxiAsCqWFQUyFcADzlCyeFMcRDAAAAAElFTkSuQmCC";
 const Crafting = ({
-        onClose: A
+        onClose: e
     }) => {
         var s;
-        const [e, t] = react.exports.useState("craft"), {
+        const [A, t] = react.exports.useState("craft"), {
             authService: a
         } = react.exports.useContext(Context$1), [n] = useActor(a);
         return React.createElement(Panel, {
@@ -12845,7 +12712,7 @@ const Crafting = ({
         }, React.createElement("div", {
             className: "flex"
         }, React.createElement(Tab, {
-            isActive: e === "craft",
+            isActive: A === "craft",
             onClick: () => t("craft")
         }, React.createElement("img", {
             src: hammer,
@@ -12853,7 +12720,7 @@ const Crafting = ({
         }), React.createElement("span", {
             className: "text-sm text-shadow"
         }, "Tools")), React.createElement(Tab, {
-            isActive: e === "nfts",
+            isActive: A === "nfts",
             onClick: () => t("nfts")
         }, React.createElement("img", {
             src: nft,
@@ -12863,25 +12730,25 @@ const Crafting = ({
         }, "Rare"))), React.createElement("img", {
             src: close,
             className: "h-6 cursor-pointer mr-2 mb-1",
-            onClick: A
+            onClick: e
         })), React.createElement("div", {
             style: {
                 minHeight: "200px"
             }
-        }, e === "craft" && React.createElement(CraftingItems$1, {
+        }, A === "craft" && React.createElement(CraftingItems$1, {
             items: TOOLS,
             isBulk: !0,
-            onClose: A
-        }), e === "nfts" && React.createElement(Rare, {
+            onClose: e
+        }), A === "nfts" && React.createElement(Rare, {
             items: BLACKSMITH_ITEMS,
-            onClose: A,
+            onClose: e,
             hasAccess: !!((s = n.context.token) == null ? void 0 : s.userAccess.mintCollectible)
         })))
     },
     Blacksmith = () => {
         const {
-            gameService: A
-        } = react.exports.useContext(Context), [e] = useActor(A), [t, a] = React.useState(!1), n = !e.matches("readonly"), s = () => {
+            gameService: e
+        } = react.exports.useContext(Context), [A] = useActor(e), [t, a] = React.useState(!1), n = !A.matches("readonly"), s = () => {
             if (n) a(!0), blacksmithAudio.play();
             else return
         };
@@ -12918,13 +12785,13 @@ const Crafting = ({
 var plant = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMBAMAAACkW0HUAAAABGdBTUEAALGPC/xhBQAAABVQTFRFAAAAvkovdD85PolIJlxCY8dNGBQlRgj2hQAAAAF0Uk5TAEDm2GYAAABASURBVAjXY2BLYwCB1NAEMGUaBqaCwVy2UNOENCAjNcQtFCjOluIaDJJOcQWrSnEGKWITcQSZwKakBNaRBlQPAD1xDcnZIECyAAAAAElFTkSuQmCC";
 const MAX_BULK_SEED_BUY_AMOUNT = 10;
 
-function makeBulkSeedBuyAmount(A) {
-    return A.lessThan(MAX_BULK_SEED_BUY_AMOUNT) ? A.toDecimalPlaces(0, Decimal$1.ROUND_DOWN).toNumber() : MAX_BULK_SEED_BUY_AMOUNT
+function makeBulkSeedBuyAmount(e) {
+    return e.lessThan(MAX_BULK_SEED_BUY_AMOUNT) ? e.toDecimalPlaces(0, Decimal$1.ROUND_DOWN).toNumber() : MAX_BULK_SEED_BUY_AMOUNT
 }
 const Seeds = ({
-        onClose: A
+        onClose: e
     }) => {
-        const [e, t] = react.exports.useState(SEEDS()["Sunflower Seed"]), {
+        const [A, t] = react.exports.useState(SEEDS()["Sunflower Seed"]), {
             setToast: a
         } = react.exports.useContext(ToastContext), {
             gameService: n,
@@ -12933,24 +12800,24 @@ const Seeds = ({
             context: {
                 state: r
             }
-        }] = useActor(n), [i, m] = react.exports.useState(!1), [d, E] = react.exports.useState(!1), u = r.inventory, h = getBuyPrice(e, u), B = (D = 1) => {
+        }] = useActor(n), [i, m] = react.exports.useState(!1), [d, E] = react.exports.useState(!1), u = r.inventory, w = getBuyPrice(A, u), B = (D = 1) => {
             n.send("item.crafted", {
-                item: e.name,
+                item: A.name,
                 amount: D
             }), a({
-                content: "SFL -$" + h.mul(D).toString()
-            }), s(e.name)
+                content: "SFL -$" + w.mul(D).toString()
+            }), s(A.name)
         }, g = () => {
             E(!0)
         }, C = async D => {
             await new Promise(F => setTimeout(F, 1e3)), n.send("SYNC", {
                 captcha: D
-            }), A()
-        }, Q = (D = 1) => r.balance.lessThan(h.mul(D).toString()), w = e.name.split(" ")[0], f = CROPS()[w], S = r.stock[e.name] || new Decimal$1(0), y = makeBulkSeedBuyAmount(S);
+            }), e()
+        }, Q = (D = 1) => r.balance.lessThan(w.mul(D).toString()), h = A.name.split(" ")[0], f = CROPS()[h], S = r.stock[A.name] || new Decimal$1(0), y = makeBulkSeedBuyAmount(S);
         if (react.exports.useEffect(() => m(hasBoost({
-                item: e.name,
+                item: A.name,
                 inventory: u
-            })), [u, e.name, r.inventory]), d) return React.createElement(RecaptchaWrapper, {
+            })), [u, A.name, r.inventory]), d) return React.createElement(RecaptchaWrapper, {
             sitekey: "6Lfqm6MeAAAAAFS5a0vwAfTGUwnlNoHziyIlOl1s",
             onChange: C,
             onExpired: () => E(!1),
@@ -12958,7 +12825,7 @@ const Seeds = ({
         });
         const I = () => {
             var T;
-            if (e.requires && !u[e.requires] || e.disabled) return React.createElement("span", {
+            if (A.requires && !u[A.requires] || A.disabled) return React.createElement("span", {
                 className: "text-xs mt-1 text-shadow"
             }, "Locked");
             if (S == null ? void 0 : S.equals(0)) return React.createElement("div", null, React.createElement("p", {
@@ -12969,8 +12836,8 @@ const Seeds = ({
                 className: "text-xs mt-1",
                 onClick: g
             }, "Sync"));
-            const F = INITIAL_STOCK[e.name];
-            return F && ((T = u[e.name]) == null ? void 0 : T.gt(F)) ? React.createElement("span", {
+            const F = INITIAL_STOCK[A.name];
+            return F && ((T = u[A.name]) == null ? void 0 : T.gt(F)) ? React.createElement("span", {
                 className: "text-xs mt-1 text-shadow text-center"
             }, "No space left") : React.createElement(React.Fragment, null, React.createElement(Button, {
                 disabled: Q() || (S == null ? void 0 : S.lessThan(1)),
@@ -12987,7 +12854,7 @@ const Seeds = ({
         }, React.createElement("div", {
             className: "w-3/5 flex flex-wrap h-fit"
         }, Object.values(SEEDS()).map(D => React.createElement(Box, {
-            isSelected: e.name === D.name,
+            isSelected: A.name === D.name,
             key: D.name,
             onClick: () => t(D),
             image: ITEM_DETAILS[D.name].image,
@@ -12997,13 +12864,13 @@ const Seeds = ({
         }, React.createElement("div", {
             className: "flex flex-col justify-center items-center p-2 relative"
         }, React.createElement(Stock, {
-            item: e
+            item: A
         }), React.createElement("span", {
             className: "text-shadow text-center"
-        }, e.name), React.createElement("img", {
-            src: ITEM_DETAILS[e.name].image,
+        }, A.name), React.createElement("img", {
+            src: ITEM_DETAILS[A.name].image,
             className: "w-8 sm:w-12 img-highlight mt-1",
-            alt: e.name
+            alt: A.name
         }), React.createElement("div", {
             className: "border-t border-white w-full mt-2 pt-1"
         }, React.createElement("div", {
@@ -13025,10 +12892,10 @@ const Seeds = ({
             className: classNames("text-xs text-shadow text-center mt-2", {
                 "text-red-500": Q()
             })
-        }, `$${h}`))), I())))
+        }, `$${w}`))), I())))
     },
     Plants = () => {
-        const [A, e] = react.exports.useState(CROPS().Sunflower), {
+        const [e, A] = react.exports.useState(CROPS().Sunflower), {
             setToast: t
         } = react.exports.useContext(ToastContext), [a, n] = React.useState(!1), {
             gameService: s
@@ -13038,18 +12905,18 @@ const Seeds = ({
             }
         }] = useActor(s), [i, m] = react.exports.useState(!1), d = r.inventory, E = (f = 1) => {
             s.send("item.sell", {
-                item: A.name,
+                item: e.name,
                 amount: f
             }), t({
-                content: "SFL +$" + B(A).mul(f).toString()
+                content: "SFL +$" + B(e).mul(f).toString()
             })
-        }, u = new Decimal(d[A.name] || 0), h = u.equals(0), B = f => getSellPrice(f, d), g = () => {
+        }, u = new Decimal(d[e.name] || 0), w = u.equals(0), B = f => getSellPrice(f, d), g = () => {
             E(1)
         }, C = () => {
             E(u.toNumber()), n(!1)
         }, Q = () => {
             u.equals(1) ? g() : n(!0)
-        }, w = () => {
+        }, h = () => {
             n(!1)
         };
         return react.exports.useEffect(() => {
@@ -13059,9 +12926,9 @@ const Seeds = ({
         }, React.createElement("div", {
             className: "w-3/5 flex flex-wrap h-fit"
         }, Object.values(CROPS()).map(f => React.createElement(Box, {
-            isSelected: A.name === f.name,
+            isSelected: e.name === f.name,
             key: f.name,
-            onClick: () => e(f),
+            onClick: () => A(f),
             image: ITEM_DETAILS[f.name].image,
             count: d[f.name]
         }))), React.createElement(OuterPanel, {
@@ -13070,13 +12937,13 @@ const Seeds = ({
             className: "flex flex-col justify-center items-center p-2 "
         }, React.createElement("span", {
             className: "text-shadow"
-        }, A.name), React.createElement("img", {
-            src: ITEM_DETAILS[A.name].image,
+        }, e.name), React.createElement("img", {
+            src: ITEM_DETAILS[e.name].image,
             className: "w-8 sm:w-12",
-            alt: A.name
+            alt: e.name
         }), React.createElement("span", {
             className: "text-shadow text-center mt-2 sm:text-sm"
-        }, A.description), React.createElement("div", {
+        }, e.description), React.createElement("div", {
             className: "border-t border-white w-full mt-2 pt-1"
         }, React.createElement("div", {
             className: "flex justify-center items-end"
@@ -13088,18 +12955,18 @@ const Seeds = ({
             className: "h-6 me-2"
         }), React.createElement("span", {
             className: "text-xs text-shadow text-center mt-2 "
-        }, `$${B(A)}`))), React.createElement(Button, {
+        }, `$${B(e)}`))), React.createElement(Button, {
             disabled: u.lessThan(1),
             className: "text-xs mt-1",
             onClick: g
         }, "Sell 1"), React.createElement(Button, {
-            disabled: h,
+            disabled: w,
             className: "text-xs mt-1 whitespace-nowrap",
             onClick: Q
         }, "Sell All"))), React.createElement(Modal, {
             centered: !0,
             show: a,
-            onHide: w
+            onHide: h
         }, React.createElement(Panel, {
             className: "md:w-4/5 m-auto"
         }, React.createElement("div", {
@@ -13108,25 +12975,25 @@ const Seeds = ({
             className: "text-sm text-center text-shadow"
         }, "Are you sure you want to ", React.createElement("br", {
             className: "hidden md:block"
-        }), "sell all your ", A.name, "?"), React.createElement("span", {
+        }), "sell all your ", e.name, "?"), React.createElement("span", {
             className: "text-sm text-center text-shadow mt-1"
         }, "Total: ", u.toNumber())), React.createElement("div", {
             className: "flex justify-content-around p-1"
         }, React.createElement(Button, {
-            disabled: h,
+            disabled: w,
             className: "text-xs",
             onClick: C
         }, "Yes"), React.createElement(Button, {
-            disabled: h,
+            disabled: w,
             className: "text-xs ml-2",
-            onClick: w
+            onClick: h
         }, "No")))))
     },
     MarketItems = ({
-        onClose: A
+        onClose: e
     }) => {
         var r;
-        const [e, t] = react.exports.useState("buy"), {
+        const [A, t] = react.exports.useState("buy"), {
             authService: a
         } = react.exports.useContext(Context$1), [n] = useActor(a), s = i => {
             t(i)
@@ -13138,7 +13005,7 @@ const Seeds = ({
         }, React.createElement("div", {
             className: "flex"
         }, React.createElement(Tab, {
-            isActive: e === "buy",
+            isActive: A === "buy",
             onClick: () => s("buy")
         }, React.createElement("img", {
             src: seeds$1,
@@ -13146,7 +13013,7 @@ const Seeds = ({
         }), React.createElement("span", {
             className: "text-sm text-shadow"
         }, "Buy")), React.createElement(Tab, {
-            isActive: e === "sell",
+            isActive: A === "sell",
             onClick: () => s("sell")
         }, React.createElement("img", {
             src: sunflowerPlant$1,
@@ -13154,7 +13021,7 @@ const Seeds = ({
         }), React.createElement("span", {
             className: "text-sm text-shadow"
         }, "Sell")), React.createElement(Tab, {
-            isActive: e === "rare",
+            isActive: A === "rare",
             onClick: () => s("rare")
         }, React.createElement("img", {
             src: goldenCauliflower,
@@ -13164,19 +13031,19 @@ const Seeds = ({
         }, "Rare"))), React.createElement("img", {
             src: close,
             className: "h-6 cursor-pointer mr-2 mb-1",
-            onClick: A
-        })), e === "buy" && React.createElement(Seeds, {
-            onClose: A
-        }), e === "sell" && React.createElement(Plants, null), e === "rare" && React.createElement(Rare, {
+            onClick: e
+        })), A === "buy" && React.createElement(Seeds, {
+            onClose: e
+        }), A === "sell" && React.createElement(Plants, null), A === "rare" && React.createElement(Rare, {
             items: MARKET_ITEMS,
-            onClose: A,
+            onClose: e,
             hasAccess: !!((r = n.context.token) == null ? void 0 : r.userAccess.mintCollectible)
         }))
     },
     Market = () => {
         const {
-            gameService: A
-        } = react.exports.useContext(Context), [e] = useActor(A), [t, a] = React.useState(!1), n = !e.matches("readonly"), s = () => {
+            gameService: e
+        } = react.exports.useContext(Context), [A] = useActor(e), [t, a] = React.useState(!1), n = !A.matches("readonly"), s = () => {
             a(!0), marketAudio.play()
         };
         return React.createElement("div", {
@@ -13213,17 +13080,17 @@ var wishingWell = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAtCAMAAAD
 const wishingWellAddress = CONFIG.WISHING_WELL_CONTRACT,
     LOCKED_SECONDS = 60;
 async function loadWishingWell() {
-    const A = metamask.getWishingWell().getBalance(),
-        e = metamask.getWishingWell().canCollect(),
+    const e = metamask.getWishingWell().getBalance(),
+        A = metamask.getWishingWell().canCollect(),
         t = metamask.getWishingWell().lastCollected(),
         a = metamask.getPair().getBalance(),
         n = metamask.getToken().balanceOf(wishingWellAddress),
-        [s, r, i, m, d] = await Promise.all([A, e, a, t, n]);
+        [s, r, i, m, d] = await Promise.all([e, A, a, t, n]);
     let E;
     const u = new Date().getTime() / 1e3 - m;
     if (u <= LOCKED_SECONDS) {
-        const h = LOCKED_SECONDS - u;
-        E = secondsToLongString(h)
+        const w = LOCKED_SECONDS - u;
+        E = secondsToLongString(w)
     }
     return {
         myTokensInWell: s,
@@ -13235,8 +13102,8 @@ async function loadWishingWell() {
 }
 const API_URL = CONFIG.API_URL;
 async function collectFromWell({
-    farmId: A,
-    sessionId: e,
+    farmId: e,
+    sessionId: A,
     token: t,
     amount: a,
     captcha: n
@@ -13248,8 +13115,8 @@ async function collectFromWell({
             Authorization: `Bearer ${t}`
         },
         body: JSON.stringify({
-            sessionId: e,
-            farmId: A,
+            sessionId: A,
+            farmId: e,
             tokens: a,
             captcha: n
         })
@@ -13258,7 +13125,7 @@ async function collectFromWell({
     const r = await s.json();
     await metamask.getWishingWell().collectFromWell(r)
 }
-const wishingWellMachine = A => createMachine({
+const wishingWellMachine = e => createMachine({
         id: "wishingWell",
         initial: "loading",
         context: {
@@ -13279,7 +13146,7 @@ const wishingWellMachine = A => createMachine({
                     onDone: {
                         target: "ready",
                         actions: assign({
-                            state: (e, t) => t.data.state
+                            state: (A, t) => t.data.state
                         })
                     },
                     onError: {
@@ -13319,20 +13186,20 @@ const wishingWellMachine = A => createMachine({
             },
             searching: {
                 invoke: {
-                    src: async (e, t) => {
+                    src: async (A, t) => {
                         console.log({
-                            contextIs: e.state
+                            contextIs: A.state
                         });
-                        const a = Math.min(Number(e.state.lpTokens), Number(e.state.totalTokensInWell));
+                        const a = Math.min(Number(A.state.lpTokens), Number(A.state.totalTokensInWell));
                         console.log({
                             tokensToPull: a
                         }), console.log({
                             event: t
                         }), await collectFromWell({
-                            farmId: A.farmId,
-                            sessionId: A.sessionId,
+                            farmId: e.farmId,
+                            sessionId: e.sessionId,
                             amount: a.toString(),
-                            token: A.rawToken,
+                            token: e.rawToken,
                             captcha: t.captcha
                         })
                     },
@@ -13355,11 +13222,11 @@ const wishingWellMachine = A => createMachine({
             }
         }
     }),
-    shortAddress = A => A ? `${A.slice(0,5)}...${A.slice(-4)}` : "",
+    shortAddress = e => e ? `${e.slice(0,5)}...${e.slice(-4)}` : "",
     WishingWellModal = () => {
         const {
-            authService: A
-        } = react.exports.useContext(Context$1), [e] = useActor(A), [t, a] = useMachine(wishingWellMachine(e.context)), n = () => {
+            authService: e
+        } = react.exports.useContext(Context$1), [A] = useActor(e), [t, a] = useMachine(wishingWellMachine(A.context)), n = () => {
             if (t.matches("error")) return React.createElement("span", null, "Something went wrong!");
             if (t.matches("captcha")) return React.createElement(RecaptchaWrapper, {
                 sitekey: "6Lfqm6MeAAAAAFS5a0vwAfTGUwnlNoHziyIlOl1s",
@@ -13453,8 +13320,8 @@ const wishingWellMachine = A => createMachine({
     },
     WishingWell = () => {
         const {
-            gameService: A
-        } = react.exports.useContext(Context), [e] = useActor(A), [t, a] = React.useState(!1), n = !e.matches("readonly"), s = () => {
+            gameService: e
+        } = react.exports.useContext(Context), [A] = useActor(e), [t, a] = React.useState(!1), n = !A.matches("readonly"), s = () => {
             if (n) wishingWellAudio.play(), a(!0);
             else return
         };
@@ -13490,17 +13357,17 @@ const wishingWellMachine = A => createMachine({
         })))
     },
     Markdown = ({
-        children: A
+        children: e
     }) => React.createElement(ReactMarkdown, {
         remarkPlugins: [remarkGfm]
-    }, A),
+    }, e),
     Inbox = ({
-        inbox: A,
-        isLoading: e,
+        inbox: e,
+        isLoading: A,
         onRead: t
     }) => React.createElement(OuterPanel, {
         className: "relative"
-    }, e ? React.createElement(InnerPanel, null, "Loading...") : A.length ? React.createElement(Accordion, null, A.map(({
+    }, A ? React.createElement(InnerPanel, null, "Loading...") : e.length ? React.createElement(Accordion, null, e.map(({
         title: a,
         body: n,
         unread: s
@@ -13521,50 +13388,47 @@ const wishingWellMachine = A => createMachine({
     }, React.createElement(Markdown, null, n))))) : React.createElement(InnerPanel, null, "No messages")),
     MESSAGES_KEY = "readMessages";
 var Halvening;
-(function(A) {
-    A.MILESTONE_1 = "5e+6", A.MILESTONE_2 = "10e+6"
+(function(e) {
+    e.MILESTONE_1 = "5e+6", e.MILESTONE_2 = "10e+6"
 })(Halvening || (Halvening = {}));
 async function getSFLSupply() {
-    const A = await metamask.getToken().totalSupply();
-    return new Decimal(lib.fromWei(A))
+    const e = await metamask.getToken().totalSupply();
+    return new Decimal(lib.fromWei(e))
 }
 
-function cleanupCache(A) {
-    const e = A.filter(t => !t.unread).map(t => t.id);
-    e.length ? localStorage.setItem(MESSAGES_KEY, JSON.stringify(e)) : localStorage.removeItem(MESSAGES_KEY)
+function cleanupCache(e) {
+    const A = e.filter(t => !t.unread).map(t => t.id);
+    A.length ? localStorage.setItem(MESSAGES_KEY, JSON.stringify(A)) : localStorage.removeItem(MESSAGES_KEY)
 }
 
-function getNextHalvening(A) {
-    if (A.lessThan(new Decimal(Halvening.MILESTONE_1))) return new Decimal(Halvening.MILESTONE_1);
-    if (A.lessThan(new Decimal(Halvening.MILESTONE_2))) return new Decimal(Halvening.MILESTONE_2);
-    const e = A.idiv(Halvening.MILESTONE_2).add(1).times(10);
-    return new Decimal(`${e}e+6`)
+function getNextHalvening(e) {
+    if (e.lessThan(new Decimal(Halvening.MILESTONE_1))) return new Decimal(Halvening.MILESTONE_1);
+    if (e.lessThan(new Decimal(Halvening.MILESTONE_2))) return new Decimal(Halvening.MILESTONE_2);
+    const A = e.idiv(Halvening.MILESTONE_2).add(1).times(10);
+    return new Decimal(`${A}e+6`)
 }
 async function getInbox() {
-    const A = await getSFLSupply(),
-        e = getNextHalvening(A);
+    const e = await getSFLSupply(),
+        A = getNextHalvening(e);
     return [{
         id: "sfl-supply",
         title: "SFL Supply",
-        body: `Total SFL: ${A.toDecimalPlaces(3,Decimal.ROUND_DOWN).toNumber().toLocaleString()}  
+        body: `Total SFL: ${e.toDecimalPlaces(3,Decimal.ROUND_DOWN).toNumber().toLocaleString()}  
         &nbsp;  
-        Next halvening is at ${e.toNumber().toLocaleString()}  
+        Next halvening is at ${A.toNumber().toLocaleString()}  
         &nbsp;   
         **Note: this value is read from the Blockchain. Other farmers may not have synced yet.**
       `
     }, {
-        id: "2022-04-30",
+        id: "2022-05-04",
         title: "May 2022 Dates",
-        body: `Check our social pages for NFT release dates  
+        body: `Dates shown are in your **local** timezone. Check our social pages for NFT release dates.  
         &nbsp;  
         ${formatDateTime("2022-05-04T00:00:00Z")}  
         - End of V1 Migration  
         &nbsp;  
-        ${formatDateTime("2022-05-09T00:00:00Z")}  
-        - SFL Token Launch  
-        &nbsp;  
-        ${formatDateTime("2022-05-16T00:00:00Z")}\u{1F534}  
-        - 50,000 **new** farm spots  
+        ${formatDateTime("2022-05-09T12:00:00Z")}  
+        - SFL Withdrawals
         &nbsp;  
         ${formatDateTime("2022-05-30T00:00:00Z")}\u{1F534}  
         - Rarible  
@@ -13581,18 +13445,18 @@ function getReadMessages() {
     return JSON.parse(localStorage.getItem(MESSAGES_KEY) || "[]")
 }
 
-function updateCache(A) {
-    const e = [...getReadMessages(), A];
-    localStorage.setItem(MESSAGES_KEY, JSON.stringify(e))
+function updateCache(e) {
+    const A = [...getReadMessages(), e];
+    localStorage.setItem(MESSAGES_KEY, JSON.stringify(A))
 }
 var baldMan = "data:image/gif;base64,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";
 const Mail = () => {
-        const [A, e] = react.exports.useState(!1), [t, a] = react.exports.useState(!1), [n, s] = react.exports.useState([]), [r, i] = react.exports.useState(!1), m = async () => {
+        const [e, A] = react.exports.useState(!1), [t, a] = react.exports.useState(!1), [n, s] = react.exports.useState([]), [r, i] = react.exports.useState(!1), m = async () => {
             a(!0);
             const E = getReadMessages();
             let u = await getInbox();
-            u = u.map(h => l(c({}, h), {
-                unread: !(E == null ? void 0 : E.includes(h.id))
+            u = u.map(w => l(c({}, w), {
+                unread: !(E == null ? void 0 : E.includes(w.id))
             })), s(u), cleanupCache(u), a(!1)
         }, d = E => {
             if (!n[E].unread) return;
@@ -13602,8 +13466,8 @@ const Mail = () => {
         return react.exports.useEffect(() => {
             m()
         }, []), react.exports.useEffect(() => {
-            A && m()
-        }, [A]), react.exports.useEffect(() => {
+            e && m()
+        }, [e]), react.exports.useEffect(() => {
             const E = n.some(u => u.unread);
             i(E)
         }, [n]), React.createElement("div", {
@@ -13618,13 +13482,13 @@ const Mail = () => {
         }), React.createElement("img", {
             src: baldMan,
             className: "absolute w-10 z-10 hover:cursor-pointer hover:img-highlight npc-shadow",
-            onClick: () => e(!0)
+            onClick: () => A(!0)
         }), React.createElement("span", {
             className: "npc-shadow"
         }), React.createElement(Modal, {
             centered: !0,
-            show: A,
-            onHide: () => e(!1)
+            show: e,
+            onHide: () => A(!1)
         }, React.createElement(Inbox, {
             inbox: n,
             isLoading: t,
@@ -13642,7 +13506,7 @@ const Mail = () => {
         }
     }, React.createElement(Market, null), React.createElement(Bank, null), React.createElement(Bakery, null), React.createElement(Blacksmith, null), React.createElement(WishingWell, null), React.createElement(Mail, null)),
     RejectedSignTransaction = ({
-        onTryAgain: A
+        onTryAgain: e
     }) => React.createElement("div", {
         className: "flex flex-col text-center text-shadow items-center p-1"
     }, React.createElement("div", {
@@ -13661,7 +13525,7 @@ const Mail = () => {
     }, "Terms of Service"), "."), React.createElement("p", {
         className: "text-center mb-4 text-xs"
     }, "This request will not trigger a blockchain transaction or cost any gas fees."), React.createElement(Button, {
-        onClick: A,
+        onClick: e,
         className: "overflow-hidden mb-2"
     }, React.createElement("span", null, "Try Again"))),
     ConnectingError = () => React.createElement("div", {
@@ -13727,31 +13591,31 @@ const Mail = () => {
         className: "text-center mb-4 text-xs"
     }, "Looks like you have been busy! Please try again later.")),
     ErrorMessage = ({
-        errorCode: A
+        errorCode: e
     }) => {
         const {
-            authService: e
-        } = react.exports.useContext(Context$1), [t, a] = useActor(e);
+            authService: A
+        } = react.exports.useContext(Context$1), [t, a] = useActor(A);
         return react.exports.useEffect(() => {
             const n = document.querySelector("body");
             return n && (n.style.pointerEvents = "none"), () => {
                 n && (n.style.pointerEvents = "initial")
             }
         }, []), console.log({
-            errorCode: A
-        }), A === "NO_WEB3" ? React.createElement(Web3Missing, null) : A === "WRONG_CHAIN" ? React.createElement(WrongChain, null) : A === "REJECTED_TRANSACTION" ? React.createElement(RejectedSignTransaction, {
+            errorCode: e
+        }), e === "NO_WEB3" ? React.createElement(Web3Missing, null) : e === "WRONG_CHAIN" ? React.createElement(WrongChain, null) : e === "REJECTED_TRANSACTION" ? React.createElement(RejectedSignTransaction, {
             onTryAgain: () => a("REFRESH")
-        }) : A === "NO_FARM" ? React.createElement(Beta, null) : A === "BLOCKED" ? React.createElement(Blocked, null) : A === "DISCORD_USER_EXISTS" ? React.createElement(DuplicateUser, null) : A === "NETWORK_CONGESTED" ? React.createElement(Congestion, null) : A === "SESSION_EXPIRED" ? React.createElement(SessionExpired, null) : A === "TOO_MANY_REQUESTS" ? React.createElement(TooManyRequests, null) : React.createElement(ConnectingError, null)
+        }) : e === "NO_FARM" ? React.createElement(Beta, null) : e === "BLOCKED" ? React.createElement(Blocked, null) : e === "DISCORD_USER_EXISTS" ? React.createElement(DuplicateUser, null) : e === "NETWORK_CONGESTED" ? React.createElement(Congestion, null) : e === "SESSION_EXPIRED" ? React.createElement(SessionExpired, null) : e === "TOO_MANY_REQUESTS" ? React.createElement(TooManyRequests, null) : React.createElement(ConnectingError, null)
     };
 var house = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAA7CAMAAAAKG/l2AAAABGdBTUEAALGPC/xhBQAAAFRQTFRFAAAAUKNBaTk3GTw+pvn/i5u0JJOiHEmPFDdhwMvcCmSSPolIWmmIOkRmSqJq6LeW////6tSquG9QJitELOj1vkovHm3VAJnbwoVpEk6Jcz455KZy2SYaFQAAAAF0Uk5TAEDm2GYAAAKASURBVEjHjZaLdpswDIbZuq4hGYUCBku8/3tOVyNuSXROCdj/h61Yv9KquowkUb0biN0PRYf4prxtFWjbNxCWt22W4LsXSJS/RtDlKU0SKTlyymDXdSpHnCUQFaEJvABUPsEoAZMiV0D2t6+Ar5JPgcRyGEnvABEjoExcJD2ReLsCQdNF0hXPk3YLjDp6DoxXwHgJ8Pb3OcjlHJDtH3Pgy6st6cG9sSUHLJ4DGHLQ8n6aA+JiOQAsiwLLYssccyA5zepu6G7R4uY7ONuSyJdMQJSvyA4wec6wylFiReBEnrm8Xa5dw5G1vFHlTdPQ69UPKl8kHGFACpC7Cb2zoYFmnGUuyCOSkbuOAJn0tELXCGByHCRwRQwQuKkJqJuZyz6lnsMBeWBElAoANDXNEUBEsm+zV6C3x4QAalM+x6n5rOv6UwDfugP+LE4E99jwj2PYAHoOATDX0dnevxyYoABJgRQBOe3b3/vXjQGQwtMkOU8D/Bm9Ym+3O63QUCZSeJgvAmf2q65AAOx9Y7GeHwN/CuBGEzvHWJkIuMdkmTkuwJY2hHMQIPaJuVhTozPrACftroutay7WNMCsQ5HL17rpE1uvFevwyyPgOezlwaChc4Q+Ea25N+gI2xyCPIWISNjSVr4sR7fFzgHX8iMCxdMm709iRYKnVX5Vd44ET59t5mxj5ulX8oCgNDJ6eA2gdA79baZSTNZW0LzvUYYTMqS9kms3ZZvhdgxDuZRhBpbfAbC20kvh8KnO/AllWAA8Beh/Hv6Ty1PA2tAesOEDYG0l9VugDB+AbDN5C5Th45Y8uNV+MPAxTaHNrMD3DhgeIYYToPrexOMRfit/PR7b2ar6D8/uyX9Za1K4AAAAAElFTkSuQmCC",
     smoke = "data:image/gif;base64,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";
 
-function skillUpgradeToast(A, e) {
-    const a = getAvailableUpgrades(A)[0],
+function skillUpgradeToast(e, A) {
+    const a = getAvailableUpgrades(e)[0],
         n = SKILL_TREE[a].profession,
-        s = getLevel(A.skills[n]),
-        r = `${A.farmAddress}.${n}.level-${s}`;
-    localStorage.getItem(r) || (localStorage.setItem(r, new Date().toDateString()), e({
+        s = getLevel(e.skills[n]),
+        r = `${e.farmAddress}.${n}.level-${s}`;
+    localStorage.getItem(r) || (localStorage.setItem(r, new Date().toDateString()), A({
         content: "Skill upgrade available",
         icon: n === "farming" ? plant : pickaxe,
         timeout: 5800
@@ -13759,12 +13623,12 @@ function skillUpgradeToast(A, e) {
 }
 const SkillUpgrade = () => {
     const {
-        gameService: A
-    } = react.exports.useContext(Context), [e] = useActor(A), t = s => {
-        A.send("LEVEL_UP", {
+        gameService: e
+    } = react.exports.useContext(Context), [A] = useActor(e), t = s => {
+        e.send("LEVEL_UP", {
             skill: s
         })
-    }, a = getAvailableUpgrades(e.context.state);
+    }, a = getAvailableUpgrades(A.context.state);
     if (a.length === 0) return null;
     const n = SKILL_TREE[a[0]];
     return React.createElement("div", {
@@ -13814,22 +13678,22 @@ const SkillUpgrade = () => {
 };
 var lock = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAOBAMAAADpk+DfAAAABGdBTUEAALGPC/xhBQAAABVQTFRFAAAAWmqH/+ax6HkCi5y0+qcHMCUqnjGH7AAAAAF0Uk5TAEDm2GYAAABISURBVAjXY2BgS0tLYGBgSHFxcWNgYHNMSxNJYGADMlNwUGluaWkpaQxJSkCgxpAampYWGsaQHBqWGmoGo9iMgQBoaBoQMAAAlpYUdXGHxPYAAAAASUVORK5CYII=";
 const SkillTree = ({
-        back: A
+        back: e
     }) => {
         const {
-            gameService: e
+            gameService: A
         } = react.exports.useContext(Context), [{
             context: {
                 state: t
             }
-        }] = useActor(e);
+        }] = useActor(A);
         return React.createElement(React.Fragment, null, React.createElement("div", {
             className: "flex"
         }, React.createElement("img", {
             className: "h-6 mr-3 cursor-pointer",
             src: arrowLeft,
             alt: "back",
-            onClick: A
+            onClick: e
         }), React.createElement("span", {
             className: "text-base"
         }, "Skills")), React.createElement("div", {
@@ -13864,16 +13728,16 @@ const SkillTree = ({
     },
     House = () => {
         const {
-            gameService: A
+            gameService: e
         } = react.exports.useContext(Context), {
-            setToast: e
-        } = react.exports.useContext(ToastContext), [t] = useActor(A), {
+            setToast: A
+        } = react.exports.useContext(ToastContext), [t] = useActor(e), {
             state: a
         } = t.context, [n, s] = React.useState(!1), [r, i] = React.useState(!1), [m, d] = React.useState(!1);
         React.useEffect(() => {
             const I = upgradeAvailable(a);
-            d(I), I && a.farmAddress && skillUpgradeToast(a, e)
-        }, [e, a]);
+            d(I), I && a.farmAddress && skillUpgradeToast(a, A)
+        }, [A, a]);
         const E = () => {
                 i(!0)
             },
@@ -13881,13 +13745,13 @@ const SkillTree = ({
                 i(!1), s(!0), homeDoorAudio.play()
             },
             {
-                gathering: h,
+                gathering: w,
                 farming: B
             } = a.skills,
-            g = getLevel(h),
+            g = getLevel(w),
             C = getLevel(B),
             Q = g + C,
-            w = getRequiredXpToLevelUp(g),
+            h = getRequiredXpToLevelUp(g),
             f = getRequiredXpToLevelUp(C),
             S = () => {
                 const D = ["Green Thumb", "Barn Manager", "Seed Specialist", "Wrangler", "Lumberjack", "Prospector", "Logger", "Gold Rush"].map(F => t.context.state.inventory[F] ? React.createElement("img", {
@@ -13947,7 +13811,7 @@ const SkillTree = ({
                 className: "w-4 h-4 ml-2"
             })), React.createElement("span", {
                 className: "text-xxs"
-            }, w ? `${h.toNumber()} XP/${w} XP` : `${h.toNumber()} XP`), React.createElement("div", {
+            }, h ? `${w.toNumber()} XP/${h} XP` : `${w.toNumber()} XP`), React.createElement("div", {
                 className: "flex items-center mt-1 flex-wrap mb-1 md:mb-0"
             }, new Array(10).fill(null).map((I, D) => D < g ? React.createElement(Label, {
                 key: D,
@@ -14017,15 +13881,15 @@ const SkillTree = ({
     };
 var tailor = "./assets/tailor.3917066c.gif";
 const TailorSale = ({
-        onClose: A
+        onClose: e
     }) => {
         const {
-            gameService: e
+            gameService: A
         } = react.exports.useContext(Context), [{
             context: {
                 state: t
             }
-        }] = useActor(e), [a, n] = react.exports.useState("flags"), s = Object.keys(FLAGS).sort().reduce((i, m) => (i[m] = FLAGS[m], i), {}), r = Object.values(FLAGS).filter(i => i.name in t.inventory).length === 3;
+        }] = useActor(A), [a, n] = react.exports.useState("flags"), s = Object.keys(FLAGS).sort().reduce((i, m) => (i[m] = FLAGS[m], i), {}), r = Object.values(FLAGS).filter(i => i.name in t.inventory).length === 3;
         return React.createElement(Panel, {
             className: "pt-5 relative"
         }, React.createElement("div", {
@@ -14043,14 +13907,14 @@ const TailorSale = ({
         }, "Flags"))), React.createElement("img", {
             src: close,
             className: "h-6 cursor-pointer mr-2 mb-1",
-            onClick: A
+            onClick: e
         })), React.createElement("div", {
             style: {
                 minHeight: "200px"
             }
         }, React.createElement(Rare, {
             items: s,
-            onClose: A,
+            onClose: e,
             hasAccess: !0,
             canCraft: !r
         }), React.createElement("p", {
@@ -14059,8 +13923,8 @@ const TailorSale = ({
     },
     Tailor = () => {
         const {
-            gameService: A
-        } = react.exports.useContext(Context), [e] = useActor(A), [t, a] = React.useState(!1), n = !e.matches("readonly"), s = () => {
+            gameService: e
+        } = react.exports.useContext(Context), [A] = useActor(e), [t, a] = React.useState(!1), n = !A.matches("readonly"), s = () => {
             a(!0), tailorAudio.play()
         };
         return React.createElement("div", {
@@ -14096,12 +13960,12 @@ var greenBook = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHAgMAAAC5P
     yellowBook = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAHBAMAAAAyiZrdAAAABGdBTUEAALGPC/xhBQAAAA9QTFRFwMvc+dO693Yivkov/q40B6UNmwAAABlJREFUCNdjcHFxYEDGSkoKDAaCAgzGxgYARcsEbIXZOoIAAAAASUVORK5CYII=",
     tombstone = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAMBAMAAACgrpHpAAAABGdBTUEAALGPC/xhBQAAABhQTFRFAAAAwMvc////i5u0OkRmPolIPUhpWmmIODDc5wAAAAF0Uk5TAEDm2GYAAABISURBVAjXY2BgSEtLYwACNkFBwQQgnaykpGQG5BqVl5crJzCwqQPpIiBdDgJAusTdpcQdSpsD6WJz4+JyhHwYmE5lYA0FgQAA2KUYKrSvhfoAAAAASUVORK5CYII=";
 const Lore = () => {
-        const [A, e] = react.exports.useState(!1), [t, a] = react.exports.useState(!1), [n, s] = react.exports.useState(!1), r = () => {
-            e(!0), battleAudio.play()
+        const [e, A] = react.exports.useState(!1), [t, a] = react.exports.useState(!1), [n, s] = react.exports.useState(!1), r = () => {
+            A(!0), battleAudio.play()
         }, i = () => {
             a(!0), diaryAudio.play()
         }, m = () => {
-            a(!1), e(!1), battleAudio.stop(), diaryAudio.stop()
+            a(!1), A(!1), battleAudio.stop(), diaryAudio.stop()
         };
         return React.createElement(React.Fragment, null, React.createElement("img", {
             src: greenBook,
@@ -14112,9 +13976,9 @@ const Lore = () => {
                 right: `${GRID_WIDTH_PX*4.25}px`,
                 top: `${GRID_WIDTH_PX*27.1}px`
             }
-        }), A && React.createElement(Modal, {
+        }), e && React.createElement(Modal, {
             centered: !0,
-            show: A,
+            show: e,
             onHide: m
         }, React.createElement(Panel, null, React.createElement("img", {
             src: close,
@@ -14196,11 +14060,11 @@ const Lore = () => {
         }, "A hero of the resistance. Loved by friends, family & followers"))))))
     },
     ClockIssue = ({
-        show: A
+        show: e
     }) => {
-        const [e, t] = react.exports.useState(!1);
+        const [A, t] = react.exports.useState(!1);
         return React.createElement(Modal, {
-            show: A && !e,
+            show: e && !A,
             centered: !0
         }, React.createElement(Panel, null, React.createElement("div", {
             className: "flex flex-col items-center p-2"
@@ -14218,7 +14082,7 @@ const Lore = () => {
     },
     Withdrawn = () => {
         const {
-            gameService: A
+            gameService: e
         } = react.exports.useContext(Context);
         return React.createElement("div", {
             className: "flex flex-col items-center"
@@ -14244,7 +14108,7 @@ const Lore = () => {
             target: "_blank",
             rel: "noreferrer"
         }, "PolygonScan")), React.createElement(Button, {
-            onClick: () => A.send("REFRESH")
+            onClick: () => e.send("REFRESH")
         }, "Continue"))
     },
     Resetting = () => React.createElement("span", {
@@ -14268,16 +14132,16 @@ const Lore = () => {
     },
     Game = () => {
         const {
-            gameService: A
-        } = react.exports.useContext(Context), [e, t] = useActor(A);
+            gameService: e
+        } = react.exports.useContext(Context), [A, t] = useActor(e);
         return useInterval(() => t("SAVE"), AUTO_SAVE_INTERVAL), react.exports.useEffect(() => {
             const a = n => {
-                e.context.actions.length !== 0 && (n.preventDefault(), n.returnValue = "")
+                A.context.actions.length !== 0 && (n.preventDefault(), n.returnValue = "")
             };
             return window.addEventListener("beforeunload", a), () => {
                 window.removeEventListener("beforeunload", a)
             }
-        }, [e]), react.exports.useEffect(() => {
+        }, [A]), react.exports.useEffect(() => {
             const a = () => {
                 t("SAVE")
             };
@@ -14285,14 +14149,14 @@ const Lore = () => {
                 window.removeEventListener("blur", a), screenTracker.pause()
             }
         }, []), React.createElement(React.Fragment, null, React.createElement(ToastManager, null), React.createElement(Modal, {
-            show: SHOW_MODAL[e.value],
+            show: SHOW_MODAL[A.value],
             centered: !0
         }, React.createElement(Panel, {
             className: "text-shadow"
-        }, e.matches("loading") && React.createElement(Loading, null), e.matches("resetting") && React.createElement(Resetting, null), e.matches("error") && React.createElement(ErrorMessage, {
-            errorCode: e.context.errorCode
-        }), e.matches("blacklisted") && React.createElement(Blacklisted, null), e.matches("minting") && React.createElement(Minting, null), e.matches("synced") && React.createElement(Success, null), e.matches("syncing") && React.createElement(Syncing, null), e.matches("withdrawing") && React.createElement(Withdrawing, null), e.matches("withdrawn") && React.createElement(Withdrawn, null))), React.createElement(ClockIssue, {
-            show: e.context.offset > 0
+        }, A.matches("loading") && React.createElement(Loading, null), A.matches("resetting") && React.createElement(Resetting, null), A.matches("error") && React.createElement(ErrorMessage, {
+            errorCode: A.context.errorCode
+        }), A.matches("blacklisted") && React.createElement(Blacklisted, null), A.matches("minting") && React.createElement(Minting, null), A.matches("synced") && React.createElement(Success, null), A.matches("syncing") && React.createElement(Syncing, null), A.matches("withdrawing") && React.createElement(Withdrawing, null), A.matches("withdrawn") && React.createElement(Withdrawn, null))), React.createElement(ClockIssue, {
+            show: A.context.offset > 0
         }), React.createElement(Hud, null), React.createElement(TeamDonation, null), React.createElement(Crops, null), React.createElement(Water, null), React.createElement(Animals, null), React.createElement(Decorations, null), React.createElement(Forest, null), React.createElement(Quarry, null), React.createElement(Town, null), React.createElement(House, null), React.createElement(Tailor, null), React.createElement(Lore, null))
     };
 let container;
@@ -14300,24 +14164,24 @@ const sensitivity = 3,
     intervalTime = 1,
     movementIntervals = {},
     initialCoordinates = [1024, 1214],
-    keyDownListener = A => {
-        const e = A.key.toLowerCase();
-        container && A.target === document.body && (e === "w" || e === "arrowup" ? movementIntervals.moveUp === void 0 && (movementIntervals.moveUp = setInterval(() => {
+    keyDownListener = e => {
+        const A = e.key.toLowerCase();
+        container && e.target === document.body && (A === "w" || A === "arrowup" ? movementIntervals.moveUp === void 0 && (movementIntervals.moveUp = setInterval(() => {
             container.scrollTop -= sensitivity
-        }, intervalTime)) : e === "a" || e === "arrowleft" ? movementIntervals.moveLeft === void 0 && (movementIntervals.moveLeft = setInterval(() => {
+        }, intervalTime)) : A === "a" || A === "arrowleft" ? movementIntervals.moveLeft === void 0 && (movementIntervals.moveLeft = setInterval(() => {
             container.scrollLeft -= sensitivity
-        }, intervalTime)) : e === "s" || e === "arrowdown" ? movementIntervals.moveDown === void 0 && (movementIntervals.moveDown = setInterval(() => {
+        }, intervalTime)) : A === "s" || A === "arrowdown" ? movementIntervals.moveDown === void 0 && (movementIntervals.moveDown = setInterval(() => {
             container.scrollTop += sensitivity
-        }, intervalTime)) : e === "d" || e === "arrowright" ? movementIntervals.moveRight === void 0 && (movementIntervals.moveRight = setInterval(() => {
+        }, intervalTime)) : A === "d" || A === "arrowright" ? movementIntervals.moveRight === void 0 && (movementIntervals.moveRight = setInterval(() => {
             container.scrollLeft += sensitivity
-        }, intervalTime)) : e === " " && (container.scrollTop = initialCoordinates[0], container.scrollLeft = initialCoordinates[1], A.preventDefault()))
+        }, intervalTime)) : A === " " && (container.scrollTop = initialCoordinates[0], container.scrollLeft = initialCoordinates[1], e.preventDefault()))
     },
-    keyUpListener = A => {
-        const e = A.key.toLowerCase();
-        container && (e === "w" || e === "arrowup" ? movementIntervals.moveUp !== void 0 && (clearInterval(movementIntervals.moveUp), delete movementIntervals.moveUp) : e === "a" || e === "arrowleft" ? movementIntervals.moveLeft !== void 0 && (clearInterval(movementIntervals.moveLeft), delete movementIntervals.moveLeft) : e === "s" || e === "arrowdown" ? movementIntervals.moveDown !== void 0 && (clearInterval(movementIntervals.moveDown), delete movementIntervals.moveDown) : (e === "d" || e === "arrowright") && movementIntervals.moveRight !== void 0 && (clearInterval(movementIntervals.moveRight), delete movementIntervals.moveRight))
+    keyUpListener = e => {
+        const A = e.key.toLowerCase();
+        container && (A === "w" || A === "arrowup" ? movementIntervals.moveUp !== void 0 && (clearInterval(movementIntervals.moveUp), delete movementIntervals.moveUp) : A === "a" || A === "arrowleft" ? movementIntervals.moveLeft !== void 0 && (clearInterval(movementIntervals.moveLeft), delete movementIntervals.moveLeft) : A === "s" || A === "arrowdown" ? movementIntervals.moveDown !== void 0 && (clearInterval(movementIntervals.moveDown), delete movementIntervals.moveDown) : (A === "d" || A === "arrowright") && movementIntervals.moveRight !== void 0 && (clearInterval(movementIntervals.moveRight), delete movementIntervals.moveRight))
     },
-    addListeners = A => {
-        A != null && (container = A), window.addEventListener("keydown", keyDownListener), window.addEventListener("keyup", keyUpListener)
+    addListeners = e => {
+        e != null && (container = e), window.addEventListener("keydown", keyDownListener), window.addEventListener("keyup", keyUpListener)
     },
     removeListeners = () => {
         window.removeEventListener("keydown", keyDownListener), window.removeEventListener("keyup", keyUpListener)
@@ -14328,7 +14192,7 @@ var mapMovement = {
     },
     cloudGazer = "./assets/cloud-gazer.e5175f4f.gif";
 const ExpansionInfo = () => {
-        const [A, e] = react.exports.useState(!1);
+        const [e, A] = react.exports.useState(!1);
         return React.createElement("div", {
             style: {
                 width: `${GRID_WIDTH_PX*2}px`,
@@ -14349,16 +14213,16 @@ const ExpansionInfo = () => {
             className: "absolute h-3 w-8 bg-black opacity-20 bottom-1 left-[39%]"
         }), React.createElement("img", {
             src: cloudGazer,
-            onClick: () => e(!0),
+            onClick: () => A(!0),
             className: "absolute w-20 bottom-0 left-1/2 -translate-x-1/2 cursor-pointer hover:img-highlight drop-shadow-md"
         })), React.createElement(Modal, {
             centered: !0,
-            show: A,
-            onHide: () => e(!1)
+            show: e,
+            onHide: () => A(!1)
         }, React.createElement(Panel, null, React.createElement("img", {
             src: close,
             className: "h-6 top-4 right-4 absolute cursor-pointer",
-            onClick: () => e(!1)
+            onClick: () => A(!1)
         }), React.createElement("div", {
             className: "flex items-start"
         }, React.createElement("img", {
@@ -14373,12 +14237,12 @@ const ExpansionInfo = () => {
         }, "I wonder if I will ever get to see what lies beneath them all?"))))))
     },
     Session = () => {
-        const A = react.exports.useRef(null);
-        return react.exports.useEffect(() => (mapMovement.addListeners(A.current), () => {
+        const e = react.exports.useRef(null);
+        return react.exports.useEffect(() => (mapMovement.addListeners(e.current), () => {
             mapMovement.removeListeners()
-        }), [A]), React.createElement(GameProvider, null, React.createElement(ToastProvider, null, React.createElement(p$1, {
+        }), [e]), React.createElement(GameProvider, null, React.createElement(ToastProvider, null, React.createElement(p$1, {
             className: "bg-green-background overflow-scroll relative w-full h-full",
-            innerRef: A
+            innerRef: e
         }, React.createElement("div", {
             className: "relative h-gameboard w-gameboard"
         }, React.createElement("img", {
@@ -14398,16 +14262,16 @@ const Signing = () => React.createElement(React.Fragment, null, React.createElem
         className: "text-center mb-3"
     }, "Supply reached!"), React.createElement("p", {
         className: "text-center mb-4 text-xs"
-    }, "100,000 farms have already been minted for open beta. Currently only people who owned V1 Sunflower Farmer assets are able to create a farm. More spots are opening soon!")),
+    }, "100,000 farms have already been minted for open beta. More spots are opening soon!")),
     Countdown = () => {
-        const [A, e] = react.exports.useState("60secs"), {
+        const [e, A] = react.exports.useState("60secs"), {
             authService: t
         } = react.exports.useContext(Context$1);
         return react.exports.useEffect(() => {
             const a = Date.now(),
                 n = setInterval(() => {
                     const s = 60 - (Date.now() - a) / 1e3;
-                    e(secondsToLongString(s)), s <= 0 && (t.send("REFRESH"), clearInterval(n))
+                    A(secondsToLongString(s)), s <= 0 && (t.send("REFRESH"), clearInterval(n))
                 }, 1e3);
             return () => clearInterval(n)
         }, []), React.createElement("div", {
@@ -14421,7 +14285,7 @@ const Signing = () => React.createElement(React.Fragment, null, React.createElem
             className: "text-xs text-center mb-1"
         }, "Your farm will be ready in"), React.createElement("span", {
             className: "text-3xl"
-        }, A), React.createElement("span", {
+        }, e), React.createElement("span", {
             className: "text-xs text-center mt-4 underline mb-1"
         }, "Do not refresh this browser"))
     },
@@ -14438,73 +14302,15 @@ const Signing = () => React.createElement(React.Fragment, null, React.createElem
     })), React.createElement("p", {
         className: "text-center mb-4 text-xs"
     }, "Only goblins play the game with the screen minimized. Make sure your browser is full screen to enjoy Sunflower Land to the fullest!")),
-    Airdrop = () => {
-        const {
-            authService: A
-        } = react.exports.useContext(Context$1), [e, t] = useActor(A), a = e.context.farmId;
-        return e.matches({
-            airdropping: "idle"
-        }) ? React.createElement("div", {
-            className: "p-2"
-        }, React.createElement("span", null, `Airdrop to #${a}`), React.createElement("p", {
-            className: "text-sm py-2"
-        }, "If you played Sunflower Farmers before January 9th, you may be eligible to send resources from an account into your existing farm."), React.createElement("p", {
-            className: "underline"
-        }, "To receive an airdrop, keep this screen open and swap to your Metamask account that you wish to migrate.")) : e.matches({
-            airdropping: "confirmation"
-        }) ? React.createElement("div", null, React.createElement("span", null, `Progress from this account will be airdropped to farm #${a}`), React.createElement(Button, {
-            onClick: () => t("CONFIRM")
-        }, "Sign & Airdrop")) : e.matches({
-            airdropping: "signing"
-        }) ? React.createElement("span", {
-            className: "loading"
-        }, "Airdropping") : e.matches({
-            airdropping: "checking"
-        }) ? React.createElement("span", {
-            className: "loading"
-        }, "Looking for farm") : e.matches({
-            airdropping: "duplicate"
-        }) ? React.createElement("div", {
-            className: "flex items-center border-2 rounded-md border-black p-2 mt-2 mb-2 bg-[#e43b44]"
-        }, React.createElement("img", {
-            src: alert,
-            alt: "alert",
-            className: "mr-2 w-5 h-5/6"
-        }), React.createElement("span", {
-            className: "text-xs"
-        }, "ALREADY AIRDROPPED")) : e.matches({
-            airdropping: "noFarm"
-        }) ? React.createElement("div", {
-            className: "flex items-center border-2 rounded-md border-black p-2 mt-2 mb-2 bg-[#e43b44]"
-        }, React.createElement("img", {
-            src: alert,
-            alt: "alert",
-            className: "mr-2 w-5 h-5/6"
-        }), React.createElement("span", {
-            className: "text-xs"
-        }, "NO SFF TOKENS OR FARM FOUND ON ACCOUNT")) : e.matches({
-            airdropping: "success"
-        }) ? React.createElement(React.Fragment, null, React.createElement("span", null, "Successfully airdropped!"), React.createElement("div", {
-            className: "flex items-center border-2 rounded-md border-black p-2 mt-2 mb-2 bg-[#e43b44]"
-        }, React.createElement("img", {
-            src: alert,
-            alt: "alert",
-            className: "mr-2 w-5 h-5/6"
-        }), React.createElement("span", {
-            className: "text-xs"
-        }, "REFRESH THE PAGE AND SYNC YOUR FARM #", a, " TO THE BLOCKCHAIN BEFORE MAY 4TH TO APPLY THE AIRDROP."))) : React.createElement(ErrorMessage, {
-            errorCode: e.context.errorCode
-        })
-    },
     Auth = () => {
         const {
-            authService: A
-        } = react.exports.useContext(Context$1), [e, t] = useActor(A);
+            authService: e
+        } = react.exports.useContext(Context$1), [A, t] = useActor(e);
         return React.createElement(Modal, {
             centered: !0,
-            show: !e.matches({
+            show: !A.matches({
                 connected: "authorised"
-            }) && !e.matches("visiting"),
+            }) && !A.matches("visiting"),
             backdrop: !1
         }, React.createElement("div", {
             className: "relative"
@@ -14515,34 +14321,34 @@ const Signing = () => React.createElement(React.Fragment, null, React.createElem
         }), React.createElement("img", {
             src: jumpingGoblin,
             className: "absolute w-52 -top-[83px] -z-10"
-        }), React.createElement(Panel, null, (e.matches({
+        }), React.createElement(Panel, null, (A.matches({
             connected: "loadingFarm"
-        }) || e.matches("checkFarm") || e.matches({
+        }) || A.matches("checkFarm") || A.matches({
             connected: "checkingSupply"
-        }) || e.matches({
+        }) || A.matches({
             connected: "checkingAccess"
-        })) && React.createElement(Loading, null), e.matches("connecting") && React.createElement(Loading, {
+        })) && React.createElement(Loading, null), A.matches("connecting") && React.createElement(Loading, {
             text: "Connecting"
-        }), e.matches("signing") && React.createElement(Signing, null), e.matches({
+        }), A.matches("signing") && React.createElement(Signing, null), A.matches({
             connected: "noFarmLoaded"
-        }) && React.createElement(NoFarm, null), e.matches({
+        }) && React.createElement(NoFarm, null), A.matches({
             connected: "supplyReached"
-        }) && React.createElement(SupplyReached, null), e.matches("oauthorising") && React.createElement(Loading, null), e.matches("airdropping") && React.createElement(Airdrop, null), e.matches({
+        }) && React.createElement(SupplyReached, null), A.matches("oauthorising") && React.createElement(Loading, null), A.matches({
             connected: "oauthorised"
-        }) && React.createElement(CreateFarm, null), e.matches({
+        }) && React.createElement(CreateFarm, null), A.matches({
             connected: "countdown"
-        }) && React.createElement(Countdown, null), e.matches({
+        }) && React.createElement(Countdown, null), A.matches({
             connected: "creatingFarm"
-        }) && React.createElement(CreatingFarm, null), e.matches({
+        }) && React.createElement(CreatingFarm, null), A.matches({
             connected: "readyToStart"
-        }) && React.createElement(StartFarm, null), e.matches("exploring") && React.createElement(VisitFarm, null), e.matches("minimised") && React.createElement(Minimized, null), e.matches("unauthorised") && React.createElement(ErrorMessage, {
-            errorCode: e.context.errorCode
+        }) && React.createElement(StartFarm, null), A.matches("exploring") && React.createElement(VisitFarm, null), A.matches("minimised") && React.createElement(Minimized, null), A.matches("unauthorised") && React.createElement(ErrorMessage, {
+            errorCode: A.context.errorCode
         }))))
     },
     Navigation = () => {
         const {
-            authService: A
-        } = react.exports.useContext(Context$1), [e, t] = useActor(A), [a, n] = react.exports.useState(!1);
+            authService: e
+        } = react.exports.useContext(Context$1), [A, t] = useActor(e), [a, n] = react.exports.useState(!1);
         return react.exports.useEffect(() => {
             if (a) {
                 const s = document.getElementById("crops");
@@ -14559,11 +14365,11 @@ const Signing = () => React.createElement(React.Fragment, null, React.createElem
                 t("ACCOUNT_CHANGED")
             }))
         }, [t]), react.exports.useEffect(() => {
-            const s = e.matches({
+            const s = A.matches({
                 connected: "authorised"
-            }) || e.matches("visiting");
+            }) || A.matches("visiting");
             setTimeout(() => n(s), 20)
-        }, [e, e.value]), React.createElement(React.Fragment, null, React.createElement(Auth, null), a ? React.createElement(Session, null) : React.createElement(Splash, null))
+        }, [A, A.value]), React.createElement(React.Fragment, null, React.createElement(Auth, null), a ? React.createElement(Session, null) : React.createElement(Splash, null))
     };
 var styles = "";
 const App = () => React.createElement(Provider, null, React.createElement(Navigation, null));
